@@ -1,0 +1,23 @@
+@aamad-core @development-workflow  
+
+CONTEXT: Enterprise Content Marketing Crew - implement ONLY the assistant-ui frontend that connects to the API from Module 2.
+
+## Frontend Integration Module Tasks:
+1. **Create app/chat/page.tsx**:
+   - assistant-ui Thread and Composer components
+   - Integration with /api/content-strategy endpoint
+   - Real-time streaming display
+2. **Implement custom tool components**:
+   - ContentStrategyDisplay component for agent results
+   - ResearchInsights component for research agent output
+   - FeedbackCollector component for user feedback
+3. **Configure assistant-ui providers** in layout.tsx
+4. **Test complete workflow** end-to-end
+
+## Strict Requirements:
+- Use assistant-ui components (not custom chat interface)
+- Connect to existing API endpoints from Module 2
+- Display CrewAI agent results with proper formatting
+- Include user feedback collection
+
+FOCUS: Only frontend integration - complete the full workflow connection.

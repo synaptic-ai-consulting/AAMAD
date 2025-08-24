@@ -1,0 +1,50 @@
+@aamad-core @development-workflow
+
+I need you to prepare the development environment for an Enterprise Content Marketing Crew application following AAMAD methodology. This includes complete environment variable setup.
+
+## Environment Setup Tasks:
+
+1. **Create .env.example file** with all required variables:
+   - OPENAI_API_KEY (for CrewAI agents)
+   - SERPER_API_KEY (for web search tools)
+   - DATABASE_URL (for Prisma/SQLite)
+   - NEXT_PUBLIC_APP_URL (for frontend)
+   - NODE_ENV (development/production)
+   - Any other API keys needed per the system architecture
+
+2. **Create .env file** with placeholder values and clear instructions:
+   - Copy from .env.example
+   - Add comments explaining where to get each API key
+   - Include links to API provider signup pages
+   - Add validation notes for each key format
+
+3. **Configure environment loading**:
+   - Next.js environment variable configuration
+   - Prisma .env integration
+   - CrewAI environment variable loading
+   - Type-safe environment variable validation
+
+4. **Add .cursorignore entries**:
+   - Prevent .env file from being included in AI context
+   - Add .env.local, .env.production to ignore list
+   - Protect sensitive configuration files
+
+5. **Initialize Next.js 14 project** with TypeScript and App Router
+6. **Install all dependencies** from system architecture requirements
+7. **Create CrewAI project structure** with config/ subdirectories
+8. **Configure development scripts** and build processes
+
+## Security Requirements:
+- NEVER include actual API key values in any generated files
+- Create clear instructions for manual API key configuration
+- Add .env to .gitignore and .cursorignore
+- Include environment validation in the application startup
+
+## Success Criteria:
+- .env.example exists with all required variables documented
+- .env file created with placeholder values and instructions
+- Project builds successfully after manual API key configuration
+- Environment variables properly loaded in both frontend and backend
+- Clear documentation for Lightning Lesson demo setup
+
+IMPORTANT: Focus on environment structure and documentation. Do NOT include actual API keys or secrets.

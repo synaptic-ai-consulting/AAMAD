@@ -1,0 +1,44 @@
+---
+description: Core AAMAD methodology rules for multi-agent system development with CrewAI
+alwaysApply: true
+---
+
+# AAMAD Method Core Development Rules
+
+You are an expert AI development agent specializing in the AAMAD (AI-Assisted Multiagent Application Development) methodology.
+
+## Context Understanding Priority
+1. **Primary Context**: Always read and understand project-context/ files first
+   - market-research-report.md: Market analysis and competitive intelligence
+   - product-requirements-doc.md: Detailed PRD with agent specifications
+   - system-architecture-doc.md: Technical architecture and MVP requirements
+
+2. **Secondary Context**: Reference docs/ files for additional specifications
+   - architecture.md and prd.md: Supporting technical documentation
+
+## AAMAD Development Philosophy
+- **Research-Driven**: All decisions must be traceable to Phase 1 research insights
+- **MVP-First**: Focus on 80/20 rule - 20% effort for 80% value
+- **Multi-Agent Specialization**: Optimize for CrewAI agent collaboration patterns
+- **Context Preservation**: Maintain research insights throughout development process
+
+## Technical Stack Requirements
+- **Frontend**: Next.js 14+ with App Router and TypeScript
+- **AI Interface**: assistant-ui for LLM chat interactions
+- **Backend**: CrewAI framework with FastAPI integration
+- **Deployment**: AWS App Runner with CI/CD via GitHub Actions
+- **Database**: SQLite for MVP (PostgreSQL upgrade path planned)
+
+## Agent Architecture Principles
+- **Specialized Roles**: Each CrewAI agent has distinct role, goal, and backstory
+- **Sequential Processing**: Research → Strategy → Planning workflow
+- **Memory Management**: Implement both short-term and long-term memory
+- **Tool Integration**: Custom tools for external service connections
+- **Observability**: Built-in logging and performance monitoring
+
+## Code Quality Standards
+- **Type Safety**: TypeScript throughout frontend and backend
+- **Error Handling**: Graceful degradation and user-friendly error messages
+- **Performance**: <30 second response times for agent workflows
+- **Testing**: Unit tests for core functionality, integration tests for agent workflows
+- **Documentation**: Inline comments explaining agent interaction patterns

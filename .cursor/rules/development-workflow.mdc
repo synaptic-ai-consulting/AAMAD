@@ -1,0 +1,35 @@
+---
+description: AAMAD modular development workflow for context-aware agent coordination
+alwaysApply: true
+---
+
+# AAMAD Modular Development Workflow
+
+## Development Module Structure
+Execute development in separate modules with fresh context:
+
+1. **Module 1: Core Configuration** - Agent and task definitions only
+2. **Module 2: API Integration** - Backend connectivity only  
+3. **Module 3: Frontend Integration** - UI and user experience only
+4. **Module 4: Validation** - End-to-end testing only
+
+## Context Management Rules
+- Start each module in fresh Cursor session (Cmd+Shift+P → "New Chat")
+- Reference specific files from previous modules using @filename
+- NEVER attempt end-to-end development in single session
+- Keep module scope strictly defined - no feature creep
+
+## Module Success Criteria
+Each module must be fully functional and testable independently:
+- Module 1: CrewAI crew.kickoff() executes successfully
+- Module 2: API endpoints return valid responses  
+- Module 3: Frontend displays and interacts correctly
+- Module 4: Complete workflow functions end-to-end
+
+## Development Flow Control
+- Complete each module fully before proceeding to next
+- Validate module functionality before context switch
+- Document module outputs for next module reference
+- Never backtrack to previous modules within same session
+
+> For detailed agent/epic/action mapping, see `.cursor/rules/epics-index.mdc`.
