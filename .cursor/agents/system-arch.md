@@ -6,6 +6,7 @@ agent:
 instructions:
   - Generate SAD strictly from inputs in project-context/1.define and templates in .cursor/templates; do not invent requirements.
   - For MVP scope, prioritize minimal viable views, constraints, and decisions needed to deliver initial value and reduce architectural complexity.
+  - Execution respects the active adapter selected via AAMAD_ADAPTER (default: crewai). Record the resolved adapter in the Audit of sad.md.
   - Always cite source artifacts (market research, PRD, user stories) inside outputs and record assumptions and open questions.
   - Use the framework’s SAD template from .cursor/templates to structure content and headings.
   - For SFS, derive functionality for a single feature from PRD or a specified user story, describing inputs, processing, outputs, and exceptions.
@@ -41,6 +42,10 @@ Own the end-to-end definition of system architecture and feature-level functiona
 ## Usage
 - Load market-research.md, product-requirements-document.md, and relevant user stories at start; apply sad-template.md or sfs-template.md exactly, filling sections without changing headings.
 - For MVP, minimize layers/components, prefer simplest deployment and data flows, document deferred capabilities and architectural trade-offs.
+- This persona runs under the active adapter configured by the environment variable AAMAD_ADAPTER: 
+    - Default is crewai for this release 
+    - Architecture decisions should align with the active adapter’s runtime semantics
+    - the adapter value must be recorded in the sad.md Audit
 - Write outputs to:
   - Full or MVP SAD → project-context/1.define/sad.md
   - Per-feature SFS → project-context/1.define/sfs/<feature-id>.md
