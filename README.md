@@ -19,7 +19,7 @@ It systematizes research-driven planning, modular AI agent workflows, and rapid 
 
 ## What is AAMAD?
 
-AAMAD is based on the latest research in AI-assisted, multi-agent system development and CrewAI methodologies.  
+AAMAD is a context engineering framework based on best practices in AI-assisted coding and multi-agent system development methodologies.  
 It enables teams to:
 
 - Launch projects with autonomous or collaborative AI agents
@@ -54,23 +54,25 @@ It enables teams to:
 
 ## How to Use the Framework
 
-1. **Clone this repository.**
-2. In `project-context/1.define`, add or generate your PRD and SAD using provided templates.
+1. Generate the Market Research Document and PRD using the provided templates before you start coding (Phase 1)
+2. **Clone this repository.**
 3. Confirm `.cursor/` contains the full agent, prompt, and rule set.
-4. Follow the `CHECKLIST.md` to run Phase 2 (build) using multi-agent autonomy—typically, via CursorAI or another agent platform.
-5. Each agent persona executes its epic(s), producing separate markdown artifacts and code as they go.
-6. Review, test, and launch the MVP, then iterate or scale with additional features.
+4. In `project-context/1.define`, add your MRD and PRD. 
+5. Follow the `CHECKLIST.md` to run Phase 2 (build) using multi-agent autonomy — typically, via CursorAI or another coding agent platform.
+6. Each agent persona executes its epic(s), producing separate markdown artifacts and code as they go.
+7. Review, test, and launch the MVP, then iterate or scale with additional features.
 
 ---
 
 ## Phase 2: Build Workflow (Multi-Agent)
 
 Each role is embodied by an agent persona, defined in `.cursor/agents/`.  
-Phase 2 is executed by running each epic in parallel or sequence:
+Phase 2 is executed by running each epic in sequence:
 
+- **Architecture:** Generate solution architecture document (`sad.md`)
 - **Setup:** Scaffold environment, install dependencies, and document (`setup.md`)
-- **Frontend:** Build MVP UI + placeholders, document (`frontend.md`)
-- **Backend:** Implement CrewAI MVP backend, document (`backend.md`)
+- **Frontend:** Build UI + placeholders, document (`frontend.md`)
+- **Backend:** Implement backend, document (`backend.md`)
 - **Integration:** Wire up chat flow, verify, document (`integration.md`)
 - **Quality Assurance:** Test end-to-end, log results and limitations (`qa.md`)
 
@@ -99,7 +101,12 @@ Contributions are welcome!
 
 ## License
 
-[Insert your chosen open-source license here, e.g., MIT, Apache 2.0, etc.]
+Licensed under Apache License 2.0.
+
+> Why Apache-2.0
+>    Explicit patent grant and patent retaliation protect maintainers and users from patent disputes, which is valuable for AI/ML methods, agent protocols, and orchestration logic.
+>    Permissive terms enable proprietary or closed-source usage while requiring attribution and change notices, which encourages integration into enterprise stacks.
+>    Compared to MIT/BSD, Apache-2.0 clarifies modification notices and patent rights, reducing legal ambiguity for contributors and adopters.
 
 ---
 

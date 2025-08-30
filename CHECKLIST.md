@@ -9,14 +9,22 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 - [ ] Clone this repository and install all prerequisites (see README.md).
 - [ ] Ensure your project-context/1.define folder includes:
   - [ ] product-requirements-document.md (PRD)
-  - [ ] system-architecture-doc.md (SAD)
-  - [ ] market-research-report.md (optional but recommended)
+  - [ ] market-research-report.md (MR)
 - [ ] Confirm `.cursor/` contains:
   - [ ] agents/ (with all persona .md files)
   - [ ] rules/, prompts/, templates/ folders as provided
   - [ ] epics.md and personas.md reference files
 
 ---
+## Step 0: Architecture Definition (`@system.arch`)
+
+- [ ] Open a Cursor agent chat as `@system.arch`.
+- Run one of:
+     [ ] `*create-sad` — Generate full SAD at project-context/1.define/sad.md using .cursor/templates/sad-template.md.
+     [ ] `*create-sad --mvp` — Generate a lean MVP SAD, deferring nonessential components and NFRs; output to project-context/1.define/sad.md.
+- [ ] Validate SAD completeness: stakeholders/concerns, views, quality attributes, decisions, constraints, and risks.
+- [ ] Record assumptions and open questions in sad.md for downstream resolution.
+
 
 ## Step 1: Environment Setup (`@project.mgr`)
 

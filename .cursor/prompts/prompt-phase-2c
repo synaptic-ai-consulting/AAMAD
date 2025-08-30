@@ -1,8 +1,0 @@
-Test the complete Enterprise Content Marketing Crew workflow:
-1. Start development server: npm run dev
-2. Navigate to /chat
-3. Test with: "Create content strategy for AI automation tools targeting enterprise CTOs"
-4. Verify all 3 agents execute in sequence
-5. Display results in assistant-ui interface
-
-Report any integration issues for immediate fixes.

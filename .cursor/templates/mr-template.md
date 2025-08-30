@@ -1,6 +1,9 @@
-## Context & Instructions
+# AAMAD Deep Research Generation Template
 
-You are conducting comprehensive research for developing a production-ready multi-agent system using CrewAI framework. This research will inform critical architecture and business decisions. Perform autonomous deep research across multiple dimensions to provide evidence-based insights.
+## Context & Instructions
+You are conducting comprehensive research for developing a production-ready multi-agent system using CrewAI framework. 
+This research will inform critical architecture and business decisions. 
+Perform autonomous deep research across multiple dimensions to provide evidence-based insights.
 
 ## Research Query Structure
 
