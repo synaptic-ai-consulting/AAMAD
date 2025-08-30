@@ -29,6 +29,47 @@ It enables teams to:
 
 ---
 
+## AAMAD phases at a glance
+
+AAMAD organizes work into three phases: Define, Build, and Deliver, each with clear artifacts, personas, and rules to keep development auditable and reusable. 
+The flow begins by defining context and templates, proceeds through multi‑agent build execution, and finishes with operational delivery.
+
+```mermaid
+flowchart LR
+  %% AAMAD phases overview
+  subgraph P1[DEFINE]
+    D1H[ PROMPT ]:::hdr --> D1L["• Product Manager prompt"]:::list
+    D2H[TEMPLATES]:::hdr --> D2L["• Deep Research<br/>• PRD"]:::list
+  end
+
+  subgraph P2[BUILD]
+    B1H[AGENTS]:::hdr --> B1L["• Project Mgr<br/>• System Architect<br/>• Frontend Eng<br/>• Backend Eng<br/>• Integration Eng<br/>• QA Eng"]:::list
+    B2H[RULES]:::hdr --> B2L["• core<br/>• development‑workflow<br/>• adapter‑crewai"]:::list
+  end
+
+  subgraph P3[DELIVER]
+    L1H[AGENTS]:::hdr --> L1L["• DevOps Eng"]:::list
+    L2H[RULES]:::hdr --> L2L["• continuous‑deploy<br/>• hosting‑environment<br/>• access‑control"]:::list
+  end
+
+  P1 --> P2 --> P3
+
+  classDef hdr fill:#111,stroke:#555,color:#fff;
+  classDef list fill:#222,stroke:#555,color:#fff;
+``` 
+
+- Phase 1: (Define)
+    - Prompt-driven discovery and context setup, supported by templates for Market Research and PRD, to standardize project scoping.
+
+- Phase 2: (Build)
+    - Multi‑agent execution by Project Manager, System Architect, Frontend Engineer, Backend Engineer, Integration Engineer, and QA Engineer, governed by core, development‑workflow, and CrewAI‑specific rules.
+
+- Phase 3: (Deliver)
+    - DevOps Engineer focuses on release and runtime concerns using rules for continuous deployment, hosting environment definitions, and access control.
+
+
+---
+
 ## Repository Structure
 
     aamad/
