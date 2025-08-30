@@ -19,9 +19,9 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 ## Step 0: Architecture Definition (`@system.arch`)
 
 - [ ] Open a Cursor agent chat as `@system.arch`.
-- Run one of:
-     [ ] `*create-sad` — Generate full SAD at project-context/1.define/sad.md using .cursor/templates/sad-template.md.
-     [ ] `*create-sad --mvp` — Generate a lean MVP SAD, deferring nonessential components and NFRs; output to project-context/1.define/sad.md.
+- [ ] Run one of:
+    - [ ] `*create-sad` — Generate full SAD at project-context/1.define/sad.md using .cursor/templates/sad-template.md.
+    - [ ] `*create-sad --mvp` — Generate a lean MVP SAD, deferring nonessential components and NFRs; output to project-context/1.define/sad.md.
 - [ ] Validate SAD completeness: stakeholders/concerns, views, quality attributes, decisions, constraints, and risks.
 - [ ] Record assumptions and open questions in sad.md for downstream resolution.
 
