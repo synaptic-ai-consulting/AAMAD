@@ -25,6 +25,7 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 - [ ] Validate SAD completeness: stakeholders/concerns, views, quality attributes, decisions, constraints, and risks.
 - [ ] Record assumptions and open questions in sad.md for downstream resolution.
 
+---
 
 ## Step 1: Environment Setup (`@project.mgr`)
 

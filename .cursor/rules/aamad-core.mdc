@@ -1,44 +1,41 @@
 ---
-description: Core AAMAD methodology rules for multi-agent system development with CrewAI
+description: Core, framework-agnostic rules and contracts for AAMAD; applies to all personas, tasks, and artifacts across the repository.
+globs: 
 alwaysApply: true
 ---
 
-# AAMAD Method Core Development Rules
+## Purpose
+- Define universal principles, contracts, and invariants for AI-assisted, multi-agent development, independent of any specific execution framework.
 
-You are an expert AI development agent specializing in the AAMAD (AI-Assisted Multiagent Application Development) methodology.
+## Principles
+- **Single responsibility personas:** each persona owns a defined epic with explicit inputs, outputs, and prohibited actions.
+- **Context-first engineering:** all outputs must trace to PRD, SAD, SFS, or user stories; do not invent requirements.
+- **Reproducibility and provenance:** every artifact includes Sources, Assumptions, and Open Questions sections.
+- **Deterministic execution:** actions are idempotent; perform temp-write-then-atomic-replace for file outputs.
+- **Minimal viable architecture first:** implement MVP scope before expanding; document deferrals with rationale.
 
-## Context Understanding Priority
-1. **Primary Context**: Always read and understand project-context/ files first
-   - market-research-report.md: Market analysis and competitive intelligence
-   - product-requirements-doc.md: Detailed PRD with agent specifications
-   - system-architecture-doc.md: Technical architecture and MVP requirements
+## Agent Contract
+- Personas declare: id, role, instructions, actions, inputs, outputs, prohibited-actions. Agents MUST read only declared inputs and write only to declared outputs.
+- On missing/ambiguous inputs, write Assumptions and Open Questions; do not fabricate content.
+- All actions must append an Audit block with timestamp, persona id, and action name to the artifact.
 
-2. **Secondary Context**: Reference docs/ files for additional specifications
-   - architecture.md and prd.md: Supporting technical documentation
+## Task Contract
+- Each task defines: description, expected_output (exact target file path and required headings), acceptance_criteria, traceability to PRD/SAD/SFS anchors.
+- Tasks include a self-check verifying required headings; if missing, write Diagnostic and halt.
 
-## AAMAD Development Philosophy
-- **Research-Driven**: All decisions must be traceable to Phase 1 research insights
-- **MVP-First**: Focus on 80/20 rule - 20% effort for 80% value
-- **Multi-Agent Specialization**: Optimize for CrewAI agent collaboration patterns
-- **Context Preservation**: Maintain research insights throughout development process
+## Tooling Rules
+- Use only approved file and validation tools provided by the active adapter; no direct shell or network unless explicitly authorized by persona.
+- Log tool usage in the artifact, including model, temperature, and max_tokens impacting determinism.
 
-## Technical Stack Requirements
-- **Frontend**: Next.js 14+ with App Router and TypeScript
-- **AI Interface**: assistant-ui for LLM chat interactions
-- **Backend**: CrewAI framework with FastAPI integration
-- **Deployment**: AWS App Runner with CI/CD via GitHub Actions
-- **Database**: SQLite for MVP (PostgreSQL upgrade path planned)
+## State and Output
+- Outputs follow template headings exactly (.cursor/templates). Do not wrap machine-parsed blocks in code fences if templates require raw content.
+- Artifacts end with sections: Sources, Assumptions, Open Questions, Audit.
 
-## Agent Architecture Principles
-- **Specialized Roles**: Each CrewAI agent has distinct role, goal, and backstory
-- **Sequential Processing**: Research → Strategy → Planning workflow
-- **Memory Management**: Implement both short-term and long-term memory
-- **Tool Integration**: Custom tools for external service connections
-- **Observability**: Built-in logging and performance monitoring
+## Adapter Abstraction
+- The active framework adapter binds: framework agent, task, tool, execution controls, logging. Personas/tasks remain adapter-neutral.
 
-## Code Quality Standards
-- **Type Safety**: TypeScript throughout frontend and backend
-- **Error Handling**: Graceful degradation and user-friendly error messages
-- **Performance**: <30 second response times for agent workflows
-- **Testing**: Unit tests for core functionality, integration tests for agent workflows
-- **Documentation**: Inline comments explaining agent interaction patterns
+## Failure Policy
+- On iteration/time limits or missing prerequisites, write a Halt and Report section with blockers; do not continue.
+
+## Security and Compliance
+- Never embed secrets in artifacts; use environment variables in runtime code only. Record third-party content in NOTICES as needed
