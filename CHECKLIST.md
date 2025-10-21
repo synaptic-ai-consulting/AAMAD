@@ -1,15 +1,28 @@
-# AAMAD Phase 2 Execution Checklist
+# AAMAD Execution Checklist
 
-This checklist guides you step-by-step through running AAMAD Phase 2 (Build), from project setup to MVP delivery, using the agentic workflows defined in the framework.
+This checklist guides you step-by-step through running AAMAD from Phase 1 (Define) through Phase 2 (Build), using the agentic workflows defined in the framework.
 
 ---
 
-## Before You Start
+## Phase 1: Requirements Definition (`@product-mgr`)
+
+- [ ] Open a Cursor agent chat as `@product-mgr`.
+- [ ] Run one of:
+    - [ ] `*create-mrd` — Generate Market Research Document at project-context/1.define/mrd.md using .cursor/templates/mrd-template.md.
+    - [ ] `*create-prd` — Generate Product Requirements Document at project-context/1.define/prd.md using .cursor/templates/prd-template.md.
+    - [ ] `*create-context` — Generate both MRD and PRD with context summary for handoff.
+- [ ] Validate completeness: market analysis, user personas, feature requirements, success metrics, and business goals.
+- [ ] Record assumptions and open questions in artifacts for downstream resolution.
+- [ ] Approve context boundaries and artifacts for technical build phase.
+
+---
+
+## Before Phase 2 Starts
 
 - [ ] Clone this repository and install all prerequisites (see README.md).
 - [ ] Ensure your project-context/1.define folder includes:
+  - [ ] market-research-document.md (MRD)
   - [ ] product-requirements-document.md (PRD)
-  - [ ] market-research-report.md (MR)
 - [ ] Confirm `.cursor/` contains:
   - [ ] agents/ (with all persona .md files)
   - [ ] rules/, prompts/, templates/ folders as provided
@@ -17,7 +30,10 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 - [ ] Add "AAMAD_ADAPTER=crewai" to your environment variables (current default multiagent system framework)
 
 ---
-## Step 0: Architecture Definition (`@system.arch`)
+
+## Phase 2: Build Execution
+
+### Step 0: Architecture Definition (`@system.arch`)
 
 - [ ] Open a Cursor agent chat as `@system.arch`.
 - [ ] Run one of:
@@ -28,7 +44,7 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 
 ---
 
-## Step 1: Environment Setup (`@project.mgr`)
+### Step 1: Environment Setup (`@project.mgr`)
 
 - [ ] Open a Cursor agent chat as `@project.mgr`
 - [ ] Run `*setup-project`
@@ -38,7 +54,7 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 
 ---
 
-## Step 2: Frontend Development (`@frontend.eng`)
+### Step 2: Frontend Development (`@frontend.eng`)
 
 - [ ] Open a Cursor agent chat as `@frontend.eng`
 - [ ] Run `*develop-fe`
@@ -49,7 +65,7 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 
 ---
 
-## Step 3: Backend Development (`@backend.eng`)
+### Step 3: Backend Development (`@backend.eng`)
 
 - [ ] Open a Cursor agent chat as `@backend.eng`
 - [ ] Run `*develop-be`
@@ -60,7 +76,7 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 
 ---
 
-## Step 4: Integration (`@integration.eng`)
+### Step 4: Integration (`@integration.eng`)
 
 - [ ] Open a Cursor agent chat as `@integration.eng`
 - [ ] Run `*integrate-api`
@@ -70,7 +86,7 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 
 ---
 
-## Step 5: Quality Assurance (`@qa.eng`)
+### Step 5: Quality Assurance (`@qa.eng`)
 
 - [ ] Open a Cursor agent chat as `@qa.eng`
 - [ ] Run `*qa`
@@ -80,7 +96,7 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 
 ---
 
-## Step 6: Local MVP Launch
+### Step 6: Local MVP Launch
 
 - [ ] Follow docs in setup.md and integration.md to run the full MVP locally
 - [ ] Confirm MVP chat use case works end-to-end
@@ -88,7 +104,7 @@ This checklist guides you step-by-step through running AAMAD Phase 2 (Build), fr
 
 ---
 
-## Step 7: Prepare for Next Phase
+### Step 7: Prepare for Next Phase
 
 - [ ] Archive all MVP milestone artifacts in project-context/2.build and 3.deliver
 - [ ] List all deferred/backlog features in qa.md and/or as GitHub issues

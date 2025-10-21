@@ -8,8 +8,10 @@ It systematizes research-driven planning, modular AI agent workflows, and rapid 
 ## Table of Contents
 
 - [What is AAMAD?](#what-is-aamad)
+- [AAMAD phases at a glance](#aamad-phases-at-a-glance)
 - [Repository Structure](#repository-structure)
 - [How to Use the Framework](#how-to-use-the-framework)
+- [Phase 1: Define Workflow (Product Manager)](#phase-1-define-workflow-product-manager)
 - [Phase 2: Build Workflow (Multi-Agent)](#phase-2-build-workflow-multi-agent)
 - [Core Concepts](#core-concepts)
 - [Contributing](#contributing)
@@ -38,8 +40,8 @@ The flow begins by defining context and templates, proceeds through multi‑agen
 flowchart LR
   %% AAMAD phases overview
   subgraph P1[DEFINE]
-    D1H[ PROMPT ]:::hdr --> D1L["• Product Manager prompt"]:::list
-    D2H[TEMPLATES]:::hdr --> D2L["• Deep Research<br/>• PRD"]:::list
+    D1H[ PERSONA ]:::hdr --> D1L["• Product Manager<br/>(@product-mgr)"]:::list
+    D2H[TEMPLATES]:::hdr --> D2L["• Market Research<br/>• PRD"]:::list
   end
 
   subgraph P2[BUILD]
@@ -59,7 +61,7 @@ flowchart LR
 ``` 
 
 - Phase 1: (Define)
-    - Prompt-driven discovery and context setup, supported by templates for Market Research and PRD, to standardize project scoping.
+    - Product Manager persona (`@product-mgr`) conducts prompt-driven discovery and context setup, supported by templates for Market Research Document (MRD) and Product Requirements Document (PRD), to standardize project scoping.
 
 - Phase 2: (Build)
     - Multi‑agent execution by Project Manager, System Architect, Frontend Engineer, Backend Engineer, Integration Engineer, and QA Engineer, governed by core, development‑workflow, and CrewAI‑specific rules.
@@ -77,15 +79,13 @@ flowchart LR
     │ ├─ agents/ # Agent persona markdown files (definitions & actions)
     │ ├─ prompts/ # Parameterized and phase-specific agent prompts
     │ ├─ rules/ # Architecture, workflow, and epics rules/patterns
-    │ ├─ templates/ # Generation templates for research, PRD, SAD, etc.
-    │ ├─ personas.md # List of all active personas (index)
-    │ ├─ epics.md # Mapping of epics to personas, artifacts, actions
+    │ └─ templates/ # Generation templates for research, PRD, SAD, etc.
     ├─ project-context/
     │ ├─ 1.define/ # Project-specific PRD, SAD, research reports, etc.
     │ ├─ 2.build/ # Output artifacts for setup, frontend, backend, etc.
-    │ ├─ 3.deliver/ # QA logs, deploy configs, release notes, etc.
-    ├─ CHECKLIST.md # Step-by-step Phase 2 execution guide
-    ├─ README.md # This file
+    │ └─ 3.deliver/ # QA logs, deploy configs, release notes, etc.
+    ├─ CHECKLIST.md # Step-by-step execution guide
+    └─ README.md # This file
 
 
 **Framework artifacts** (in `.cursor/`) are reusable for any new project.  
@@ -95,20 +95,34 @@ flowchart LR
 
 ## How to Use the Framework
 
-1. Generate the Market Research Document and PRD using the provided templates before you start coding (Phase 1)
-2. **Clone this repository.**
-3. Confirm `.cursor/` contains the full agent, prompt, and rule set.
-4. In `project-context/1.define`, add your MRD and PRD. 
-5. Follow the `CHECKLIST.md` to run Phase 2 (build) using multi-agent autonomy — typically, via CursorAI or another coding agent platform.
-6. Each agent persona executes its epic(s), producing separate markdown artifacts and code as they go.
-7. Review, test, and launch the MVP, then iterate or scale with additional features.
+1. **Clone this repository.**
+   ```bash
+   git clone https://github.com/synaptic-ai-consulting/AAMAD
+   ```
+2. Confirm `.cursor/` contains the full agent, prompt, and rule set.
+3. Follow the `CHECKLIST.md` to run using multi-agent autonomy — typically, via CursorAI or another coding agent platform.
+4. Each agent persona executes its epic(s), producing separate markdown artifacts and code as they go.
+5. Review, test, and launch the MVP, then iterate or scale with additional features.
 
 ---
 
-## Phase 2: Build Workflow (Multi-Agent)
+## Phase 1: Define Stage (Product Manager)
+
+The Product Manager persona (`@product-mgr`) conducts prompt-driven discovery and context setup to standardize project scoping:
+
+- **Market Research:** Generate Market Research Document (MRD) using `.cursor/templates/mrd-template.md`
+- **Requirements:** Generate Product Requirements Document (PRD) using `.cursor/templates/prd-template.md`
+- **Context Summary:** Create comprehensive context handoff artifacts for technical teams
+- **Validation:** Ensure completeness of market analysis, user personas, feature requirements, and success metrics
+
+Phase 1 outputs are stored in `project-context/1.define/` and provide the foundation for all subsequent development phases.
+
+---
+
+## Phase 2: Build Stage (Multi-Agent)
 
 Each role is embodied by an agent persona, defined in `.cursor/agents/`.  
-Phase 2 is executed by running each epic in sequence:
+Phase 2 is executed by running each epic in sequence after completing Phase 1:
 
 - **Architecture:** Generate solution architecture document (`sad.md`)
 - **Setup:** Scaffold environment, install dependencies, and document (`setup.md`)
