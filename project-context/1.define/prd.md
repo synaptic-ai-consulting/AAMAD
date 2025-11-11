@@ -1,73 +1,87 @@
 # Product Requirements Document: Automated Employee Onboarding Workflow
 
 ## Table of Contents
-1. **Executive Summary – Market Context, Problem Statement, and Solution Rationale**  
-   → Overview of onboarding inefficiencies, market opportunity, and CrewAI-powered solution.  
-2. **Market Context & User Analysis – Target Users, Market Opportunity, and Pain Points**  
-   → Defines user personas, market segmentation, needs, and competitive differentiation.  
-3. **Technical Requirements & Architecture – Multi-Agent Automation Framework Overview**  
+
+1. **Executive Summary – Market Context, Problem, Users, and Solution Rationale**  
+   → Presents the landscape of onboarding inefficiencies, highlights the market opportunity, and introduces the CrewAI-powered automation solution. Defines core user personas, market segmentation, key user needs, and competitive differentiation.  
+
+2. **Technical Requirements & Architecture – Multi-Agent Automation Framework Overview**  
    → Conceptual overview of CrewAI agent roles, interactions, and supporting systems.  
-4. **Functional Requirements – User Stories, Features, and Acceptance Criteria**  
+
+3. **Functional Requirements – User Stories, Features, and Acceptance Criteria**  
    → Functional requirements mapped to personas and conceptual agents.  
-5. **Non-Functional Requirements – Security, Performance, and Scalability**  
+
+4. **Non-Functional Requirements – Security, Performance, and Scalability**  
    → Core quality attributes, compliance, and system expectations.  
-6. **User Experience Design – Interface, Accessibility, and Interaction Principles**  
+
+5. **User Experience Design – Interface, Accessibility, and Interaction Principles**  
    → UX and mobile-first interaction standards.  
-7. **Success Metrics & KPIs – Business, Technical, and Experience Targets**  
+
+6. **Success Metrics & KPIs – Business, Technical, and Experience Targets**  
    → Measurable indicators of success.  
-8. **Implementation Strategy – Phased Development, Resources, and Risk Mitigation**  
+
+7. **Implementation Strategy – Phased Development, Resources, and Risk Mitigation**  
    → Development roadmap and resource plan.  
-9. **Launch & Go-to-Market Strategy – Beta Testing and Growth Plan**  
+
+8. **Launch & Go-to-Market Strategy – Beta Testing and Growth Plan**  
    → Pilot rollout, pricing, and customer acquisition plan.  
 
 ---
 
-## 1. Executive Summary – Market Context, Problem Statement, and Solution Rationale
+## 1. Executive Summary – Market Context, Problem, Users, and Solution Rationale
 
-### Problem Statement
-- **Critical Pain Point:** Organizations spend an average of **$4,129 per new hire** and **54 hours of HR time** on manual onboarding processes.  
-- **Market Impact:** 58% of new hires report poor onboarding; 31% leave within 90 days.  
-- **Target Opportunity:** Mid-market companies (100–1000 employees) with limited automation and high ROI potential.  
-
-### Solution Overview
-- **CrewAI Multi-Agent Automation:** Reduces onboarding time by 60% while improving satisfaction by 23%.  
-- **AI Personalization:** Tailored onboarding by role, region, and department.  
-- **Seamless HRIS Integration:** Works with Workday, BambooHR, and ADP.  
-
-### Strategic Rationale
-- **Architecture:** Multi-agent approach optimizes complex workflows.  
-- **ROI:** $1,200 savings per employee; 94% completion rate vs. 78% manually.  
-- **Market Timing:** 78% of Fortune 500 companies already investing in onboarding automation.  
+### **Market Context & Opportunity**
+The global onboarding automation market is valued at **$2.8B**, growing at **12.4% CAGR**, driven by demand for efficiency and better employee experiences.  
+**Target segment:** mid-market organizations (100–1000 employees) in **North America** (primary), expanding to **Europe** and **APAC**.  
+These companies face enterprise-level compliance requirements but often lack automation, creating strong ROI potential.
 
 ---
 
-## 2. Market Context & User Analysis – Target Users, Market Opportunity, and Pain Points
+### **Problem Statement**
+Organizations spend an average of **$4,129 per new hire** and **54 hours of HR time** on manual onboarding tasks.  
+Despite this investment:
+- **58%** of new hires report poor onboarding.  
+- **31%** leave within **90 days** due to inefficiency and lack of clarity.  
 
-### Target Market
-- **Segment:** Mid-market organizations (100–1000 employees).  
-- **Regions:** North America (primary), Europe (secondary), APAC (future).  
-- **Market Size:** $2.8B global onboarding automation market, 12.4% CAGR growth.  
+Manual, inconsistent processes and weak compliance tracking create high costs and poor employee experiences.
 
-### User Personas
+---
 
-#### HR Administrator (Primary)
-- **Goal:** Simplify document verification, ensure compliance.  
-- **Pain Points:** Manual data entry, missing audit trails, repetitive tasks.  
-- **Success Metric:** 50% reduction in onboarding time.  
+### **User Analysis**
 
-#### New Hire (End User)
-- **Goal:** Complete onboarding quickly and smoothly.  
-- **Pain Points:** Confusing instructions, limited visibility, poor UX.  
-- **Success Metric:** 90%+ satisfaction and 100% task completion.  
+#### **HR Administrator (Primary User)**
+- **Goal:** Simplify verification, automate compliance, and reduce manual work.  
+- **Pain Points:** Repetitive data entry, missing audit trails, and lack of visibility.  
+- **Success Metric:** **50% reduction** in onboarding time.
 
-#### Hiring Manager (Oversight)
+#### **New Hire (End User)**
+- **Goal:** Complete onboarding quickly through a clear, mobile-first experience.  
+- **Pain Points:** Confusing instructions and limited visibility.  
+- **Success Metric:** **90%+ satisfaction** and **100% task completion.**
+
+#### **Hiring Manager (Oversight Role)**
 - **Goal:** Track onboarding progress and readiness.  
-- **Pain Points:** Lack of visibility into new hire progress.  
-- **Success Metric:** Real-time dashboard of onboarding status.  
+- **Pain Points:** No centralized progress dashboard.  
+- **Success Metric:** **Real-time visibility** into onboarding status.
 
 ---
 
-## 3. Technical Requirements & Architecture – Multi-Agent Automation Framework Overview
+### **Solution Overview**
+**CrewAI Multi-Agent Automation Platform** delivers end-to-end onboarding automation through an intelligent, auditable system that:
+- **Reduces onboarding time by 60%** and boosts satisfaction by **23%.**  
+- Applies **AI-driven personalization** by role, region, and department.  
+- Integrates with **HRIS systems** (Workday, BambooHR, ADP) for seamless data sync.  
+
+---
+
+### **Strategic & Architectural Rationale**
+- **Multi-Agent Architecture:** CrewAI’s supervisor–specialist model automates document processing, compliance, and notifications with human oversight.  
+- **ROI Impact:** Delivers **$1,200+ savings per employee** and raises onboarding completion rates to **94%** (vs. 78% manually).  
+- **Market Timing:** With **78% of Fortune 500 companies** already adopting automation, mid-market adoption is the next growth frontier.
+
+---
+
+## 2. Technical Requirements & Architecture – Multi-Agent Automation Framework Overview
 
 ### Conceptual CrewAI Agent Framework
 
@@ -183,18 +197,17 @@ In this section, we describe how the various **agents** in the system **interact
 
 ### Coordination Summary
 
-The interaction between agents follows a **sequential and interdependent flow**, where each agent has a clear role but must coordinate with others to ensure the successful completion of the onboarding process. This includes:
+The interaction between agents follows a **sequential and interdependent flow**, where each agent has a clear role but must coordinate with others to ensure the successful completion of the onboarding process. This system of agent coordination ensures that all onboarding steps—document submission, compliance validation, task assignment, and notifications—are completed on time, efficiently, and with minimal manual intervention.
+
+This includes:
 
 - **Document Collection and Verification** by the **Document Processing Agent** and **Compliance Agent**.
 - **Compliance Checks** by the **Compliance Agent** with escalation support from the **Escalation Agent**.
 - **Task Management and Progress Tracking** by the **Task Management Agent**.
 - **Real-Time Notifications** by the **Notification Agent** to ensure all stakeholders are kept informed.
 
-This system of agent coordination ensures that all onboarding steps—document submission, compliance validation, task assignment, and notifications—are completed on time, efficiently, and with minimal manual intervention.
----
 
-
-## 4. Functional Requirements – User Stories, Features, and Acceptance Criteria
+## 3. Functional Requirements – User Stories, Features, and Acceptance Criteria
 
 ### P0 – Core Features
 
@@ -286,7 +299,7 @@ As a *new hire*, I want to complete onboarding via mobile so I can do it anywher
 
 ---
 
-## 5. Non-Functional Requirements
+## 4. Non-Functional Requirements
 - **Performance:** Sub-2s response; 1000+ concurrent users.  
 - **Security:** AES-256 encryption, OAuth 2.0, SOC 2 Type II compliance.  
 - **Scalability:** Auto-scaling and 99.9% uptime.  
@@ -294,7 +307,7 @@ As a *new hire*, I want to complete onboarding via mobile so I can do it anywher
 
 ---
 
-## 6. User Experience Design
+## 5. User Experience Design
 - **Mobile-First:** Optimized for 67% mobile use.  
 - **Accessibility:** WCAG 2.1 AA compliance.  
 - **Transparency:** Progress visibility and clear agent status.  
@@ -302,14 +315,14 @@ As a *new hire*, I want to complete onboarding via mobile so I can do it anywher
 
 ---
 
-## 7. Success Metrics & KPIs
+## 6. Success Metrics & KPIs
 - **Business:** $1,200 savings per hire, 5% market share in 2 years.  
 - **Technical:** 95% document accuracy, <2s latency, 99.9% uptime.  
 - **User Experience:** +23% satisfaction, 94% completion rate.  
 
 ---
 
-## 8. Implementation Strategy
+## 7. Implementation Strategy
 
 ### Development Phases
 **Phase 1 (MVP – 8–12 months):**  
@@ -330,7 +343,7 @@ Predictive insights, global scaling, enterprise-grade security.
 
 ---
 
-## 9. Launch & Go-to-Market Strategy
+## 8. Launch & Go-to-Market Strategy
 
 ### Beta Plan
 - 5–10 mid-market companies (100–1000 employees).  
