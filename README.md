@@ -106,6 +106,31 @@ flowchart LR
 
 ---
 
+## Install via pip / uv
+
+Instead of cloning, you can install the full artifact bundle from PyPI:
+
+```bash
+pip install aamad
+# or
+uv install aamad
+```
+
+After installation, run the CLI to copy the artifacts into your project:
+
+```bash
+aamad init --dest /path/to/your/project
+```
+
+Flags:
+- `--dest PATH` (defaults to current directory)
+- `--overwrite` (allow replacing existing files)
+- `--dry-run` (preview what would be written)
+
+You can inspect the package contents without extracting them via `aamad bundle-info --verbose`.
+
+---
+
 ## Phase 1: Define Stage (Product Manager)
 
 The Product Manager persona (`@product-mgr`) conducts prompt-driven discovery and context setup to standardize project scoping:
@@ -151,6 +176,7 @@ Contributions are welcome!
 - Open an issue for bugs/feature ideas/improvements.
 - Submit pull requests with extended templates, new agent personas, or bug fixes.
 - Help evolve the knowledge base and documentation for greater adoption.
+- When modifying `.cursor/` or `project-context/`, run `python scripts/update_bundle.py` to refresh the packaged artifact bundle before publishing.
 
 ---
 

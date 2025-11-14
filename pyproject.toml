@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aamad"
+version = "0.1.0"
+description = "AI-Assisted Multi-Agent Development framework artifacts and installer"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.9"
+authors = [{ name = "Synaptic AI Consulting" }]
+keywords = ["multi-agent", "crew", "automation", "prompt-engineering"]
+classifiers = [
+  "License :: OSI Approved :: Apache Software License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Build Tools",
+  "Topic :: Software Development :: Libraries",
+]
+
+[project.urls]
+Homepage = "https://github.com/synaptic-ai-consulting/AAMAD"
+Documentation = "https://github.com/synaptic-ai-consulting/AAMAD#readme"
+Repository = "https://github.com/synaptic-ai-consulting/AAMAD.git"
+
+[project.scripts]
+aamad = "aamad.cli:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+aamad = ["data/aamad_bundle.zip"]
+
