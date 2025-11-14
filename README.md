@@ -108,18 +108,23 @@ flowchart LR
 
 ## Install via pip / uv
 
-Instead of cloning, you can install the full artifact bundle from PyPI:
+Instead of cloning, you can install the full artifact bundle from PyPI.
+
+### Using pip
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install aamad
-# or
-uv install aamad
+aamad init --dest /path/to/your/project
 ```
 
-After installation, run the CLI to copy the artifacts into your project:
+### Using uv
 
 ```bash
-aamad init --dest /path/to/your/project
+uv venv
+uv pip install aamad
+uv run aamad init --dest /path/to/your/project
 ```
 
 Flags:
@@ -127,7 +132,7 @@ Flags:
 - `--overwrite` (allow replacing existing files)
 - `--dry-run` (preview what would be written)
 
-You can inspect the package contents without extracting them via `aamad bundle-info --verbose`.
+You can inspect the package contents without extracting them via `aamad bundle-info --verbose` (or `uv run aamad bundle-info --verbose`).
 
 ---
 
