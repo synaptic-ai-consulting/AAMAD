@@ -3,7 +3,13 @@ dist/
 build/
 
 # Packaging metadata
-src/aamad.egg-info/
+*.egg-info/
+
+# Virtual environment
+.venv/
+
+# Test cache
+.pytest_cache/
 
 # Python cache
 __pycache__/

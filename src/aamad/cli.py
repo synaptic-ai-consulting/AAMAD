@@ -5,6 +5,8 @@ from pathlib import Path
 
 from .installer import ArtifactInstaller, extract_artifacts, get_bundle_path
 
+IDE_CHOICES = ["cursor", "claude-code"]
+
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
@@ -23,6 +25,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Output directory (defaults to current working directory).",
     )
     init_cmd.add_argument(
+        "--ide",
+        choices=IDE_CHOICES,
+        default="cursor",
+        help="Target IDE: cursor (default) or claude-code.",
+    )
+    init_cmd.add_argument(
         "--overwrite",
         action="store_true",
         help="Allow overwriting existing files.",
@@ -35,6 +43,12 @@ def build_parser() -> argparse.ArgumentParser:
 
     info_cmd = sub.add_parser(
         "bundle-info", help="Show the files bundled in the distribution."
+    )
+    info_cmd.add_argument(
+        "--ide",
+        choices=IDE_CHOICES,
+        default="cursor",
+        help="Which bundle to inspect: cursor (default) or claude-code.",
     )
     info_cmd.add_argument(
         "--verbose",
@@ -51,6 +65,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "init":
         paths = extract_artifacts(
             destination=args.dest,
+            ide=args.ide,
             overwrite=args.overwrite,
             dry_run=args.dry_run,
         )
@@ -63,12 +78,12 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "bundle-info":
-        installer = ArtifactInstaller(get_bundle_path())
+        installer = ArtifactInstaller(get_bundle_path(args.ide))
         files = installer.preview()
         if args.verbose:
             print("\n".join(files))
         else:
-            print(f"{len(files)} files bundled")
+            print(f"{len(files)} files bundled ({args.ide})")
         return 0
 
     parser.error("Unknown command")
@@ -77,4 +92,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":  # pragma: no cover
     raise SystemExit(main())
-

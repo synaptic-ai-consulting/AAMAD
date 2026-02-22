@@ -9,6 +9,7 @@ It systematizes research-driven planning, modular AI agent workflows, and rapid 
 
 - [What is AAMAD?](#what-is-aamad)
 - [AAMAD phases at a glance](#aamad-phases-at-a-glance)
+- [Installation](#installation)
 - [Repository Structure](#repository-structure)
 - [How to Use the Framework](#how-to-use-the-framework)
 - [Phase 1: Define Workflow (Product Manager)](#phase-1-define-workflow-product-manager)
@@ -60,15 +61,139 @@ flowchart LR
   classDef list fill:#222,stroke:#555,color:#fff;
 ``` 
 
-- Phase 1: (Define)
-    - Product Manager persona (`@product-mgr`) conducts prompt-driven discovery and context setup, supported by templates for Market Research Document (MRD) and Product Requirements Document (PRD), to standardize project scoping.
+- **Phase 1 (Define):** Product Manager persona (`@product-mgr`) conducts prompt-driven discovery and context setup, supported by templates for Market Research Document (MRD) and Product Requirements Document (PRD), to standardize project scoping.
 
-- Phase 2: (Build)
-    - Multi‑agent execution by Project Manager, System Architect, Frontend Engineer, Backend Engineer, Integration Engineer, and QA Engineer, governed by core, development‑workflow, and CrewAI‑specific rules.
+- **Phase 2 (Build):** Multi‑agent execution by Project Manager, System Architect, Frontend Engineer, Backend Engineer, Integration Engineer, and QA Engineer, governed by core, development‑workflow, and CrewAI‑specific rules.
 
-- Phase 3: (Deliver)
-    - DevOps Engineer focuses on release and runtime concerns using rules for continuous deployment, hosting environment definitions, and access control.
+- **Phase 3 (Deliver):** DevOps Engineer focuses on release and runtime concerns using rules for continuous deployment, hosting environment definitions, and access control.
 
+---
+
+## Installation
+
+Install AAMAD from PyPI and initialize the framework for your IDE:
+
+```bash
+pip install aamad
+# or
+uv pip install aamad
+```
+
+### Multi-IDE support
+
+AAMAD supports **Cursor** and **Claude Code**. Choose your IDE with the `--ide` flag:
+
+```bash
+aamad init --ide cursor        # Default: Cursor
+aamad init --ide claude-code   # Claude Code
+```
+
+#### Framework feature implementation by IDE
+
+| Feature | Cursor | Claude Code |
+| :------ | :----- | :---------- |
+| **Rules / instructions** | `.cursor/rules/*.mdc` with `alwaysApply: true` | `.claude/CLAUDE.md` + `.claude/rules/*.md` |
+| **Rule format** | `.mdc` (YAML frontmatter + markdown body) | `.md` (plain markdown) |
+| **Glob-based scoping** | ✅ `globs:` in frontmatter | ❌ Not supported (all rules loaded) |
+| **Agent definitions** | `.cursor/agents/*.md` | `.claude/agents/*.md` |
+| **Agent invocation** | `@agent-name` in chat | Delegation via `description`; explicit request |
+| **Tool enforcement** | Instructions-based | ✅ Hard allowlist/denylist |
+| **Phase 1 prompt** | `.cursor/prompts/prompt-phase-1` | `.claude/commands/phase-1-define.md` (slash command) |
+| **Templates** | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) |
+| **Project context** | `project-context/` (shared) | `project-context/` (shared) |
+| **Bridge file** | `AGENTS.md` (root) | `AGENTS.md` (root) |
+
+---
+
+### Cursor
+
+**Install and initialize:**
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install aamad
+aamad init --ide cursor --dest .
+```
+
+Or with uv:
+
+```bash
+uv venv
+uv pip install aamad
+uv run aamad init --ide cursor --dest .
+```
+
+**Folder structure after init:**
+
+```
+your-project/
+├── .cursor/
+│   ├── agents/          # Persona definitions (@product-mgr, @backend.eng, etc.)
+│   ├── prompts/         # Phase-specific prompts (e.g. prompt-phase-1)
+│   ├── rules/           # Always-on rules (*.mdc)
+│   └── templates/      # PRD, SAD, MR templates
+├── project-context/
+│   ├── 1.define/        # MRD, PRD, SAD outputs
+│   ├── 2.build/         # setup.md, frontend.md, backend.md, etc.
+│   └── 3.deliver/       # QA logs, deploy configs
+├── AGENTS.md            # Bridge file (IDE discoverability)
+├── CHECKLIST.md
+└── README.md
+```
+
+---
+
+### Claude Code
+
+**Install and initialize:**
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install aamad
+aamad init --ide claude-code --dest .
+```
+
+Or with uv:
+
+```bash
+uv venv
+uv pip install aamad
+uv run aamad init --ide claude-code --dest .
+```
+
+**Folder structure after init:**
+
+```
+your-project/
+├── .claude/
+│   ├── CLAUDE.md        # Rules summary + cross-references
+│   ├── agents/          # Persona definitions (Claude Code format)
+│   ├── commands/        # Slash commands (e.g. phase-1-define)
+│   ├── rules/           # Individual rule files (*.md)
+│   └── settings.json    # Permissions, AAMAD_ADAPTER env
+├── .cursor/
+│   └── templates/       # PRD, SAD, MR templates (shared)
+├── project-context/
+│   ├── 1.define/
+│   ├── 2.build/
+│   └── 3.deliver/
+├── AGENTS.md
+├── CHECKLIST.md
+└── README.md
+```
+
+---
+
+**CLI flags:**
+
+- `--dest PATH` — Output directory (default: current directory)
+- `--ide {cursor,claude-code}` — Target IDE (default: cursor)
+- `--overwrite` — Allow replacing existing files
+- `--dry-run` — Preview what would be written
+
+Inspect bundle contents: `aamad bundle-info --verbose` or `aamad bundle-info --ide claude-code`.
 
 ---
 
@@ -76,63 +201,31 @@ flowchart LR
 
     aamad/
     ├─ .cursor/
-    │ ├─ agents/ # Agent persona markdown files (definitions & actions)
-    │ ├─ prompts/ # Parameterized and phase-specific agent prompts
-    │ ├─ rules/ # Architecture, workflow, and epics rules/patterns
-    │ └─ templates/ # Generation templates for research, PRD, SAD, etc.
+    │   ├─ agents/       # Agent persona definitions
+    │   ├─ prompts/      # Phase-specific prompts
+    │   ├─ rules/        # Architecture, workflow, epics rules
+    │   └─ templates/    # PRD, SAD, MR templates
     ├─ project-context/
-    │ ├─ 1.define/ # Project-specific PRD, SAD, research reports, etc.
-    │ ├─ 2.build/ # Output artifacts for setup, frontend, backend, etc.
-    │ └─ 3.deliver/ # QA logs, deploy configs, release notes, etc.
-    ├─ CHECKLIST.md # Step-by-step execution guide
-    └─ README.md # This file
+    │   ├─ 1.define/     # PRD, SAD, research reports
+    │   ├─ 2.build/      # Setup, frontend, backend, integration, QA
+    │   └─ 3.deliver/    # QA logs, deploy configs
+    ├─ docs/
+    ├─ CHECKLIST.md
+    └─ README.md
 
-
-**Framework artifacts** (in `.cursor/`) are reusable for any new project.  
-**Project-context** contains all generated and instance-specific documentation for each app built with AAMAD.
+**Framework artifacts** in `.cursor/` are the source for both Cursor and Claude Code bundles.  
+**Project-context** is IDE-agnostic and shared across all IDEs.
 
 ---
 
 ## How to Use the Framework
 
-1. **Clone this repository.**
-   ```bash
-   git clone https://github.com/synaptic-ai-consulting/AAMAD
-   ```
-2. Confirm `.cursor/` contains the full agent, prompt, and rule set.
-3. Follow the `CHECKLIST.md` to run using multi-agent autonomy — typically, via CursorAI or another coding agent platform.
-4. Each agent persona executes its epic(s), producing separate markdown artifacts and code as they go.
-5. Review, test, and launch the MVP, then iterate or scale with additional features.
-
----
-
-## Install via pip / uv
-
-Instead of cloning, you can install the full artifact bundle from PyPI.
-
-### Using pip
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install aamad
-aamad init --dest /path/to/your/project
-```
-
-### Using uv
-
-```bash
-uv venv
-uv pip install aamad
-uv run aamad init --dest /path/to/your/project
-```
-
-Flags:
-- `--dest PATH` (defaults to current directory)
-- `--overwrite` (allow replacing existing files)
-- `--dry-run` (preview what would be written)
-
-You can inspect the package contents without extracting them via `aamad bundle-info --verbose` (or `uv run aamad bundle-info --verbose`).
+1. **Install** (recommended): `pip install aamad` then `aamad init --ide <cursor|claude-code>`
+2. **Or clone** this repository and copy `.cursor/` and `project-context/` into your project.
+3. Confirm your IDE has the full agent, prompt, and rule set.
+4. Follow `CHECKLIST.md` for the Define → Build → Deliver workflow.
+5. Each agent persona executes its epic(s), producing markdown artifacts and code.
+6. Review, test, and launch the MVP, then iterate.
 
 ---
 
@@ -140,7 +233,7 @@ You can inspect the package contents without extracting them via `aamad bundle-i
 
 The Product Manager persona (`@product-mgr`) conducts prompt-driven discovery and context setup to standardize project scoping:
 
-- **Market Research:** Generate Market Research Document (MRD) using `.cursor/templates/mrd-template.md`
+- **Market Research:** Generate Market Research Document (MRD) using `.cursor/templates/mr-template.md`
 - **Requirements:** Generate Product Requirements Document (PRD) using `.cursor/templates/prd-template.md`
 - **Context Summary:** Create comprehensive context handoff artifacts for technical teams
 - **Validation:** Ensure completeness of market analysis, user personas, feature requirements, and success metrics
@@ -151,7 +244,7 @@ Phase 1 outputs are stored in `project-context/1.define/` and provide the founda
 
 ## Phase 2: Build Stage (Multi-Agent)
 
-Each role is embodied by an agent persona, defined in `.cursor/agents/`.  
+Each role is embodied by an agent persona, defined in `.cursor/agents/` (Cursor) or `.claude/agents/` (Claude Code).  
 Phase 2 is executed by running each epic in sequence after completing Phase 1:
 
 - **Architecture:** Generate solution architecture document (`sad.md`)
@@ -181,7 +274,7 @@ Contributions are welcome!
 - Open an issue for bugs/feature ideas/improvements.
 - Submit pull requests with extended templates, new agent personas, or bug fixes.
 - Help evolve the knowledge base and documentation for greater adoption.
-- When modifying `.cursor/` or `project-context/`, run `python scripts/update_bundle.py` to refresh the packaged artifact bundle before publishing.
+- When modifying `.cursor/` or `project-context/`, run `python scripts/update_bundle.py` to refresh both Cursor and Claude Code bundles before publishing.
 
 ---
 
@@ -196,6 +289,6 @@ Licensed under Apache License 2.0.
 
 ---
 
-> For detailed step-by-step Phase 2 execution, see [CHECKLIST.md].  
-> For advanced reference and prompt engineering, see `.cursor/templates/` and `.cursor/rules/`.
-
+> For detailed step-by-step Phase 2 execution, see [CHECKLIST.md](CHECKLIST.md).  
+> For advanced reference and prompt engineering, see `.cursor/templates/` and `.cursor/rules/`.  
+> For IDE migration details, see [aamad-ide-guide.md](aamad-ide-guide.md).
