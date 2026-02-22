@@ -10,6 +10,7 @@ It systematizes research-driven planning, modular AI agent workflows, and rapid 
 - [What is AAMAD?](#what-is-aamad)
 - [AAMAD phases at a glance](#aamad-phases-at-a-glance)
 - [Installation](#installation)
+- [Using AAMAD in your IDE](#using-aamad-in-your-ide)
 - [Repository Structure](#repository-structure)
 - [How to Use the Framework](#how-to-use-the-framework)
 - [Phase 1: Define Workflow (Product Manager)](#phase-1-define-workflow-product-manager)
@@ -81,27 +82,28 @@ uv pip install aamad
 
 ### Multi-IDE support
 
-AAMAD supports **Cursor** and **Claude Code**. Choose your IDE with the `--ide` flag:
+AAMAD supports **Cursor**, **Claude Code**, and **VS Code + GitHub Copilot**. Choose your IDE with the `--ide` flag:
 
 ```bash
 aamad init --ide cursor        # Default: Cursor
-aamad init --ide claude-code   # Claude Code
+aamad init --ide claude-code  # Claude Code
+aamad init --ide vscode       # VS Code + GitHub Copilot
 ```
 
 #### Framework feature implementation by IDE
 
-| Feature | Cursor | Claude Code |
-| :------ | :----- | :---------- |
-| **Rules / instructions** | `.cursor/rules/*.mdc` with `alwaysApply: true` | `.claude/CLAUDE.md` + `.claude/rules/*.md` |
-| **Rule format** | `.mdc` (YAML frontmatter + markdown body) | `.md` (plain markdown) |
-| **Glob-based scoping** | ✅ `globs:` in frontmatter | ❌ Not supported (all rules loaded) |
-| **Agent definitions** | `.cursor/agents/*.md` | `.claude/agents/*.md` |
-| **Agent invocation** | `@agent-name` in chat | Delegation via `description`; explicit request |
-| **Tool enforcement** | Instructions-based | ✅ Hard allowlist/denylist |
-| **Phase 1 prompt** | `.cursor/prompts/prompt-phase-1` | `.claude/commands/phase-1-define.md` (slash command) |
-| **Templates** | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) |
-| **Project context** | `project-context/` (shared) | `project-context/` (shared) |
-| **Bridge file** | `AGENTS.md` (root) | `AGENTS.md` (root) |
+| Feature | Cursor | Claude Code | VS Code + Copilot |
+| :------ | :----- | :---------- | :---------------- |
+| **Rules / instructions** | `.cursor/rules/*.mdc` with `alwaysApply: true` | `.claude/CLAUDE.md` + `.claude/rules/*.md` | `.github/instructions/*.instructions.md` |
+| **Rule format** | `.mdc` (YAML frontmatter + markdown body) | `.md` (plain markdown) | `.instructions.md` (`applyTo`, `name`, `description`) |
+| **Glob-based scoping** | ✅ `globs:` in frontmatter | ❌ Not supported (all rules loaded) | ✅ `applyTo:` in frontmatter |
+| **Agent definitions** | `.cursor/agents/*.md` | `.claude/agents/*.md` | `.github/agents/*.agent.md` |
+| **Agent invocation** | `@agent-name` in chat | Delegation via `description`; explicit request | Agent dropdown; `@agent-name`; handoff buttons |
+| **Tool enforcement** | Instructions-based | ✅ Hard allowlist/denylist | ✅ Tool allowlist in frontmatter |
+| **Phase 1 prompt** | `.cursor/prompts/prompt-phase-1` | `.claude/commands/phase-1-define.md` (slash command) | `.github/prompts/phase-1-define.prompt.md` |
+| **Templates** | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) |
+| **Project context** | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) |
+| **Bridge file** | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) |
 
 ---
 
@@ -186,14 +188,94 @@ your-project/
 
 ---
 
+### VS Code + GitHub Copilot
+
+**Install and initialize:**
+
+```bash
+pip install aamad
+aamad init --ide vscode --dest .
+```
+
+Or with uv:
+
+```bash
+uv pip install aamad
+uv run aamad init --ide vscode --dest .
+```
+
+**Folder structure after init:**
+
+```
+your-project/
+├── .github/
+│   ├── instructions/   # Copilot instructions (*.instructions.md)
+│   ├── agents/         # Custom agents (*.agent.md) with optional handoffs
+│   └── prompts/        # Phase 1 prompt (phase-1-define.prompt.md)
+├── .vscode/
+│   └── settings.json   # chat.instructionsFilesLocations, chat.agentFilesLocations
+├── .cursor/
+│   └── templates/      # PRD, SAD, MR templates (shared)
+├── project-context/
+│   ├── 1.define/
+│   ├── 2.build/
+│   └── 3.deliver/
+├── AGENTS.md
+├── CHECKLIST.md
+└── README.md
+```
+
+**Required extensions:** GitHub Copilot, GitHub Copilot Chat. Recommended: Python (ms-python), YAML (redhat).
+
+---
+
+### Using AAMAD in your IDE
+
+How you interact with AAMAD depends on your IDE. The framework produces the same artifacts (`project-context/`, templates, Phase 1 prompt); only rules and agent scaffolding differ.
+
+#### Workflow and context (per IDE)
+
+| What you do | Cursor | Claude Code | VS Code + Copilot |
+| :---------- | :----- | :---------- | :---------------- |
+| **Start a fresh context** (e.g. new module) | `Cmd+Shift+P` → **New Chat** | `/clear` or start a new session | Start a new chat session |
+| **Invoke a persona** | Type `@backend.eng` (or other agent) in chat | Ask to use the subagent by name, or refer to its description | Pick the agent from the dropdown, or use `@agent-name` |
+| **Reference a file** | `@path/to/file` in chat | `@path/to/file` in the prompt | `#file:path/to/file` or drag-and-drop the file |
+| **Phase transitions** (Define → Build → Deliver) | Switch persona manually in chat | Use subagent chaining or explicit instructions | Use **handoff** buttons in the chat UI (when configured) |
+
+#### Capability comparison
+
+| Capability | Cursor | Claude Code | VS Code + Copilot |
+| :--------- | :----- | :---------- | :---------------- |
+| **AAMAD support** | Native (default) | Via `aamad init --ide claude-code` | Via `aamad init --ide vscode` |
+| **Glob-based rule scoping** | Yes | No (all rules loaded) | Yes (`applyTo:` in instructions) |
+| **Tool enforcement** | Instructions only | Hard allowlist/denylist | Tool allowlist in agent frontmatter |
+| **Agent handoffs** | Manual | Manual or subagent chaining | Native UI buttons (Define → Build → Deliver) |
+| **Parallel work** | Multiple chat tabs | Subagents / Agent Teams | Subagents |
+| **Model choice** | Multi-model | Claude models | Multi-model (GPT, Claude, Gemini, etc.) |
+| **Best for** | AAMAD as designed | CLI-first, solo use | Teams, enterprise, model diversity |
+
+#### What is the same in all IDEs
+
+These are **IDE-agnostic** — no change when you switch:
+
+- **`project-context/`** — Directory layout and all Phase 1/2/3 outputs (MRD, PRD, SAD, setup.md, frontend.md, backend.md, integration.md, qa.md).
+- **Templates** — PRD, SAD, MR templates (in `.cursor/templates/`; shared across IDEs).
+- **Phase 1 prompt** — Usable in any AI chat; same content in Cursor prompts, Claude Code commands, or VS Code prompts.
+- **CrewAI code, YAML configs, Python** — All build and runtime logic.
+- **Git and dependency setup** — Same repo and `pyproject.toml` workflow.
+
+What **does** change per IDE: where rules and agents live (`.cursor/`, `.claude/`, or `.github/`) and how you invoke personas and reference files (see table above).
+
+---
+
 **CLI flags:**
 
 - `--dest PATH` — Output directory (default: current directory)
-- `--ide {cursor,claude-code}` — Target IDE (default: cursor)
+- `--ide {cursor,claude-code,vscode}` — Target IDE (default: cursor)
 - `--overwrite` — Allow replacing existing files
 - `--dry-run` — Preview what would be written
 
-Inspect bundle contents: `aamad bundle-info --verbose` or `aamad bundle-info --ide claude-code`.
+Inspect bundle contents: `aamad bundle-info --verbose` or `aamad bundle-info --ide claude-code`. For `--ide vscode`, artifacts are generated from the Cursor bundle (no separate bundle).
 
 ---
 
@@ -290,5 +372,4 @@ Licensed under Apache License 2.0.
 ---
 
 > For detailed step-by-step Phase 2 execution, see [CHECKLIST.md](CHECKLIST.md).  
-> For advanced reference and prompt engineering, see `.cursor/templates/` and `.cursor/rules/`.  
-> For IDE migration details, see [aamad-ide-guide.md](aamad-ide-guide.md).
+> For advanced reference and prompt engineering, see `.cursor/templates/` and `.cursor/rules/`.

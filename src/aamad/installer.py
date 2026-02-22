@@ -14,6 +14,7 @@ IDE_BUNDLES = {
     "cursor": BUNDLE_CURSOR,
     "claude-code": BUNDLE_CLAUDE,
     "claude_code": BUNDLE_CLAUDE,  # alias
+    "vscode": BUNDLE_CURSOR,  # transform from Cursor bundle
 }
 
 AGENTS_MD_TEMPLATE = """# AAMAD Agent Framework
@@ -54,6 +55,8 @@ def _agents_dir_note(ide: str) -> str:
     """Return the IDE-specific pointer for agent definitions."""
     if ide in ("claude-code", "claude_code"):
         return "See `.claude/agents/` for Claude Code agent definitions."
+    if ide == "vscode":
+        return "See `.github/agents/` for VS Code / GitHub Copilot agent definitions."
     return "See `.cursor/agents/` for Cursor agent definitions."
 
 
@@ -99,15 +102,29 @@ def extract_artifacts(
     Extract the bundled artifacts into ``destination``.
 
     Also writes AGENTS.md (bridge file for IDE discoverability).
+    For ide "vscode", extracts the Cursor bundle then runs VS Code conversion
+    to produce .github/ and .vscode/ (Option A: transform on the fly).
 
     Args:
-        destination: Directory that should receive `.cursor/` or `.claude/`, `project-context/`, etc.
-        ide: Target IDE — "cursor" (default) or "claude-code".
+        destination: Directory that should receive `.cursor/` or `.claude/` or `.github/`, `project-context/`, etc.
+        ide: Target IDE — "cursor" (default), "claude-code", or "vscode".
         overwrite: If False, raises FileExistsError when target already exists.
         dry_run: When True, no files are written; returns the would-be paths.
     """
+    dest = Path(destination).expanduser().resolve()
     installer = ArtifactInstaller(get_bundle_path(ide))
-    paths = list(installer.extract(Path(destination), overwrite=overwrite, dry_run=dry_run))
+    paths = list(installer.extract(dest, overwrite=overwrite, dry_run=dry_run))
+
+    if ide == "vscode":
+        if dry_run:
+            from aamad.vscode_copilot import get_vscode_planned_paths
+
+            paths.extend(get_vscode_planned_paths(dest))
+        else:
+            from aamad.vscode_copilot import install_vscode_copilot
+
+            paths.extend(install_vscode_copilot(dest, dest, overwrite=overwrite))
+
     # Add AGENTS.md (generated, not from bundle)
     agents_path = write_agents_md(
         destination,

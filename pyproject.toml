@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aamad"
-version = "0.2.0"
+version = "0.3.0"
 description = "AI-Assisted Multi-Agent Development framework artifacts and installer"
 readme = "README.md"
-license = { text = "Apache-2.0" }
+license = "Apache-2.0"
 requires-python = ">=3.9"
 authors = [{ name = "Synaptic AI Consulting" }]
 dependencies = [
@@ -15,7 +15,6 @@ dependencies = [
 ]
 keywords = ["multi-agent", "crew", "automation", "prompt-engineering"]
 classifiers = [
-  "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.9",

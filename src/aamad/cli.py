@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .installer import ArtifactInstaller, extract_artifacts, get_bundle_path
 
-IDE_CHOICES = ["cursor", "claude-code"]
+IDE_CHOICES = ["cursor", "claude-code", "vscode"]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -28,7 +28,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--ide",
         choices=IDE_CHOICES,
         default="cursor",
-        help="Target IDE: cursor (default) or claude-code.",
+        help="Target IDE: cursor (default), claude-code, or vscode.",
     )
     init_cmd.add_argument(
         "--overwrite",
@@ -48,7 +48,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--ide",
         choices=IDE_CHOICES,
         default="cursor",
-        help="Which bundle to inspect: cursor (default) or claude-code.",
+        help="Which bundle to inspect: cursor (default), claude-code, or vscode (uses cursor bundle).",
     )
     info_cmd.add_argument(
         "--verbose",
