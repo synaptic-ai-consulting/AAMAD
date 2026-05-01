@@ -36,4 +36,5 @@ You are responsible for validating the MVP works as intended.
 
 ## Tips
 - Only test what’s present in the current build.
+- Match test strategy to the selected runtime adapter (for example: task-output assertions for CrewAI, hook-trace plus output-schema checks for agentic harness runtimes).
 - Add documentation in qa.md for everything you check or recommend.

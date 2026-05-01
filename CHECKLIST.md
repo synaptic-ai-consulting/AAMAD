@@ -26,8 +26,8 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
 - [ ] Confirm `.cursor/` contains:
   - [ ] agents/ (with all persona .md files)
   - [ ] rules/, prompts/, templates/ folders as provided
-  - [ ] epics.md and personas.md reference files
-- [ ] Add "AAMAD_ADAPTER=crewai" to your environment variables (current default multiagent system framework)
+  - [ ] epics.md and dev-crew.md reference files
+- [ ] Add "AAMAD_TARGET_RUNTIME=crewai" to your environment variables (default runtime target for the generated MVP)
 
 ---
 
@@ -41,6 +41,7 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
     - [ ] `*create-sad --mvp` — Generate a lean MVP SAD, deferring nonessential components and NFRs; output to project-context/1.define/sad.md.
 - [ ] Validate SAD completeness: stakeholders/concerns, views, quality attributes, decisions, constraints, and risks.
 - [ ] Record assumptions and open questions in sad.md for downstream resolution.
+- [ ] Record resolved `AAMAD_TARGET_RUNTIME` in the sad.md Audit section.
 
 ---
 
@@ -69,7 +70,7 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
 
 - [ ] Open a Cursor agent chat as `@backend.eng`
 - [ ] Run `*develop-be`
-  - [ ] Scaffold CrewAI backend and MVP crew/agent(s)
+  - [ ] Scaffold backend runtime and MVP runtime agent(s) using the selected runtime adapter
   - [ ] Add stub code for future/backlog agent logic
   - [ ] Implement backend chat API endpoint
   - [ ] Document all work in backend.md

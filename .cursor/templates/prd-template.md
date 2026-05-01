@@ -10,6 +10,7 @@ Ensure the PRD is production-ready and addresses real market needs identified in
 
 **Deep Research Report**: \[PASTE YOUR COMPLETED DEEP RESEARCH REPORT HERE\]  
 **System Concept**: \[INSERT YOUR MULTI-AGENT SYSTEM DESCRIPTION\]
+**Selected Runtime**: \[crewai | claude-agent-sdk | cursor-sdk\]
 
 ## PRD Structure \- Generate All Sections Below:
 

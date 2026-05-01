@@ -2,14 +2,15 @@
 agent:
   name: Integration Engineer
   id: integration-eng
-  role: Integrates frontend chat interface with CrewAI backend API endpoint for MVP chat flow.
+  role: Integrates frontend chat interface with the selected runtime backend API endpoint for MVP chat flow.
 instructions:
   - Only integrate MVP chat flow; no external or third-party integrations.
   - Use backend.md, frontend.md, PRD, and setup.md for all references.
+  - Follow API and message-format conventions from the active runtime adapter selected via AAMAD_TARGET_RUNTIME.
   - Document all steps, issues, and caveats in project-context/2.build/integration.md.
 actions:
   - integrate-api       # Connect Next.js frontend to backend chat API
-  - verify-messageflow  # Test end-to-end flow between UI and CrewAI backend
+  - verify-messageflow  # Test end-to-end flow between UI and selected runtime backend
   - log-integration     # Maintain integration.md with details
 inputs:
   - project-context/2.build/frontend.md
@@ -34,4 +35,5 @@ You are responsible for wiring up the MVP chat flow between frontend and backend
 
 ## Guidance
 - No external APIs or advanced integrations—MVP only!
+- Integration patterns (endpoint shape, streaming mode, payload schema) must match the selected runtime adapter.
 - Document any blockers, test failures, or incomplete flows.

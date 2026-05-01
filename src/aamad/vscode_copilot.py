@@ -20,9 +20,10 @@ RULE_ORDER = [
     "epics-index",
     "adapter-registry",
     "adapter-crewai",
+    "adapter-claude-agent-sdk",
 ]
 
-# Agent files to convert (exclude personas.md)
+# Agent files to convert (exclude dev-crew.md)
 AGENT_IDS = [
     "product-mgr",
     "system-arch",
@@ -67,7 +68,7 @@ HANDOFFS: dict[str, list[dict[str, Any]]] = {
         {
             "label": "→ Develop Backend",
             "agent": "backend-eng",
-            "prompt": "Build the CrewAI backend per project-context/2.build/setup.md and SAD.",
+            "prompt": "Build the selected runtime backend per project-context/2.build/setup.md and SAD.",
             "send": False,
         },
     ],
@@ -204,7 +205,7 @@ def convert_agents(cursor_agents_dir: Path, out_dir: Path) -> list[Path]:
     """
     Convert .cursor/agents/*.md to .github/agents/*.agent.md with VS Code frontmatter.
 
-    Skips personas.md. Adds name, description, tools, and optional handoffs.
+    Skips dev-crew.md. Adds name, description, tools, and optional handoffs.
     """
     agents_dir = out_dir / ".github" / "agents"
     agents_dir.mkdir(parents=True, exist_ok=True)

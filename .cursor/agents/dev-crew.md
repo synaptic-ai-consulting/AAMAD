@@ -1,4 +1,4 @@
-# Agent Personas for AAMAD Development
+# AAMAD Development Crew
 
 ## @product-mgr - Product Manager
 - Objective: Orchestrate product vision, requirements discovery, and all context boundaries for enterprise multi-agent applications.
@@ -33,9 +33,9 @@
   - Documenting decisions and steps in frontend.md.
 
 ## @backend-eng - Backend Developer
-- Objective: Build CrewAI backend and agent logic.
+- Objective: Build backend runtime and agent logic for the selected target runtime.
 - Key Tasks:
-  - Creating core crew and agents per SAD.
+  - Creating core runtime agents per SAD.
   - Setting up backend endpoints for chat interaction.
   - Stub non-MVP agent features.
   - Documenting implementation in backend.md.
@@ -52,5 +52,4 @@
 - Key Tasks:
   - Running functional and smoke tests for MVP features.
   - Logging test coverage, failures, and known gaps in qa.md.
-  - Marking “future work” areas for non-functional parts.
-
+  - Marking "future work" areas for non-functional parts.
