@@ -8,6 +8,8 @@ It systematizes research-driven planning, modular AI agent workflows, and rapid 
 ## Table of Contents
 
 - [What is AAMAD?](#what-is-aamad)
+- [What AAMAD is not](#what-aamad-is-not)
+- [Runtime adapters](#runtime-adapters)
 - [AAMAD phases at a glance](#aamad-phases-at-a-glance)
 - [Installation](#installation)
 - [Using AAMAD in your IDE](#using-aamad-in-your-ide)
@@ -31,6 +33,29 @@ It enables teams to:
 - Use production-ready architecture/design patterns
 - Accelerate delivery, reduce manual overhead, and enable continuous iteration
 
+In AAMAD, the development crew (personas, rules, templates, and artifacts) is the stable methodology.  
+Runtime adapters are an implementation choice for what backend runtime your generated MVP targets.
+
+---
+
+## What AAMAD is not
+
+- AAMAD is not a programmatic runtime orchestrator for its own Define → Build → Deliver phases.
+- Runtime adapter selection does not change AAMAD phase orchestration; it only changes the runtime conventions used by Build-phase implementation personas.
+- Headless orchestration of AAMAD phases is out of scope for v0.4.0.
+
+---
+
+## Runtime adapters
+
+Use `AAMAD_TARGET_RUNTIME` to choose the runtime target for the generated multi-agent application in Phase 2:
+
+| Runtime | Status | Best fit |
+| :------ | :----- | :------- |
+| `crewai` | Default | Declarative task orchestration with YAML-first runtime configuration |
+| `claude-agent-sdk` | Supported | Agentic runtime harness with hooks, MCP, and session control |
+| `cursor-sdk` | Planned | TypeScript-first Cursor runtime integration (deferred to v0.5.0) |
+
 ---
 
 ## AAMAD phases at a glance
@@ -48,7 +73,7 @@ flowchart LR
 
   subgraph P2[BUILD]
     B1H[AGENTS]:::hdr --> B1L["• Project Mgr<br/>• System Architect<br/>• Frontend Eng<br/>• Backend Eng<br/>• Integration Eng<br/>• QA Eng"]:::list
-    B2H[RULES]:::hdr --> B2L["• core<br/>• development‑workflow<br/>• adapter‑crewai"]:::list
+    B2H[RULES]:::hdr --> B2L["• core<br/>• development‑workflow<br/>• runtime adapter (crewai or claude-agent-sdk)"]:::list
   end
 
   subgraph P3[DELIVER]
@@ -64,7 +89,7 @@ flowchart LR
 
 - **Phase 1 (Define):** Product Manager persona (`@product-mgr`) conducts prompt-driven discovery and context setup, supported by templates for Market Research Document (MRD) and Product Requirements Document (PRD), to standardize project scoping.
 
-- **Phase 2 (Build):** Multi‑agent execution by Project Manager, System Architect, Frontend Engineer, Backend Engineer, Integration Engineer, and QA Engineer, governed by core, development‑workflow, and CrewAI‑specific rules.
+- **Phase 2 (Build):** Multi‑agent execution by Project Manager, System Architect, Frontend Engineer, Backend Engineer, Integration Engineer, and QA Engineer, governed by core/development-workflow rules and the selected runtime adapter rule.
 
 - **Phase 3 (Deliver):** DevOps Engineer focuses on release and runtime concerns using rules for continuous deployment, hosting environment definitions, and access control.
 
@@ -174,7 +199,7 @@ your-project/
 │   ├── agents/          # Persona definitions (Claude Code format)
 │   ├── commands/        # Slash commands (e.g. phase-1-define)
 │   ├── rules/           # Individual rule files (*.md)
-│   └── settings.json    # Permissions, AAMAD_ADAPTER env
+│   └── settings.json    # Permissions, AAMAD_TARGET_RUNTIME env
 ├── .cursor/
 │   └── templates/       # PRD, SAD, MR templates (shared)
 ├── project-context/
@@ -261,7 +286,7 @@ These are **IDE-agnostic** — no change when you switch:
 - **`project-context/`** — Directory layout and all Phase 1/2/3 outputs (MRD, PRD, SAD, setup.md, frontend.md, backend.md, integration.md, qa.md).
 - **Templates** — PRD, SAD, MR templates (in `.cursor/templates/`; shared across IDEs).
 - **Phase 1 prompt** — Usable in any AI chat; same content in Cursor prompts, Claude Code commands, or VS Code prompts.
-- **CrewAI code, YAML configs, Python** — All build and runtime logic.
+- **Crew logic and artifacts** — The same persona/rules/templates methodology regardless of IDE.
 - **Git and dependency setup** — Same repo and `pyproject.toml` workflow.
 
 What **does** change per IDE: where rules and agents live (`.cursor/`, `.claude/`, or `.github/`) and how you invoke personas and reference files (see table above).
@@ -303,11 +328,12 @@ Inspect bundle contents: `aamad bundle-info --verbose` or `aamad bundle-info --i
 ## How to Use the Framework
 
 1. **Install** (recommended): `pip install aamad` then `aamad init --ide <cursor|claude-code>`
-2. **Or clone** this repository and copy `.cursor/` and `project-context/` into your project.
-3. Confirm your IDE has the full agent, prompt, and rule set.
-4. Follow `CHECKLIST.md` for the Define → Build → Deliver workflow.
-5. Each agent persona executes its epic(s), producing markdown artifacts and code.
-6. Review, test, and launch the MVP, then iterate.
+2. **Select runtime target** for Phase 2 (for example `AAMAD_TARGET_RUNTIME=crewai` or `AAMAD_TARGET_RUNTIME=claude-agent-sdk`).
+3. **Or clone** this repository and copy `.cursor/` and `project-context/` into your project.
+4. Confirm your IDE has the full agent, prompt, and rule set.
+5. Follow `CHECKLIST.md` for the Define → Build → Deliver workflow.
+6. Each agent persona executes its epic(s), producing markdown artifacts and code.
+7. Review, test, and launch the MVP, then iterate.
 
 ---
 
@@ -327,6 +353,7 @@ Phase 1 outputs are stored in `project-context/1.define/` and provide the founda
 ## Phase 2: Build Stage (Multi-Agent)
 
 Each role is embodied by an agent persona, defined in `.cursor/agents/` (Cursor) or `.claude/agents/` (Claude Code).  
+Before implementation, set `AAMAD_TARGET_RUNTIME` to the target backend runtime (`crewai` default, `claude-agent-sdk` supported).
 Phase 2 is executed by running each epic in sequence after completing Phase 1:
 
 - **Architecture:** Generate solution architecture document (`sad.md`)

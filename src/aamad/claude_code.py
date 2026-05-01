@@ -20,9 +20,10 @@ RULE_ORDER = [
     "epics-index",
     "adapter-registry",
     "adapter-crewai",
+    "adapter-claude-agent-sdk",
 ]
 
-# Agent files to convert (exclude personas.md index)
+# Agent files to convert (exclude dev-crew.md index)
 AGENT_IDS = [
     "product-mgr",
     "system-arch",
@@ -185,7 +186,7 @@ def convert_agents(
     """
     Convert .cursor/agents/*.md to .claude/agents/*.md with Claude Code frontmatter.
 
-    Skips personas.md (index file). Converts only files matching AGENT_IDS.
+    Skips dev-crew.md (index file). Converts only files matching AGENT_IDS.
     """
     claude_agents = out_dir / ".claude" / "agents"
     claude_agents.mkdir(parents=True, exist_ok=True)
@@ -248,7 +249,7 @@ def convert_prompts(
 
 
 def write_settings(out_dir: Path) -> Path:
-    """Write .claude/settings.json with permissions and AAMAD_ADAPTER."""
+    """Write .claude/settings.json with permissions and AAMAD_TARGET_RUNTIME."""
     claude_dir = out_dir / ".claude"
     claude_dir.mkdir(parents=True, exist_ok=True)
     settings_path = claude_dir / "settings.json"
@@ -266,7 +267,7 @@ def write_settings(out_dir: Path) -> Path:
             ]
         },
         "env": {
-            "AAMAD_ADAPTER": "crewai",
+            "AAMAD_TARGET_RUNTIME": "crewai",
         },
     }
     settings_path.write_text(json.dumps(settings, indent=2), encoding="utf-8")

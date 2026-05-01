@@ -176,7 +176,58 @@ def test_write_settings_creates_valid_json(tmpdir):
     assert "permissions" in data
     assert "allow" in data["permissions"]
     assert "env" in data
-    assert data["env"]["AAMAD_ADAPTER"] == "crewai"
+    assert data["env"]["AAMAD_TARGET_RUNTIME"] == "crewai"
+
+
+def test_convert_rules_includes_both_runtime_adapter_rules(tmpdir):
+    """convert_rules writes both runtime adapter rule files when present."""
+    rules_dir = tmpdir / "rules"
+    rules_dir.mkdir()
+    (rules_dir / "aamad-core.mdc").write_text(
+        """---
+description: Core rules
+alwaysApply: true
+---
+
+## Purpose
+Core.
+"""
+    )
+    (rules_dir / "adapter-registry.mdc").write_text(
+        """---
+description: Registry
+alwaysApply: true
+---
+
+## Purpose
+Registry.
+"""
+    )
+    (rules_dir / "adapter-crewai.mdc").write_text(
+        """---
+description: CrewAI adapter
+alwaysApply: true
+---
+
+## Purpose
+CrewAI.
+"""
+    )
+    (rules_dir / "adapter-claude-agent-sdk.mdc").write_text(
+        """---
+description: Claude Agent SDK adapter
+alwaysApply: true
+---
+
+## Purpose
+Claude.
+"""
+    )
+
+    convert_rules(rules_dir, tmpdir, style="split")
+    out_dir = tmpdir / ".claude" / "rules"
+    assert (out_dir / "adapter-crewai.md").exists()
+    assert (out_dir / "adapter-claude-agent-sdk.md").exists()
 
 
 def test_install_claude_code_full(tmpdir):

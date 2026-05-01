@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-05-01
+
+### Added
+
+- New runtime adapter rule: `adapter-claude-agent-sdk.mdc`. Generated MVPs can now target Claude Agent SDK runtime semantics via `AAMAD_TARGET_RUNTIME=claude-agent-sdk`.
+- New development crew index file: `.cursor/agents/dev-crew.md`.
+- Conformance tests ensuring both runtime adapter rules (`adapter-crewai`, `adapter-claude-agent-sdk`) are converted for Claude Code and VS Code bundles.
+
+### Changed (BREAKING)
+
+- Renamed environment variable `AAMAD_ADAPTER` to `AAMAD_TARGET_RUNTIME` (no alias).
+- Re-scoped adapters from "AAMAD execution framework" to "runtime target for generated Phase 2 implementation."
+- Updated core and registry rules to keep AAMAD crew orchestration adapter-neutral while runtime adapters govern generated backend conventions.
+- Slimmed `adapter-crewai.mdc` to runtime-specific guidance and promoted shared policy language into `aamad-core.mdc`.
+- Updated personas (`@backend.eng`, `@system.arch`, `@integration.eng`, `@qa.eng`) to follow selected runtime adapter semantics.
+- Renamed `.cursor/agents/personas.md` to `.cursor/agents/dev-crew.md`.
+
+### Deferred
+
+- Cursor SDK runtime adapter (`cursor-sdk`) rule and scaffolding support deferred to v0.5.0.
+
+### Out of scope
+
+- Headless/programmatic orchestration of AAMAD's own Define → Build → Deliver phases.
+
 ## [0.3.0] - 2025-02-22
 
 ### Added

@@ -7,6 +7,7 @@ This document serves as a detailed blueprint for AI development agents to unders
 ## Input Requirements:
 **PRD Document**: [PASTE YOUR COMPLETED PRD HERE]
 **MVP Scope**: Focus on core value proposition with 80/20 rule - 20% effort for 80% value
+**Selected Runtime**: [crewai | claude-agent-sdk | cursor-sdk]
 
 ## System Architecture Specification - Generate All Sections:
 

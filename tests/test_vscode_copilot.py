@@ -200,6 +200,57 @@ globs: ["src/**/*.py"]
     assert "## Body" in text
 
 
+def test_convert_rules_includes_both_runtime_adapter_rules(tmpdir):
+    """convert_rules writes both runtime adapter instruction files when present."""
+    rules_dir = tmpdir / "rules"
+    rules_dir.mkdir()
+    (rules_dir / "aamad-core.mdc").write_text(
+        """---
+description: Core rules
+alwaysApply: true
+---
+
+## Purpose
+Core.
+"""
+    )
+    (rules_dir / "adapter-registry.mdc").write_text(
+        """---
+description: Registry
+alwaysApply: true
+---
+
+## Purpose
+Registry.
+"""
+    )
+    (rules_dir / "adapter-crewai.mdc").write_text(
+        """---
+description: CrewAI adapter
+alwaysApply: true
+---
+
+## Purpose
+CrewAI.
+"""
+    )
+    (rules_dir / "adapter-claude-agent-sdk.mdc").write_text(
+        """---
+description: Claude Agent SDK adapter
+alwaysApply: true
+---
+
+## Purpose
+Claude.
+"""
+    )
+
+    convert_rules(rules_dir, tmpdir)
+    out_dir = tmpdir / ".github" / "instructions"
+    assert (out_dir / "adapter-crewai.instructions.md").exists()
+    assert (out_dir / "adapter-claude-agent-sdk.instructions.md").exists()
+
+
 def test_convert_agents_creates_vscode_format(tmpdir, sample_agent):
     """convert_agents creates .github/agents/*.agent.md with name, description, tools."""
     out = convert_agents(sample_agent, tmpdir)
