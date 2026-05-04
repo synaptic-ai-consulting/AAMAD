@@ -200,8 +200,8 @@ globs: ["src/**/*.py"]
     assert "## Body" in text
 
 
-def test_convert_rules_includes_both_runtime_adapter_rules(tmpdir):
-    """convert_rules writes both runtime adapter instruction files when present."""
+def test_convert_rules_includes_all_runtime_adapter_rules(tmpdir):
+    """convert_rules writes all runtime adapter instruction files when present."""
     rules_dir = tmpdir / "rules"
     rules_dir.mkdir()
     (rules_dir / "aamad-core.mdc").write_text(
@@ -244,11 +244,22 @@ alwaysApply: true
 Claude.
 """
     )
+    (rules_dir / "adapter-cursor-sdk.mdc").write_text(
+        """---
+description: Cursor SDK adapter
+alwaysApply: true
+---
+
+## Purpose
+Cursor.
+"""
+    )
 
     convert_rules(rules_dir, tmpdir)
     out_dir = tmpdir / ".github" / "instructions"
     assert (out_dir / "adapter-crewai.instructions.md").exists()
     assert (out_dir / "adapter-claude-agent-sdk.instructions.md").exists()
+    assert (out_dir / "adapter-cursor-sdk.instructions.md").exists()
 
 
 def test_convert_agents_creates_vscode_format(tmpdir, sample_agent):

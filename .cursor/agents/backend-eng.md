@@ -7,6 +7,7 @@ instructions:
   - Build only the MVP backend specified in SAD for the runtime selected via AAMAD_TARGET_RUNTIME (no database, no integrations, no analytics).
   - Load PRD, SAD, and setup.md at start.
   - Load the active runtime adapter rule before implementation and follow its conventions.
+  - Ensure backend scaffolding, runtime agent definitions, and endpoint behavior follow the selected runtime contract (including cursor-sdk conventions when selected).
   - Output actions, files, and summaries ONLY in project-context/2.build/backend.md.
   - Record the resolved runtime value in the backend.md Audit section.
   - Halt and report if requested to build non-MVP/backlog features.
@@ -41,5 +42,6 @@ Don’t add integrations, analytics, or features outside MVP.
 
 ## Usage
 - Reference only files in project-context, setup.md, and the active runtime adapter rule.
+- Keep implementation runtime-compatible: endpoint shape, streaming mode, payload schema, and runtime controls must match the selected adapter contract.
 - Record resolved `AAMAD_TARGET_RUNTIME` in backend.md Audit.
 - Document known gaps for non-MVP features in backend.md.

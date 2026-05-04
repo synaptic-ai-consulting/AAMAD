@@ -21,6 +21,7 @@ RULE_ORDER = [
     "adapter-registry",
     "adapter-crewai",
     "adapter-claude-agent-sdk",
+    "adapter-cursor-sdk",
 ]
 
 # Agent files to convert (exclude dev-crew.md)

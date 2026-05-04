@@ -8,9 +8,9 @@ It systematizes research-driven planning, modular AI agent workflows, and rapid 
 ## Table of Contents
 
 - [What is AAMAD?](#what-is-aamad)
-- [What AAMAD is not](#what-aamad-is-not)
 - [Runtime adapters](#runtime-adapters)
 - [AAMAD phases at a glance](#aamad-phases-at-a-glance)
+- [What AAMAD is not](#what-aamad-is-not)
 - [Installation](#installation)
 - [Using AAMAD in your IDE](#using-aamad-in-your-ide)
 - [Repository Structure](#repository-structure)
@@ -36,13 +36,7 @@ It enables teams to:
 In AAMAD, the development crew (personas, rules, templates, and artifacts) is the stable methodology.  
 Runtime adapters are an implementation choice for what backend runtime your generated MVP targets.
 
----
-
-## What AAMAD is not
-
-- AAMAD is not a programmatic runtime orchestrator for its own Define → Build → Deliver phases.
-- Runtime adapter selection does not change AAMAD phase orchestration; it only changes the runtime conventions used by Build-phase implementation personas.
-- Headless orchestration of AAMAD phases is out of scope for v0.4.0.
+You can use AAMAD across multiple development environments: see [Using AAMAD in your IDE](#using-aamad-in-your-ide) for Cursor, Claude Code, and VS Code + GitHub Copilot.
 
 ---
 
@@ -54,7 +48,7 @@ Use `AAMAD_TARGET_RUNTIME` to choose the runtime target for the generated multi-
 | :------ | :----- | :------- |
 | `crewai` | Default | Declarative task orchestration with YAML-first runtime configuration |
 | `claude-agent-sdk` | Supported | Agentic runtime harness with hooks, MCP, and session control |
-| `cursor-sdk` | Planned | TypeScript-first Cursor runtime integration (deferred to v0.5.0) |
+| `cursor-sdk` | Supported | TypeScript-first Cursor runtime integration with explicit tool/runtime contracts |
 
 ---
 
@@ -73,7 +67,7 @@ flowchart LR
 
   subgraph P2[BUILD]
     B1H[AGENTS]:::hdr --> B1L["• Project Mgr<br/>• System Architect<br/>• Frontend Eng<br/>• Backend Eng<br/>• Integration Eng<br/>• QA Eng"]:::list
-    B2H[RULES]:::hdr --> B2L["• core<br/>• development‑workflow<br/>• runtime adapter (crewai or claude-agent-sdk)"]:::list
+    B2H[RULES]:::hdr --> B2L["• core<br/>• development‑workflow<br/>• runtime adapter (crewai, claude-agent-sdk, or cursor-sdk)"]:::list
   end
 
   subgraph P3[DELIVER]
@@ -92,6 +86,14 @@ flowchart LR
 - **Phase 2 (Build):** Multi‑agent execution by Project Manager, System Architect, Frontend Engineer, Backend Engineer, Integration Engineer, and QA Engineer, governed by core/development-workflow rules and the selected runtime adapter rule.
 
 - **Phase 3 (Deliver):** DevOps Engineer focuses on release and runtime concerns using rules for continuous deployment, hosting environment definitions, and access control.
+
+---
+
+## What AAMAD is not
+
+- AAMAD is not a programmatic runtime orchestrator for its own Define → Build → Deliver phases.
+- Runtime adapter selection does not change AAMAD phase orchestration; it only changes the runtime conventions used by Build-phase implementation personas.
+- Headless orchestration of AAMAD phases is out of scope for v0.5.0.
 
 ---
 
@@ -328,7 +330,7 @@ Inspect bundle contents: `aamad bundle-info --verbose` or `aamad bundle-info --i
 ## How to Use the Framework
 
 1. **Install** (recommended): `pip install aamad` then `aamad init --ide <cursor|claude-code>`
-2. **Select runtime target** for Phase 2 (for example `AAMAD_TARGET_RUNTIME=crewai` or `AAMAD_TARGET_RUNTIME=claude-agent-sdk`).
+2. **Select runtime target** for Phase 2 (for example `AAMAD_TARGET_RUNTIME=crewai`, `AAMAD_TARGET_RUNTIME=claude-agent-sdk`, or `AAMAD_TARGET_RUNTIME=cursor-sdk`).
 3. **Or clone** this repository and copy `.cursor/` and `project-context/` into your project.
 4. Confirm your IDE has the full agent, prompt, and rule set.
 5. Follow `CHECKLIST.md` for the Define → Build → Deliver workflow.
@@ -353,7 +355,7 @@ Phase 1 outputs are stored in `project-context/1.define/` and provide the founda
 ## Phase 2: Build Stage (Multi-Agent)
 
 Each role is embodied by an agent persona, defined in `.cursor/agents/` (Cursor) or `.claude/agents/` (Claude Code).  
-Before implementation, set `AAMAD_TARGET_RUNTIME` to the target backend runtime (`crewai` default, `claude-agent-sdk` supported).
+Before implementation, set `AAMAD_TARGET_RUNTIME` to the target backend runtime (`crewai` default, `claude-agent-sdk` supported, `cursor-sdk` supported).
 Phase 2 is executed by running each epic in sequence after completing Phase 1:
 
 - **Architecture:** Generate solution architecture document (`sad.md`)

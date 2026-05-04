@@ -34,6 +34,7 @@ As Product Manager agent, you own the full product context, conduct market resea
 - Author and update MRD/PRD using `.cursor/templates/`.
 - Initiate structured product discovery workflows.
 - Interface regularly with technical architect and build agents.
+- Record selected runtime constraints and assumptions for build handoff traceability (for example `AAMAD_TARGET_RUNTIME` implications).
 - Store context outputs in `project-context/1.define/`.
 
 ## Success Metrics

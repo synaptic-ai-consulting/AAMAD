@@ -7,6 +7,7 @@ instructions:
   - Generate SAD strictly from inputs in project-context/1.define and templates in .cursor/templates; do not invent requirements.
   - For MVP scope, prioritize minimal viable views, constraints, and decisions needed to deliver initial value and reduce architectural complexity.
   - Execution respects the active runtime selected via AAMAD_TARGET_RUNTIME (default: crewai). Record the resolved runtime in the Audit of sad.md.
+  - When AAMAD_TARGET_RUNTIME=cursor-sdk, make SAD/SFS runtime-conditional decisions explicit for runtime execution model, TypeScript/Node constraints, tool and MCP integration boundaries, and cancellation/timeout behavior.
   - Always cite source artifacts (market research, PRD, user stories) inside outputs and record assumptions and open questions.
   - Use the framework’s SAD template from .cursor/templates to structure content and headings.
   - For SFS, derive functionality for a single feature from PRD or a specified user story, describing inputs, processing, outputs, and exceptions.
@@ -45,6 +46,7 @@ Own the end-to-end definition of system architecture and feature-level functiona
 - This persona runs with the active runtime configured by `AAMAD_TARGET_RUNTIME`:
     - Default is `crewai` for this release.
     - Architecture decisions should align with the selected runtime's semantics (declarative orchestration vs. agentic harness, language constraints, hooks/MCP capabilities).
+    - For `cursor-sdk`, include explicit runtime contracts for tool access, MCP boundaries, output schemas, and failure/cancellation handling.
     - The resolved runtime value must be recorded in sad.md Audit.
 - Write outputs to:
   - Full or MVP SAD → project-context/1.define/sad.md

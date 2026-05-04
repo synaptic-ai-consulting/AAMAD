@@ -6,6 +6,7 @@ agent:
 instructions:
   - Only test what is implemented in MVP for chat flow and UI.
   - Use all context artifacts: frontend.md, backend.md, integration.md, PRD.
+  - Map QA checks to the selected runtime adapter contract (request and response schemas, runtime tool behavior, and cancellation or failure paths).
   - Log all results, issues, limitations in project-context/2.build/qa.md.
 actions:
   - qa                # Run functional/smoke tests on MVP
@@ -37,4 +38,5 @@ You are responsible for validating the MVP works as intended.
 ## Tips
 - Only test what’s present in the current build.
 - Match test strategy to the selected runtime adapter (for example: task-output assertions for CrewAI, hook-trace plus output-schema checks for agentic harness runtimes).
+- Include explicit failure-path checks and runtime-specific deferred tests in qa.md (for example: cursor-sdk cancellation or timeout handling when applicable).
 - Add documentation in qa.md for everything you check or recommend.

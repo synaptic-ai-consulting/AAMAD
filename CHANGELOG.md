@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2026-05-04
+
+### Added
+
+- New runtime adapter rule: `adapter-cursor-sdk.mdc`. Generated MVPs can now target Cursor SDK runtime semantics via `AAMAD_TARGET_RUNTIME=cursor-sdk`.
+- Converter support and conformance tests now include all runtime adapter rules (`adapter-crewai`, `adapter-claude-agent-sdk`, `adapter-cursor-sdk`) for both Claude Code and VS Code outputs.
+
+### Changed
+
+- Promoted `cursor-sdk` from planned to supported in runtime registry and user-facing documentation.
+- Updated runtime-aware personas (`@system.arch`, `@backend.eng`, `@integration.eng`, `@qa.eng`) with explicit cursor-sdk-compatible architecture, backend, integration, and QA guidance.
+- Added light runtime-traceability guidance to `@frontend.eng` and `@product-mgr`.
+
 ## [0.4.0] - 2026-05-01
 
 ### Added

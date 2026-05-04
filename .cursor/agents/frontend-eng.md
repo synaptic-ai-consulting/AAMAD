@@ -36,4 +36,5 @@ Build only the MVP chat interface and UI stubs, not backend.
 
 ## Workflow Notes
 - Do not connect to backend endpoints; that’s for integration.
+- If runtime choice introduces UI-visible constraints (for example streaming expectations), record them in frontend.md as traceability notes.
 - Add clarifications as Markdown in frontend.md if PRD/SAD is unclear.
