@@ -13,19 +13,22 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
 
   | IDE | Command |
   | :-- | :------ |
-  | **Cursor** (default) | `aamad init --ide cursor --dest .` |
+  | **Guided setup** | `aamad init --dest .` (choose Cursor, Claude Code, VS Code with GitHub Copilot, or Kiro) |
+  | **Cursor** | `aamad init --ide cursor --dest .` |
   | **Claude Code** | `aamad init --ide claude-code --dest .` |
   | **VS Code + GitHub Copilot** | `aamad init --ide vscode --dest .` |
+  | **Kiro** | `aamad init --ide kiro --dest .` |
 
 - [ ] Confirm expected outputs for **your** IDE (templates stay under `.cursor/templates/` for all):
 
   - [ ] **Cursor:** `.cursor/agents/`, `.cursor/rules/`, `.cursor/prompts/`, `.cursor/skills/`, `.cursor/templates/`, root `AGENTS.md`
   - [ ] **Claude Code:** `.claude/` (`agents/`, `rules/`, `commands/`, `skills/`, `settings.json`), `.cursor/templates/`, `AGENTS.md`
   - [ ] **VS Code + Copilot:** `.github/instructions/`, `.github/agents/`, `.github/prompts/` (includes `run-evals.prompt.md`), `.vscode/settings.json`, `.cursor/templates/`, `AGENTS.md`
+  - [ ] **Kiro:** `.kiro/agents/`, `.kiro/steering/` (rules + manual Phase 1 / sync-docs), `.kiro/skills/`, `.cursor/templates/`, `AGENTS.md`
 
 - [ ] Optionally copy `aamad.config.example.yml` → `aamad.config.yml` and set project preferences.
 - [ ] Skim root `AGENTS.md` so you know where personas live for your IDE.
-- [ ] To **invoke personas** (`@product-mgr`, `@backend.eng`, …) and reference files, follow [README.md → Using AAMAD in your IDE](README.md#using-aamad-in-your-ide) (Cursor vs Claude Code vs VS Code differ).
+- [ ] To **invoke personas** (`@product-mgr`, `@backend.eng`, …) and reference files, follow [README.md → Using AAMAD in your IDE](README.md#using-aamad-in-your-ide) (Cursor, Claude Code, VS Code, and Kiro differ).
 
 ---
 

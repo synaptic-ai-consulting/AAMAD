@@ -38,7 +38,7 @@ It enables teams to:
 In AAMAD, the development crew (personas, rules, templates, and artifacts) is the stable methodology.  
 Runtime adapters are an implementation choice for what backend runtime your generated MVP targets.
 
-You can use AAMAD across multiple development environments: see [Using AAMAD in your IDE](#using-aamad-in-your-ide) for Cursor, Claude Code, and VS Code + GitHub Copilot.
+You can use AAMAD across multiple development environments: see [Using AAMAD in your IDE](#using-aamad-in-your-ide) for Cursor, Claude Code, VS Code + GitHub Copilot, and Kiro.
 
 ---
 
@@ -127,29 +127,31 @@ uv pip install aamad
 
 ### Multi-IDE support
 
-AAMAD supports **Cursor**, **Claude Code**, and **VS Code + GitHub Copilot**. Choose your IDE with the `--ide` flag:
+AAMAD supports **Cursor**, **Claude Code**, **VS Code + GitHub Copilot**, and **Kiro**. Run `aamad init` and choose a development environment from the prompt, or pass `--ide` to skip it:
 
 ```bash
-aamad init --ide cursor        # Default: Cursor
+aamad init                     # Prompt: Cursor, Claude Code, VS Code with GitHub Copilot, Kiro
+aamad init --ide cursor        # Cursor
 aamad init --ide claude-code  # Claude Code
 aamad init --ide vscode       # VS Code + GitHub Copilot
+aamad init --ide kiro         # Kiro
 ```
 
 #### Framework feature implementation by IDE
 
-| Feature | Cursor | Claude Code | VS Code + Copilot |
-| :------ | :----- | :---------- | :---------------- |
-| **Rules / instructions** | `.cursor/rules/*.mdc` with `alwaysApply: true` | `.claude/CLAUDE.md` + `.claude/rules/*.md` | `.github/instructions/*.instructions.md` |
-| **Rule format** | `.mdc` (YAML frontmatter + markdown body) | `.md` (plain markdown) | `.instructions.md` (`applyTo`, `name`, `description`) |
-| **Glob-based scoping** | ✅ `globs:` in frontmatter | ❌ Not supported (all rules loaded) | ✅ `applyTo:` in frontmatter |
-| **Agent definitions** | `.cursor/agents/*.md` | `.claude/agents/*.md` | `.github/agents/*.agent.md` |
-| **Agent invocation** | `@agent-name` in chat | Delegation via `description`; explicit request | Agent dropdown; `@agent-name`; handoff buttons |
-| **Tool enforcement** | Instructions-based | ✅ Hard allowlist/denylist | ✅ Tool allowlist in frontmatter |
-| **Phase 1 prompt** | `.cursor/prompts/prompt-phase-1` | `.claude/commands/phase-1-define.md` (slash command) | `.github/prompts/phase-1-define.prompt.md` |
-| **Skills** | `.cursor/skills/run-evals/` | `.claude/skills/run-evals/` (native skills) | `.github/prompts/run-evals.prompt.md` (bound to `qa-eng`; no native skills primitive) |
-| **Templates** | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) |
-| **Project context** | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) |
-| **Bridge file** | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) |
+| Feature | Cursor | Claude Code | VS Code + Copilot | Kiro |
+| :------ | :----- | :---------- | :---------------- | :--- |
+| **Rules / instructions** | `.cursor/rules/*.mdc` with `alwaysApply: true` | `.claude/CLAUDE.md` + `.claude/rules/*.md` | `.github/instructions/*.instructions.md` | `.kiro/steering/*.md` with `inclusion: always` |
+| **Rule format** | `.mdc` (YAML frontmatter + markdown body) | `.md` (plain markdown) | `.instructions.md` (`applyTo`, `name`, `description`) | `.md` (steering frontmatter + markdown body) |
+| **Glob-based scoping** | ✅ `globs:` in frontmatter | ❌ Not supported (all rules loaded) | ✅ `applyTo:` in frontmatter | ✅ `inclusion: fileMatch` (AAMAD rules use `always`) |
+| **Agent definitions** | `.cursor/agents/*.md` | `.claude/agents/*.md` | `.github/agents/*.agent.md` | `.kiro/agents/*.md` |
+| **Agent invocation** | `@agent-name` in chat | Delegation via `description`; explicit request | Agent dropdown; `@agent-name`; handoff buttons | Agent picker in the chat pane |
+| **Tool enforcement** | Instructions-based | ✅ Hard allowlist/denylist | ✅ Tool allowlist in frontmatter | ✅ Tool list in agent frontmatter |
+| **Phase 1 prompt** | `.cursor/prompts/prompt-phase-1` | `.claude/commands/phase-1-define.md` (slash command) | `.github/prompts/phase-1-define.prompt.md` | `.kiro/steering/phase-1-define.md` (manual steering / slash command) |
+| **Skills** | `.cursor/skills/run-evals/` | `.claude/skills/run-evals/` (native skills) | `.github/prompts/run-evals.prompt.md` (bound to `qa-eng`; no native skills primitive) | `.kiro/skills/run-evals/` (native Agent Skills) |
+| **Templates** | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) |
+| **Project context** | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) |
+| **Bridge file** | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) |
 
 ---
 
@@ -277,30 +279,69 @@ your-project/
 
 ---
 
+### Kiro
+
+**Install and initialize:**
+
+```bash
+pip install aamad
+aamad init --ide kiro --dest .
+```
+
+Or with uv:
+
+```bash
+uv pip install aamad
+uv run aamad init --ide kiro --dest .
+```
+
+**Folder structure after init:**
+
+```
+your-project/
+├── .kiro/
+│   ├── agents/          # Persona definitions (Kiro custom agents)
+│   ├── steering/        # Always-on rules + manual Phase 1 / sync-docs prompts
+│   └── skills/          # Agent skills (e.g. run-evals)
+├── .cursor/
+│   └── templates/       # PRD, SAD, MR templates (shared)
+├── project-context/
+│   ├── 1.define/
+│   ├── 2.build/
+│   └── 3.deliver/
+├── AGENTS.md
+├── CHECKLIST.md
+└── README.md
+```
+
+Switch personas from the agent picker in the chat pane. Manual steering files (`phase-1-define`, `sync-docs`) appear as slash commands.
+
+---
+
 ### Using AAMAD in your IDE
 
 How you interact with AAMAD depends on your IDE. The framework produces the same artifacts (`project-context/`, templates, Phase 1 prompt); only rules and agent scaffolding differ.
 
 #### Workflow and context (per IDE)
 
-| What you do | Cursor | Claude Code | VS Code + Copilot |
-| :---------- | :----- | :---------- | :---------------- |
-| **Start a fresh context** (e.g. new module) | `Cmd+Shift+P` → **New Chat** | `/clear` or start a new session | Start a new chat session |
-| **Invoke a persona** | Type `@backend.eng` (or other agent) in chat | Ask to use the subagent by name, or refer to its description | Pick the agent from the dropdown, or use `@agent-name` |
-| **Reference a file** | `@path/to/file` in chat | `@path/to/file` in the prompt | `#file:path/to/file` or drag-and-drop the file |
-| **Phase transitions** (Define → Build → Deliver) | Switch persona manually in chat | Use subagent chaining or explicit instructions | Use **handoff** buttons in the chat UI (when configured) |
+| What you do | Cursor | Claude Code | VS Code + Copilot | Kiro |
+| :---------- | :----- | :---------- | :---------------- | :--- |
+| **Start a fresh context** (e.g. new module) | `Cmd+Shift+P` → **New Chat** | `/clear` or start a new session | Start a new chat session | Start a new chat session |
+| **Invoke a persona** | Type `@backend.eng` (or other agent) in chat | Ask to use the subagent by name, or refer to its description | Pick the agent from the dropdown, or use `@agent-name` | Pick the agent from the chat pane picker |
+| **Reference a file** | `@path/to/file` in chat | `@path/to/file` in the prompt | `#file:path/to/file` or drag-and-drop the file | `#file` references or attach from the workspace |
+| **Phase transitions** (Define → Build → Deliver) | Switch persona manually in chat | Use subagent chaining or explicit instructions | Use **handoff** buttons in the chat UI (when configured) | Switch persona from the agent picker |
 
 #### Capability comparison
 
-| Capability | Cursor | Claude Code | VS Code + Copilot |
-| :--------- | :----- | :---------- | :---------------- |
-| **AAMAD support** | Native (default) | Via `aamad init --ide claude-code` | Via `aamad init --ide vscode` |
-| **Glob-based rule scoping** | Yes | No (all rules loaded) | Yes (`applyTo:` in instructions) |
-| **Tool enforcement** | Instructions only | Hard allowlist/denylist | Tool allowlist in agent frontmatter |
-| **Agent handoffs** | Manual | Manual or subagent chaining | Native UI buttons (Define → Build → Deliver) |
-| **Parallel work** | Multiple chat tabs | Subagents / Agent Teams | Subagents |
-| **Model choice** | Multi-model | Claude models | Multi-model (GPT, Claude, Gemini, etc.) |
-| **Best for** | AAMAD as designed | CLI-first, solo use | Teams, enterprise, model diversity |
+| Capability | Cursor | Claude Code | VS Code + Copilot | Kiro |
+| :--------- | :----- | :---------- | :---------------- | :--- |
+| **AAMAD support** | Native | Via `aamad init --ide claude-code` | Via `aamad init --ide vscode` | Via `aamad init --ide kiro` |
+| **Glob-based rule scoping** | Yes | No (all rules loaded) | Yes (`applyTo:` in instructions) | Yes (`inclusion: fileMatch`; AAMAD rules use `always`) |
+| **Tool enforcement** | Instructions only | Hard allowlist/denylist | Tool allowlist in agent frontmatter | Tool list in agent frontmatter |
+| **Agent handoffs** | Manual | Manual or subagent chaining | Native UI buttons (Define → Build → Deliver) | Manual (agent picker) |
+| **Parallel work** | Multiple chat tabs | Subagents / Agent Teams | Subagents | Workflows / custom agents |
+| **Model choice** | Multi-model | Claude models | Multi-model (GPT, Claude, Gemini, etc.) | Multi-model |
+| **Best for** | AAMAD as designed | CLI-first, solo use | Teams, enterprise, model diversity | Spec-driven and steering-first workflows |
 
 #### What is the same in all IDEs
 
@@ -312,18 +353,18 @@ These are **IDE-agnostic** — no change when you switch:
 - **Crew logic and artifacts** — The same persona/rules/templates methodology regardless of IDE.
 - **Git and dependency setup** — Same repo and `pyproject.toml` workflow.
 
-What **does** change per IDE: where rules and agents live (`.cursor/`, `.claude/`, or `.github/`) and how you invoke personas and reference files (see table above).
+What **does** change per IDE: where rules and agents live (`.cursor/`, `.claude/`, `.github/`, or `.kiro/`) and how you invoke personas and reference files (see table above).
 
 ---
 
 **CLI flags:**
 
 - `--dest PATH` — Output directory (default: current directory)
-- `--ide {cursor,claude-code,vscode}` — Target IDE (default: cursor)
+- `--ide {cursor,claude-code,vscode,kiro}` — Target IDE. Omit on `init` to choose interactively.
 - `--overwrite` — Allow replacing existing files
 - `--dry-run` — Preview what would be written
 
-Inspect bundle contents: `aamad bundle-info --verbose` or `aamad bundle-info --ide claude-code`. For `--ide vscode`, artifacts are generated from the Cursor bundle (no separate bundle).
+Inspect bundle contents: `aamad bundle-info --verbose` or `aamad bundle-info --ide claude-code`. For `--ide vscode` and `--ide kiro`, artifacts are generated from the Cursor bundle (no separate bundle).
 
 ---
 
@@ -363,7 +404,7 @@ Use `AAMAD_TARGET_RUNTIME` to choose the runtime target for the generated multi-
 
 ## How to Use the Framework
 
-1. **Install** (recommended): `pip install aamad` then `aamad init --ide <cursor|claude-code|vscode>`
+1. **Install** (recommended): `pip install aamad` then `aamad init` (or `aamad init --ide <cursor|claude-code|vscode|kiro>`)
 2. **Optional project config:** copy `aamad.config.example.yml` → `aamad.config.yml` and set language, UI, testing, and security preferences.
 3. **Select runtime target** for Phase 2 (for example `AAMAD_TARGET_RUNTIME=crewai`, `AAMAD_TARGET_RUNTIME=claude-agent-sdk`, or `AAMAD_TARGET_RUNTIME=cursor-sdk`).
 4. Confirm your IDE has the full agent, prompt, and rule set.

@@ -1,12 +1,18 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 from .installer import ArtifactInstaller, extract_artifacts, get_bundle_path
+from .onboarding import (
+    IDE_CHOICES,
+    OnboardingCancelled,
+    OnboardingNotInteractive,
+    resolve_ide,
+)
 from .validator import format_report, validate_project
 
-IDE_CHOICES = ["cursor", "claude-code", "vscode"]
 PHASE_CHOICES = ["auto", "define", "build", "deliver"]
 
 
@@ -29,8 +35,11 @@ def build_parser() -> argparse.ArgumentParser:
     init_cmd.add_argument(
         "--ide",
         choices=IDE_CHOICES,
-        default="cursor",
-        help="Target IDE: cursor (default), claude-code, or vscode.",
+        default=None,
+        help=(
+            "Target IDE: cursor, claude-code, vscode, or kiro. "
+            "Omit to choose interactively."
+        ),
     )
     init_cmd.add_argument(
         "--overwrite",
@@ -50,7 +59,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--ide",
         choices=IDE_CHOICES,
         default="cursor",
-        help="Which bundle to inspect: cursor (default), claude-code, or vscode (uses cursor bundle).",
+        help="Which bundle to inspect: cursor (default), claude-code, vscode, or kiro (vscode and kiro use the cursor bundle).",
     )
     info_cmd.add_argument(
         "--verbose",
@@ -82,9 +91,17 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "init":
+        try:
+            ide = resolve_ide(args.ide)
+        except OnboardingNotInteractive as exc:
+            print(exc, file=sys.stderr)
+            return 2
+        except OnboardingCancelled as exc:
+            print(exc, file=sys.stderr)
+            return 2
         paths = extract_artifacts(
             destination=args.dest,
-            ide=args.ide,
+            ide=ide,
             overwrite=args.overwrite,
             dry_run=args.dry_run,
         )

@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-10-24
+
+### Added
+
+- **Kiro support** — `aamad init --ide kiro` converts the Cursor bundle into `.kiro/steering/`, `.kiro/agents/`, and `.kiro/skills/` (transform on the fly; no separate zip). Rules become always-on steering; personas become custom agents with `read`/`write`/`shell` (plus `web` for `@product-mgr` and `@system.arch`); `run-evals` copies as a native Agent Skill; Phase 1 and sync-docs prompts become manual steering. Shared output matches Claude Code: `project-context/`, `.cursor/templates/` only, docs, and `AGENTS.md`.
+- Guided `aamad init`: omitting `--ide` prompts "Which development environment will you use the AAMAD dev crew on?" with arrow-key choices (Cursor, Claude Code, VS Code with GitHub Copilot, Kiro). Non-interactive runs without `--ide` exit 2 instead of defaulting to Cursor. `--ide` still skips the prompt for CI and scripts.
+
+### Changed
+
+- `--ide` on `init` is optional (no longer defaults to `cursor`). Library `extract_artifacts` still defaults to `cursor`.
+- CLI `--ide` choices now include `kiro`.
+
 ## [0.8.0] - 2026-09-04
 
 ### Added
