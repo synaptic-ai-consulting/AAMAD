@@ -58,7 +58,8 @@ def format_next_steps(ide: str, mode: str) -> str:
                 " 2. Run *review-codebase, then *create-sad.",
                 " 3. Record the Operator Decision on project-context/1.define/sad.md.",
                 " 4. When approved, invoke @product-mgr for a constrained PRD and stories.",
-                " 5. Follow CHECKLIST.md Phase 0.",
+                " 5. If an approved enhancement adds a new surface, invoke @ux.designer for *design-ux.",
+                " 6. Follow CHECKLIST.md Phase 0.",
             ]
         )
     return "\n".join(
@@ -68,7 +69,8 @@ def format_next_steps(ide: str, mode: str) -> str:
             f" 1. {invoke}",
             " 2. Run *elicit-requirements (recommended), then *create-prd and *create-stories.",
             " 3. Hand off to @system.arch for *create-sad.",
-            " 4. Follow CHECKLIST.md Phase 1.",
+            " 4. When UI is in scope, invoke @ux.designer for *design-ux and approve ux.md.",
+            " 5. Follow CHECKLIST.md Phase 1.",
         ]
     )
 

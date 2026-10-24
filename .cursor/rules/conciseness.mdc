@@ -19,5 +19,5 @@ The operator-facing chat reply is not the artifact.
 Write as long as the owning skill already requires:
 
 - Halt and Report / Diagnostic
-- Operator gates (`AskQuestion`, the `*sync-docs` proposal, the `*run-evals` gap check, brownfield Operator Decision)
+- Operator gates (`AskQuestion`, the `*sync-docs` proposal, the `*update-visual-baselines` proposal, the `*run-evals` gap check, brownfield Operator Decision)
 - A question the operator asked that needs a short list

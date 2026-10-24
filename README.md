@@ -112,7 +112,7 @@ flowchart LR
 
 - **Phase 1 (Define):** Product Manager persona (`@product-mgr`) conducts structured elicitation (recommended), optional MRD for commercial products, and PRD/user stories. On brownfield projects this is a **constrained Define**: PRD and stories cover only the approved enhancement set.
 
-- **Phase 2 (Build):** Multi‑agent execution by Project Manager, System Architect, Frontend Engineer, Backend Engineer, Integration Engineer, QA Engineer (unit + integration stages), and (recommended) Security Engineer, governed by core/development-workflow rules and the selected runtime adapter rule.
+- **Phase 2 (Build):** Multi‑agent execution by UX Designer (when UI is in scope), Project Manager, Frontend Engineer, Backend Engineer, Integration Engineer, QA Engineer (unit + integration stages), and (recommended) Security Engineer, governed by core/development-workflow rules and the selected runtime adapter rule. Greenfield `@ux.designer` writes `ux.md` after the SAD; brownfield UX runs only for approved material UI enhancements.
 
 - **Phase 3 (Deliver):** DevOps Engineer (`@devops.eng`) packages the validated MVP using the `delivery-workflow` rule; artifacts include `project-context/3.deliver/deploy.md` and optionally `user-guide.md`.
 
@@ -189,7 +189,7 @@ AAMAD supports **Cursor**, **Claude Code**, **VS Code + GitHub Copilot**, and **
 | **Tool enforcement** | Instructions-based | Hard allowlist/denylist | Tool allowlist in frontmatter | Tool list in agent frontmatter |
 | **Phase 0 prompt** | `.cursor/prompts/prompt-phase-0-review` | `.claude/commands/phase-0-review.md` (slash command) | `.github/prompts/phase-0-review.prompt.md` | `.kiro/steering/phase-0-review.md` (manual steering / slash command) |
 | **Phase 1 prompt** | `.cursor/prompts/prompt-phase-1` | `.claude/commands/phase-1-define.md` (slash command) | `.github/prompts/phase-1-define.prompt.md` | `.kiro/steering/phase-1-define.md` (manual steering / slash command) |
-| **Skills** | `.cursor/skills/` (`run-evals`, `draw-diagram`, `sync-docs`) | `.claude/skills/` (native skills) | `.github/prompts/` (`run-evals.prompt.md`, `draw-diagram.prompt.md`, `sync-docs.prompt.md`) and `.github/skills/` | `.kiro/skills/` (native Agent Skills) |
+| **Skills** | `.cursor/skills/` (`run-evals`, `draw-diagram`, `sync-docs`, `product-design`, `visual-regression`) | `.claude/skills/` (native skills) | `.github/prompts/` (`run-evals.prompt.md`, `draw-diagram.prompt.md`, `sync-docs.prompt.md`, `product-design.prompt.md`, `visual-regression.prompt.md`) and `.github/skills/` | `.kiro/skills/` (native Agent Skills) |
 | **Templates** | `.cursor/templates/` | `.claude/templates/` | `.github/templates/` | `.kiro/templates/` |
 | **Project context** | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) |
 | **Bridge file** | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) |
@@ -229,11 +229,11 @@ your-project/
 │   ├── agents/          # Persona definitions (@product-mgr, @backend.eng, etc.)
 │   ├── prompts/         # Phase-specific prompts (prompt-phase-0-review, prompt-phase-1)
 │   ├── rules/           # Always-on rules (*.mdc)
-│   ├── skills/          # Agent skills (run-evals, draw-diagram, sync-docs)
-│   └── templates/      # PRD, SAD, brownfield review templates
+│   ├── skills/          # Agent skills (run-evals, draw-diagram, sync-docs, product-design, visual-regression)
+│   └── templates/      # PRD, SAD, UX, brownfield review templates
 ├── project-context/
 │   ├── 0.review/        # Brownfield only: current-state, docs, architecture backlog
-│   ├── 1.define/        # MRD, PRD, SAD outputs
+│   ├── 1.define/        # MRD, PRD, SAD, ux.md outputs
 │   ├── 2.build/         # setup.md, frontend.md, backend.md, etc.
 │   └── 3.deliver/       # deploy runbook and configs
 ├── AGENTS.md            # Bridge file (IDE discoverability)
@@ -260,8 +260,8 @@ your-project/
 │   ├── agents/          # Persona definitions (Claude Code format)
 │   ├── commands/        # Slash commands (phase-0-review, phase-1-define)
 │   ├── rules/           # Individual rule files (*.md)
-│   ├── skills/          # Agent skills (run-evals, draw-diagram, sync-docs)
-│   ├── templates/       # PRD, SAD, brownfield review templates
+│   ├── skills/          # Agent skills (run-evals, draw-diagram, sync-docs, product-design, visual-regression)
+│   ├── templates/       # PRD, SAD, UX, brownfield review templates
 │   └── settings.json    # Permissions, AAMAD_TARGET_RUNTIME env
 ├── project-context/
 │   ├── 0.review/        # Brownfield only
@@ -292,8 +292,8 @@ your-project/
 ├── .github/
 │   ├── instructions/   # Copilot instructions (*.instructions.md)
 │   ├── agents/         # Custom agents (*.agent.md) with optional handoffs
-│   ├── prompts/        # Phase 0/1, sync-docs, run-evals, draw-diagram
-│   └── templates/      # PRD, SAD, brownfield review templates
+│   ├── prompts/        # Phase 0/1, sync-docs, run-evals, draw-diagram, product-design, visual-regression
+│   └── templates/      # PRD, SAD, UX, brownfield review templates
 ├── .vscode/
 │   └── settings.json   # chat.instructionsFilesLocations, chat.agentFilesLocations
 ├── project-context/
@@ -323,8 +323,8 @@ your-project/
 ├── .kiro/
 │   ├── agents/          # Persona definitions (Kiro custom agents)
 │   ├── steering/        # Always-on rules + manual Phase 0 / Phase 1 / sync-docs prompts
-│   ├── skills/          # Agent skills (run-evals, draw-diagram, sync-docs)
-│   └── templates/       # PRD, SAD, brownfield review templates
+│   ├── skills/          # Agent skills (run-evals, draw-diagram, sync-docs, product-design, visual-regression)
+│   └── templates/       # PRD, SAD, UX, brownfield review templates
 ├── project-context/
 │   ├── 0.review/        # Brownfield only
 │   ├── 1.define/
@@ -357,7 +357,7 @@ Use `AAMAD_TARGET_RUNTIME` to choose the runtime target for the generated multi-
 2. **Confirm the IDE layout** in [Multi-IDE support](#multi-ide-support). Adjust `aamad.config.yml` if you need language, UI, testing, or security preferences (`project.mode` is already set).
 3. **Confirm `AAMAD_TARGET_RUNTIME`** before Build-phase implementation. Greenfield init may have already set it; if you chose later, CrewAI is the default until you set `crewai`, `claude-agent-sdk`, or `cursor-sdk`. See [Runtime adapters](#runtime-adapters).
 4. **Run the spine for your mode** (details in the phase sections below and in `CHECKLIST.md`):
-   - **Greenfield:** [Phase 1 Define](#phase-1-define-stage-product-manager) (`@product-mgr`) → SAD (`@system.arch`) → [Phase 2 Build](#phase-2-build-stage-multi-agent) → [Phase 3 Deliver](#phase-3-deliver-stage-devops).
+   - **Greenfield:** [Phase 1 Define](#phase-1-define-stage-product-manager) (`@product-mgr`) → SAD (`@system.arch`) → UX spec (`@ux.designer`, when UI is in scope) → [Phase 2 Build](#phase-2-build-stage-multi-agent) → [Phase 3 Deliver](#phase-3-deliver-stage-devops).
    - **Brownfield:** [Phase 0 Review](#phase-0-brownfield-review-system-architect) (`@system.arch` `*review-codebase` then `*create-sad`) → operator records the SAD Operator Decision → constrained [Phase 1](#phase-1-define-stage-product-manager) (approved enhancements only) → Build → Deliver. Do not scaffold a replacement app.
 5. **Validate at each gate:** `aamad validate --phase review` (brownfield), then `--phase define`, `--phase build`, and `--phase deliver`.
 6. **Keep docs aligned** after code changes: Cursor `.cursor/prompts/prompt-sync-docs`, Claude Code `/sync-docs`, VS Code `sync-docs` prompt, Kiro `/sync-docs`.
@@ -394,11 +394,12 @@ Before implementation, confirm `AAMAD_TARGET_RUNTIME` (`crewai` default if unset
 Phase 2 is executed by running each epic in sequence after completing Phase 1:
 
 - **Architecture:** Greenfield generates `sad.md`; brownfield already has an as-is SAD from Phase 0. Fill eval criteria via `*define-eval-criteria` after a PRD exists.
+- **UX (when UI is in scope):** `@ux.designer` `*design-ux` writes `ux.md` and waits for operator approval. Brownfield: only for approved enhancements that add a new surface, flow, or interaction pattern. Shared method: `.cursor/skills/product-design/`. Adopt an external brand with `ui.design_system_mode: adopt` and a workspace path in `ui.design_system_source`.
 - **Setup:** Scaffold environment, install dependencies, and document (`setup.md`)
-- **Frontend:** Build UI + placeholders, document (`frontend.md`)
+- **Frontend:** Implement the approved `ux.md` contract, render and review (`ux-review.md`), then scaffold Playwright Test visual snapshots in the generated app (`.cursor/skills/visual-regression/`). A matching baseline is not proof the design is good.
 - **Backend:** Implement backend for the selected runtime, document (`backend.md`)
 - **Integration:** Wire up chat flow, verify, document (`integration.md`)
-- **Quality Assurance:** Run `*test-unit` and `*test-integration`, then smoke/acceptance (`*qa`); map tests to acceptance-criteria IDs when present; log in `qa.md`
+- **Quality Assurance:** Run `*test-unit` and `*test-integration`, then smoke/acceptance (`*qa`); when UI is in scope run `*test-visual` (Playwright snapshots in the generated app). Map tests to acceptance-criteria IDs when present; log in `qa.md`. A matching baseline is not a Human judgment pass.
 - **Evals (recommended):** `*run-evals` — golden dataset, code-based checks, LLM-as-judge scoring, and production monitoring recommendations for DevOps; logged in `evals.md`. Already past QA on an existing project? Run `*run-evals` directly — it asks you for any missing thresholds instead of blocking (see `.cursor/skills/run-evals/`).
 - **Diagrams:** when an artifact needs a figure, the owning persona draws it with `*draw-diagram` (editorial HTML and SVG under `project-context/diagrams/<persona-id>/`). That is the default diagram tool. See `.cursor/skills/draw-diagram/`.
 - **Doc sync:** after a code, config, or deploy change, the persona that made it runs `*sync-docs`, asks for operator approval, then updates only approved descriptive docs. PRD, SAD, and Review artifacts stay the source of truth. See `.cursor/skills/sync-docs/`.

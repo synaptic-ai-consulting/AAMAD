@@ -9,7 +9,7 @@ alwaysApply: true
 
 ## Principles
 - **Single responsibility personas:** each persona owns a defined epic with explicit inputs, outputs, and prohibited actions.
-- **Context-first engineering:** all outputs must trace to PRD, SAD, SFS, user stories, or (brownfield) Review artifacts; do not invent requirements.
+- **Context-first engineering:** all outputs must trace to PRD, SAD, SFS, user stories, ux.md, or (brownfield) Review artifacts; do not invent requirements.
 - **Reproducibility and provenance:** every artifact includes Sources, Assumptions, and Open Questions sections.
 - **Deterministic execution:** actions are idempotent; perform temp-write-then-atomic-replace for file outputs.
 - **Minimal viable architecture first:** implement MVP scope before expanding; document deferrals with rationale.

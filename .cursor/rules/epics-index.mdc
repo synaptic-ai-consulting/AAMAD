@@ -9,8 +9,9 @@ alwaysApply: true
 |--------------|---------------|------------------------|-------------------------------|-------------------|
 | Review       | @system.arch   | current-state.md, documentation.md, architecture-backlog.md | Existing codebase | *review-codebase |
 | Architecture | @system.arch   | sad.md                 | SAD: Views & Decisions (greenfield: PRD; brownfield: 0.review + Proposed Enhancements) | *create-sad |
+| UX           | @ux.designer   | ux.md                  | PRD: UI Scope, SAD: Frontend, approved enhancements (brownfield) | *design-ux        |
 | Setup        | @project.mgr   | setup.md               | SAD: Environment, PRD: Setup   | *setup-project    |
-| Frontend     | @frontend.eng  | frontend.md            | SAD: MVP UI, PRD: UI Scope     | *develop-fe       |
+| Frontend     | @frontend.eng  | frontend.md, ux-review.md | SAD: MVP UI, ux.md | *develop-fe       |
 | Backend      | @backend.eng   | backend.md             | SAD: Crew Spec, PRD: Agent Def | *develop-be       |
 | Integration  | @integration.eng | integration.md       | SAD: API & Flows, PRD: Int Req | *integrate-api    |
 | QA           | @qa.eng        | qa.md                  | SAD: Testing, PRD: QA Plan     | *qa               |
@@ -19,11 +20,12 @@ alwaysApply: true
 | Deploy       | @devops.eng    | deploy.md              | SAD: DevOps & Deployment       | *prepare-release  |
 
 ## Execution Notes
-- Greenfield personas reference project-context/1.define/prd.md and sad.md.
-- Brownfield Review artifacts live under project-context/0.review/; constrained Define still writes prd.md after Operator Decision.
+- Greenfield personas reference project-context/1.define/prd.md, sad.md, and ux.md when UI is in scope.
+- Brownfield Review artifacts live under project-context/0.review/; constrained Define still writes prd.md after Operator Decision. UX runs only for approved enhancements that add a new surface, flow, or interaction pattern.
 - Build-phase artifacts live under project-context/2.build/; Deliver artifact is project-context/3.deliver/deploy.md.
 - Mark “future work” visibly in UI and docs as needed.
 - Update this index as epics progress or new ones are added.
 - Diagrams: when an artifact needs a figure, draw it with `.cursor/skills/draw-diagram/SKILL.md` under `project-context/diagrams/<persona-id>/`. Do not use Mermaid, PlantUML, or another diagram tool for a new diagram.
 - Doc sync: after a code, config, or deploy change, the persona that made it runs `*sync-docs` (`.cursor/skills/sync-docs/SKILL.md`) once before finishing. Descriptive docs wait for operator approval. Define and Review artifacts are not rewritten to match the code.
+- UX: `@ux.designer` `*design-ux` writes `ux.md` for material UI. `@frontend.eng` implements it and writes `ux-review.md`. Shared method: `.cursor/skills/product-design/SKILL.md`. Visual snapshots: `.cursor/skills/visual-regression/SKILL.md`.
 

@@ -6,8 +6,9 @@ This is the default tool when a persona's document needs a diagram. Draw only th
 |---|---|---|
 | `@product-mgr` | journey, story-map, quadrant | `system-description.md`, `prd.md`, `mrd.md`, user stories |
 | `@system.arch` | architecture, architecture-delta, it-state, nested, layers, dependency, high-level, deployment, er | Review artifacts, `sad.md`, `sfs/`, `prd.md` |
+| `@ux.designer` | journey, flowchart | `prd.md`, `sad.md`, `ux.md`, user stories, Review artifacts |
 | `@project.mgr` | high-level, timeline | `prd.md`, `sad.md`, `setup.md` |
-| `@frontend.eng` | flowchart, journey | `prd.md`, `sad.md`, `frontend.md` |
+| `@frontend.eng` | flowchart, journey | `prd.md`, `sad.md`, `ux.md`, `frontend.md` |
 | `@backend.eng` | sequence, state, er, db-schema | `prd.md`, `sad.md`, `backend.md` |
 | `@integration.eng` | sequence, swimlane, data-flow, process | `prd.md`, `frontend.md`, `backend.md`, `integration.md` |
 | `@qa.eng` | flowchart, sequence | `qa.md`, `prd.md`, `sad.md` |

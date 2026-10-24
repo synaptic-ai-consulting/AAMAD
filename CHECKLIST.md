@@ -22,12 +22,12 @@ This checklist guides you step-by-step through running AAMAD: greenfield starts 
 
 - [ ] Confirm expected outputs for **your** IDE (templates live in that IDE folder):
 
-  - [ ] **Cursor:** `.cursor/agents/`, `.cursor/rules/` (includes `conciseness.mdc`), `.cursor/prompts/`, `.cursor/skills/` (`run-evals`, `draw-diagram`, `sync-docs`), `.cursor/templates/`, root `AGENTS.md`
-  - [ ] **Claude Code:** `.claude/` (`agents/`, `rules/`, `commands/`, `skills/`, `templates/`, `settings.json`), `AGENTS.md`
-  - [ ] **VS Code + Copilot:** `.github/instructions/`, `.github/agents/`, `.github/prompts/` (includes `run-evals`, `draw-diagram`, `sync-docs`), `.github/skills/`, `.github/templates/`, `.vscode/settings.json`, `AGENTS.md`
-  - [ ] **Kiro:** `.kiro/agents/`, `.kiro/steering/` (rules + manual Phase 0 / Phase 1 / sync-docs), `.kiro/skills/`, `.kiro/templates/`, `AGENTS.md`
+  - [ ] **Cursor:** `.cursor/agents/` (includes `ux-designer`), `.cursor/rules/` (includes `conciseness.mdc`), `.cursor/prompts/`, `.cursor/skills/` (`run-evals`, `draw-diagram`, `sync-docs`, `product-design`, `visual-regression`), `.cursor/templates/` (includes `ux-template.md`), root `AGENTS.md`
+  - [ ] **Claude Code:** `.claude/` (`agents/` including `ux-designer`, `rules/`, `commands/`, `skills/` including `product-design` and `visual-regression`, `templates/`, `settings.json`), `AGENTS.md`
+  - [ ] **VS Code + Copilot:** `.github/instructions/`, `.github/agents/` (includes `ux-designer`), `.github/prompts/` (includes `run-evals`, `draw-diagram`, `sync-docs`, `product-design`, `visual-regression`), `.github/skills/`, `.github/templates/`, `.vscode/settings.json`, `AGENTS.md`
+  - [ ] **Kiro:** `.kiro/agents/` (includes `ux-designer`), `.kiro/steering/` (rules + manual Phase 0 / Phase 1 / sync-docs), `.kiro/skills/` (includes `product-design` and `visual-regression`), `.kiro/templates/` (includes `ux-template.md`), `AGENTS.md`
 
-- [ ] Upgrading an existing project to 0.9.6: `aamad init --overwrite --ide <cursor|claude-code|vscode|kiro>` to pick up `draw-diagram`, `sync-docs`, and `conciseness`. Claude Code, VS Code, or Kiro projects from 0.9.0 or earlier: if this project is not using Cursor, delete leftover `.cursor/`.
+- [ ] Upgrading an existing project to 0.9.7: `aamad init --overwrite --ide <cursor|claude-code|vscode|kiro>` to pick up `@ux.designer`, `product-design`, `visual-regression`, and the UX templates. Claude Code, VS Code, or Kiro projects from 0.9.0 or earlier: if this project is not using Cursor, delete leftover `.cursor/`.
 
 - [ ] Confirm `aamad.config.yml` exists with `project.mode` set by init. Optionally edit other preferences (or copy remaining keys from `aamad.config.example.yml`).
 - [ ] Brownfield: `project-context/0.review/` exists; an existing project README was left in place.
@@ -83,7 +83,7 @@ Skip this section when `project.mode` is `greenfield`.
     - [ ] `*create-stories` — MVP user stories under project-context/1.define/user-stories/
 - [ ] Validate completeness: market analysis (when MRD produced), user personas, feature requirements, acceptance criteria, success metrics, and business/operational goals.
 - [ ] Record assumptions and open questions in artifacts for downstream resolution.
-- [ ] Approve context boundaries and artifacts for the next phase (greenfield → `@system.arch`; brownfield → Build).
+- [ ] Approve context boundaries and artifacts for the next phase (greenfield → `@system.arch`; brownfield → `@ux.designer` if an approved enhancement adds a new surface, otherwise Build).
 
 ---
 
@@ -94,6 +94,7 @@ Skip this section when `project.mode` is `greenfield`.
   - [ ] mrd.md (MRD) — **optional** (required only for commercial/market-facing greenfield projects)
   - [ ] system-description.md — recommended when elicitation was used
   - [ ] sad.md (SAD — greenfield: after architecture step; brownfield: already written in Phase 0)
+  - [ ] ux.md — **when UI is in scope** (greenfield after SAD; brownfield only for material UI enhancements). Approval `approved` or `approved-with-changes` before material frontend work.
 - [ ] Brownfield: `project-context/0.review/` current-state, documentation, and architecture-backlog are present; Operator Decision is approved.
 - [ ] Confirm framework layout from **Install and IDE layout** is still present (re-run `aamad init` with `--overwrite` only if you intend to refresh generated files).
 - [ ] Confirm `AAMAD_TARGET_RUNTIME` is set to your chosen runtime (see **Runtime target** above).
@@ -119,6 +120,20 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 ---
 
+### Step 0b: UX specification (`@ux.designer`) — when UI is in scope
+
+- [ ] **Greenfield:** Invoke `@ux.designer` after SAD exists.
+- [ ] **Brownfield:** Invoke `@ux.designer` only when an approved enhancement adds a new surface, flow, or interaction pattern. Skip for label/copy/reuse or backend-only work.
+- [ ] Run `*design-ux`
+  - [ ] Write `project-context/1.define/ux.md` from `ux-template.md`
+  - [ ] Resolve `ui.design_system_mode` (`create` | `adopt` | `extend`) and `ui.design_system_source`
+  - [ ] For a new surface, prototype the hardest screen under `project-context/1.define/prototypes/`
+  - [ ] Leave Approval `pending` unless the operator already recorded a status
+- [ ] Operator sets Approval: `approved` | `approved-with-changes` | `rejected`.
+- [ ] Do not start material frontend work while Approval is `pending` or `rejected`.
+
+---
+
 ### Step 1: Environment Setup (`@project.mgr`)
 
 - [ ] Invoke `@project.mgr`.
@@ -133,9 +148,12 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 - [ ] Invoke `@frontend.eng`.
 - [ ] Run `*develop-fe`
-  - [ ] Implement MVP chat interface (or PRD-specified UI)
+  - [ ] Implement the approved `ux.md` contract (or record a skip if there is no user-facing UI)
   - [ ] Add UI stubs for future planned features
-  - [ ] Style and make the interface responsive
+  - [ ] Apply approved tokens and the agreed responsive behavior
+  - [ ] Render, exercise the primary task and failure paths, inspect agreed viewports
+  - [ ] Write `project-context/2.build/ux-review.md`
+  - [ ] After Human judgment, scaffold Playwright visual snapshots (`visual-regression` skill) or record **not tested** with rationale
   - [ ] Document all decisions and status in frontend.md
 
 ---
@@ -167,8 +185,10 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 - [ ] Run `*test-unit` — unit tests; map to AC-* IDs when available; log in qa.md
 - [ ] Run `*test-integration` — integration tests across UI/API/runtime; log in qa.md
 - [ ] Run `*qa` / `*verify-flow`
-  - [ ] Perform smoke tests and functional tests on chat flow
+  - [ ] Perform smoke tests and functional tests on the primary UI flow
   - [ ] Verify frontend and backend are connected
+  - [ ] When a UI exists, consume `ux.md` and `ux-review.md`; check accessibility, responsive behavior, and interface quality on changed routes
+  - [ ] Run `*test-visual` when UI is in scope; a green visual run is not a Human judgment pass
   - [ ] Log issues, known gaps, and future work in qa.md
 
 ---
@@ -201,6 +221,7 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
   - [ ] Summarize release scope and version in deploy.md
 - [ ] Run `*define-deploy` and `*configure-cicd`
   - [ ] Add minimal deploy and CI config aligned with SAD and AAMAD_TARGET_RUNTIME
+  - [ ] When UI is in scope, include a generated visual-regression job (install browsers, run the recorded script)
   - [ ] Do not embed secrets; reference `.env.example` keys only
 - [ ] Run `*document-deploy`
   - [ ] Complete project-context/3.deliver/deploy.md (hosting, access control, rollback, Audit)
@@ -213,7 +234,7 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 ### Step 7: Local MVP Launch
 
 - [ ] Follow docs in setup.md and integration.md to run the full MVP locally
-- [ ] Confirm MVP chat use case works end-to-end
+- [ ] Confirm the primary MVP use case works end-to-end
 - [ ] Review all generated artifact files in project-context/2.build and 3.deliver
 
 ---

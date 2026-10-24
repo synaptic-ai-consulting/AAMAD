@@ -224,6 +224,97 @@ def test_brownfield_define_passes_when_approved(project: Path) -> None:
     assert not any(i.path.endswith("mrd.md") for i in result.issues)
 
 
+def test_ux_review_missing_warns_when_ui_in_scope(project: Path) -> None:
+    _write(project / "project-context/1.define/prd.md")
+    _write(project / "project-context/1.define/sad.md")
+    _write(
+        project / "project-context/1.define/ux.md",
+        "# UX\n\n**Approval status**: `approved`\n\n" + TERMINAL,
+    )
+    for name in ("setup.md", "frontend.md", "backend.md", "integration.md", "qa.md"):
+        _write(project / "project-context/2.build" / name)
+    result = validate_project(project, phase="build")
+    assert result.ok, format_report(result)
+    assert any(
+        i.level == "warning" and i.path.endswith("ux-review.md") for i in result.issues
+    )
+
+
+def test_ux_review_missing_does_not_warn_on_no_ui_skip(project: Path) -> None:
+    _write(project / "project-context/1.define/prd.md")
+    _write(project / "project-context/1.define/sad.md")
+    _write(
+        project / "project-context/2.build/frontend.md",
+        "# Frontend\n\n## Assumptions\n- no-UI skip: API-only service\n\n" + TERMINAL,
+    )
+    for name in ("setup.md", "backend.md", "integration.md", "qa.md"):
+        _write(project / "project-context/2.build" / name)
+    result = validate_project(project, phase="build")
+    assert result.ok, format_report(result)
+    assert not any(i.path.endswith("ux-review.md") for i in result.issues)
+
+
+def test_ux_approval_pending_is_warning_not_error(project: Path) -> None:
+    _write(project / "project-context/1.define/prd.md")
+    _write(project / "project-context/1.define/sad.md")
+    _write(
+        project / "project-context/1.define/ux.md",
+        "# UX\n\n**Approval status**: `pending`\n\n" + TERMINAL,
+    )
+    result = validate_project(project, phase="define")
+    assert result.ok, format_report(result)
+    assert any(
+        i.level == "warning" and i.path.endswith("ux.md") and "pending" in i.message
+        for i in result.issues
+    )
+
+
+def test_require_visual_regression_warns_without_evidence(project: Path) -> None:
+    _write(project / "project-context/1.define/prd.md")
+    _write(project / "project-context/1.define/sad.md")
+    _write(
+        project / "project-context/1.define/ux.md",
+        "# UX\n\n**Approval status**: `approved`\n\n" + TERMINAL,
+    )
+    for name in ("setup.md", "frontend.md", "backend.md", "integration.md", "qa.md"):
+        _write(project / "project-context/2.build" / name)
+    _write(project / "project-context/2.build/ux-review.md")
+    (project / "aamad.config.yml").write_text(
+        "version: 1\ntesting:\n  require_visual_regression: true\n",
+        encoding="utf-8",
+    )
+    result = validate_project(project, phase="build")
+    assert result.ok, format_report(result)
+    assert any(
+        i.level == "warning"
+        and i.path.endswith("ux-review.md")
+        and "require_visual_regression" in i.message
+        for i in result.issues
+    )
+
+
+def test_require_visual_regression_passes_with_evidence(project: Path) -> None:
+    _write(project / "project-context/1.define/prd.md")
+    _write(project / "project-context/1.define/sad.md")
+    _write(
+        project / "project-context/1.define/ux.md",
+        "# UX\n\n**Approval status**: `approved`\n\n" + TERMINAL,
+    )
+    for name in ("setup.md", "frontend.md", "backend.md", "integration.md", "qa.md"):
+        _write(project / "project-context/2.build" / name)
+    _write(
+        project / "project-context/2.build/ux-review.md",
+        "# Review\n\n### 3b. Visual regression\n- Result: passed\n\n" + TERMINAL,
+    )
+    (project / "aamad.config.yml").write_text(
+        "version: 1\ntesting:\n  require_visual_regression: true\n",
+        encoding="utf-8",
+    )
+    result = validate_project(project, phase="build")
+    assert result.ok, format_report(result)
+    assert not any("require_visual_regression" in i.message for i in result.issues)
+
+
 def test_brownfield_define_rejects_rejected_status(project: Path) -> None:
     _write_review_artifacts(project, status="rejected")
     _write(project / "project-context/1.define/prd.md")

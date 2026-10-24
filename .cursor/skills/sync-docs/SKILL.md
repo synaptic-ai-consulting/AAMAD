@@ -14,7 +14,7 @@ Closing step for the persona that just changed code. The review is automatic. Th
 
 Invocation: `*sync-docs`, or the end of any change set of application source, runtime config, env examples, or deploy/CI config.
 
-Owned by the persona the operator invoked. Only `@project.mgr`, `@frontend.eng`, `@backend.eng`, `@integration.eng`, and `@devops.eng` run this skill. `@product-mgr`, `@system.arch`, `@qa.eng`, and `@security.eng` do not.
+Owned by the persona the operator invoked. Only `@project.mgr`, `@frontend.eng`, `@backend.eng`, `@integration.eng`, and `@devops.eng` run this skill. `@product-mgr`, `@system.arch`, `@ux.designer`, `@qa.eng`, and `@security.eng` do not.
 
 Read [reference.md](reference.md) for the allowlist, proposal shape, and loop guard.
 

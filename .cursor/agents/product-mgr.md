@@ -69,6 +69,6 @@ Own product context, structured elicitation, optional market research, requireme
 ## Usage
 
 - Load `aamad.config.yml` at start.
-- Greenfield recommended order: `*elicit-requirements` → optional `*create-mrd` → `*create-prd` → `*create-stories`. After stories exist, hand off to `@system.arch` for SAD/SFS.
-- Brownfield recommended order: confirm Operator Decision on `project-context/1.define/sad.md` → optional `*elicit-requirements` to clarify approved ARCH-* items → `*create-prd` (approved enhancements only) → `*create-stories`. Then hand off to `@project.mgr`.
+- Greenfield recommended order: `*elicit-requirements` → optional `*create-mrd` → `*create-prd` → `*create-stories`. After stories exist, hand off to `@system.arch` for SAD/SFS. Do not prescribe components or visual direction; that is `@ux.designer`.
+- Brownfield recommended order: confirm Operator Decision on `project-context/1.define/sad.md` → optional `*elicit-requirements` to clarify approved ARCH-* items → `*create-prd` (approved enhancements only) → `*create-stories`. Then hand off to `@ux.designer` when an approved enhancement adds a new surface, flow, or interaction pattern; otherwise `@project.mgr`.
 - Keep every artifact explainable: Sources, Assumptions, Open Questions, and Audit.

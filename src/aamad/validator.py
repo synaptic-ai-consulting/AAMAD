@@ -43,6 +43,9 @@ BUILD_ARTIFACTS = (
 BUILD_OPTIONAL = (
     "project-context/2.build/evals.md",
 )
+UX_SPEC = "project-context/1.define/ux.md"
+UX_REVIEW = "project-context/2.build/ux-review.md"
+FRONTEND_MD = "project-context/2.build/frontend.md"
 DELIVER_ARTIFACTS = (
     "project-context/3.deliver/deploy.md",
 )
@@ -59,6 +62,24 @@ OPERATOR_STATUS_WORD_RE = re.compile(
     r"(?i)\b(pending|approved-with-changes|approved|rejected)\b"
 )
 APPROVED_STATUSES = frozenset({"approved", "approved-with-changes"})
+
+NO_UI_SKIP_RE = re.compile(
+    r"(?i)\bno[- ]ui skip\b|\bno user-facing UI\b|\bno user facing UI\b"
+)
+UX_APPROVAL_RE = re.compile(
+    r"(?i)(?:approval status|\*\*approval status\*\*|approval)\s*[:=]\s*`?"
+    r"(pending|approved-with-changes|approved|rejected)`?"
+)
+VISUAL_PASSED_OR_FAILED_RE = re.compile(
+    r"(?i)visual regression[\s\S]{0,800}\b(passed|failed)\b"
+)
+VISUAL_NOT_TESTED_RE = re.compile(
+    r"(?i)visual regression[\s\S]{0,800}\bnot tested\b"
+)
+VISUAL_SKIP_RE = re.compile(
+    r"(?i)(no[- ]ui skip|no user-facing UI|no user facing UI|skip rationale|"
+    r"operator declined|brownfield small change)"
+)
 
 KNOWN_CONFIG_TOP_KEYS = frozenset(
     {
@@ -151,25 +172,97 @@ def _operator_decision_status(text: str) -> str | None:
     return word.group(1).lower() if word else None
 
 
-def _read_project_mode(root: Path) -> str | None:
+def _read_config(root: Path) -> dict:
     path = root / "aamad.config.yml"
     if not path.is_file():
-        return None
+        return {}
     try:
         import yaml
 
         data = yaml.safe_load(path.read_text(encoding="utf-8"))
     except Exception:
-        return None
-    if not isinstance(data, dict):
-        return None
-    project = data.get("project")
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _read_project_mode(root: Path) -> str | None:
+    project = _read_config(root).get("project")
     if not isinstance(project, dict):
         return None
     mode = project.get("mode")
     if mode in ("greenfield", "brownfield"):
         return mode
     return None
+
+
+def _require_visual_regression(root: Path) -> bool:
+    testing = _read_config(root).get("testing")
+    if not isinstance(testing, dict):
+        return False
+    return bool(testing.get("require_visual_regression"))
+
+
+def _ui_in_scope(root: Path) -> bool:
+    if (root / UX_SPEC).is_file():
+        return True
+    frontend = root / FRONTEND_MD
+    if not frontend.is_file():
+        return False
+    return not NO_UI_SKIP_RE.search(frontend.read_text(encoding="utf-8"))
+
+
+def _ux_approval_status(text: str) -> str | None:
+    match = UX_APPROVAL_RE.search(text)
+    return match.group(1).lower() if match else None
+
+
+def _has_visual_regression_evidence(text: str) -> bool:
+    if VISUAL_PASSED_OR_FAILED_RE.search(text):
+        return True
+    if VISUAL_NOT_TESTED_RE.search(text) and VISUAL_SKIP_RE.search(text):
+        return True
+    return False
+
+
+def _check_ux_gates(root: Path, phase: str, result: ValidationResult) -> None:
+    ux_path = root / UX_SPEC
+    if ux_path.is_file() and phase in ("define", "build", "deliver"):
+        _check_terminal_sections(ux_path, result)
+        status = _ux_approval_status(ux_path.read_text(encoding="utf-8"))
+        if status is None or status not in APPROVED_STATUSES:
+            label = status if status else "missing"
+            result.add(
+                "warning",
+                UX_SPEC,
+                f"ux.md Approval status is {label}; "
+                "material UI work expects approved or approved-with-changes",
+            )
+
+    if phase not in ("build", "deliver"):
+        return
+    if not _ui_in_scope(root):
+        return
+
+    review = root / UX_REVIEW
+    if review.is_file():
+        _check_terminal_sections(review, result)
+    else:
+        result.add(
+            "warning",
+            UX_REVIEW,
+            "ux-review.md not found (recommended for UI projects; run *review-ui)",
+        )
+
+    if not _require_visual_regression(root):
+        return
+    review_text = review.read_text(encoding="utf-8") if review.is_file() else ""
+    if not _has_visual_regression_evidence(review_text):
+        result.add(
+            "warning",
+            UX_REVIEW,
+            "testing.require_visual_regression is true but ux-review.md has no "
+            "visual-regression evidence (passed / failed / not tested with skip rationale)",
+        )
 
 
 def _is_brownfield(root: Path, exists) -> bool:
@@ -330,6 +423,7 @@ def validate_project(
             _check_terminal_sections(deploy, result)
             _check_runtime_in_audit(deploy, result, required=True)
 
+    _check_ux_gates(root, phase, result)
     _check_aamad_config(root, result)
     return result
 

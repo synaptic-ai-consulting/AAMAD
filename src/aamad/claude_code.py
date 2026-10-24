@@ -33,6 +33,7 @@ RULE_ORDER = [
 AGENT_IDS = [
     "product-mgr",
     "system-arch",
+    "ux-designer",
     "project-mgr",
     "frontend-eng",
     "backend-eng",

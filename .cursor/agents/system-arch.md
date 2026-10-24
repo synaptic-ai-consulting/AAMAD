@@ -88,4 +88,5 @@ Own architecture definition. On brownfield projects, start with a Review of the 
 - If inputs are incomplete, proceed with best-effort drafts and add explicit “Assumptions” and “Open Questions” sections for resolution.
 - Greenfield SAD/SFS stay traceable to PRD sections and user story IDs. Brownfield SAD stays traceable to `0.review/` IDs (`BH-*`, `ARCH-*`, `UNK-*`).
 - `*define-eval-criteria` defines the pass/fail contract only; `@qa.eng`'s `*run-evals` implements it during Build. Projects that reach Build without this table are not blocked — `*run-evals` runs its own operator gap check instead.
-- After a brownfield Operator Decision of `approved` or `approved-with-changes`, hand off to `@product-mgr` for constrained Define — do not run a second full `*create-sad` unless the operator asks to revise the as-is chapter.
+- After a brownfield Operator Decision of `approved` or `approved-with-changes`, hand off to `@product-mgr` for constrained Define — do not run a second full `*create-sad` unless the operator asks to revise the as-is chapter. Do not hand off to `@ux.designer` until the constrained PRD exists.
+- Greenfield: after SAD (and eval criteria when a PRD exists), hand off to `@ux.designer` when the PRD includes a user-facing surface; otherwise `@project.mgr`. Derive the surface from the PRD — do not default to chat or a dashboard.

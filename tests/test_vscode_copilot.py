@@ -482,6 +482,47 @@ def test_convert_skills_sync_docs_omits_agent_and_copies_tree(tmpdir):
     assert ref.read_text() == "# Ref\n"
 
 
+def test_convert_skills_visual_regression_omits_agent_and_copies_tree(tmpdir):
+    """visual-regression is a shared skill: no agent binding, reference files copied."""
+    skills_dir = tmpdir / "skills" / "visual-regression"
+    skills_dir.mkdir(parents=True)
+    (skills_dir / "SKILL.md").write_text(
+        "---\nname: visual-regression\ndescription: Visual.\n---\n\n# Visual regression\n"
+    )
+    (skills_dir / "reference.md").write_text("# Thresholds\n")
+    out = convert_skills(tmpdir / "skills", tmpdir / "out")
+    prompt = tmpdir / "out" / ".github" / "prompts" / "visual-regression.prompt.md"
+    ref = tmpdir / "out" / ".github" / "skills" / "visual-regression" / "reference.md"
+    assert prompt in out
+    assert ref in out
+    text = prompt.read_text()
+    assert "agent:" not in text
+    assert "Visual regression" in text
+    assert ref.read_text() == "# Thresholds\n"
+
+
+def test_convert_skills_product_design_omits_agent_and_copies_tree(tmpdir):
+    """product-design is a shared skill: no agent binding, reference files copied."""
+    skills_dir = tmpdir / "skills" / "product-design"
+    skills_dir.mkdir(parents=True)
+    (skills_dir / "SKILL.md").write_text(
+        "---\nname: product-design\ndescription: Design.\n---\n\n# Product design\n"
+    )
+    (skills_dir / "reference.md").write_text("# Router\n")
+    (skills_dir / "states.md").write_text("# States\n")
+    out = convert_skills(tmpdir / "skills", tmpdir / "out")
+    prompt = tmpdir / "out" / ".github" / "prompts" / "product-design.prompt.md"
+    ref = tmpdir / "out" / ".github" / "skills" / "product-design" / "reference.md"
+    states = tmpdir / "out" / ".github" / "skills" / "product-design" / "states.md"
+    assert prompt in out
+    assert ref in out
+    assert states in out
+    text = prompt.read_text()
+    assert "agent:" not in text
+    assert "Product design" in text
+    assert ref.read_text() == "# Router\n"
+
+
 def test_convert_skills_missing_skill_returns_empty(tmpdir):
     """convert_skills returns [] when the named skill directory does not exist."""
     skills_dir = tmpdir / "skills"
@@ -601,8 +642,13 @@ def test_get_vscode_planned_paths():
     assert dest / ".github" / "prompts" / "phase-1-define.prompt.md" in paths
     assert dest / ".github" / "prompts" / "sync-docs.prompt.md" in paths
     assert dest / ".github" / "prompts" / "run-evals.prompt.md" in paths
+    assert dest / ".github" / "prompts" / "product-design.prompt.md" in paths
+    assert dest / ".github" / "prompts" / "visual-regression.prompt.md" in paths
     assert dest / ".github" / "templates" / "prd-template.md" in paths
     assert dest / ".github" / "templates" / "sad-brownfield-template.md" in paths
+    assert dest / ".github" / "templates" / "ux-template.md" in paths
+    assert dest / ".github" / "templates" / "ux-review-template.md" in paths
+    assert dest / ".github" / "agents" / "ux-designer.agent.md" in paths
     assert dest / ".github" / "instructions" / "brownfield-review.instructions.md" in paths
 
 
@@ -630,6 +676,11 @@ def test_extract_artifacts_vscode_creates_github_and_agents_md(tmpdir):
     assert (tmpdir / ".github" / "templates" / "prd-template.md").exists()
     assert (tmpdir / ".github" / "templates" / "sad-brownfield-template.md").exists()
     assert (tmpdir / ".github" / "templates" / "current-state-template.md").exists()
+    assert (tmpdir / ".github" / "templates" / "ux-template.md").exists()
+    assert (tmpdir / ".github" / "templates" / "ux-review-template.md").exists()
+    assert (tmpdir / ".github" / "agents" / "ux-designer.agent.md").exists()
+    assert (tmpdir / ".github" / "prompts" / "product-design.prompt.md").exists()
+    assert (tmpdir / ".github" / "prompts" / "visual-regression.prompt.md").exists()
     assert (tmpdir / ".github" / "prompts" / "phase-0-review.prompt.md").exists()
     assert (tmpdir / ".github" / "instructions" / "brownfield-review.instructions.md").exists()
     assert (tmpdir / ".vscode" / "settings.json").exists()

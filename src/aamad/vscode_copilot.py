@@ -33,6 +33,7 @@ RULE_ORDER = [
 AGENT_IDS = [
     "product-mgr",
     "system-arch",
+    "ux-designer",
     "project-mgr",
     "frontend-eng",
     "backend-eng",
@@ -65,6 +66,12 @@ HANDOFFS: dict[str, list[dict[str, Any]]] = {
             "send": False,
         },
         {
+            "label": "→ Design UX (brownfield, material UI)",
+            "agent": "ux-designer",
+            "prompt": "Write ux.md only for approved enhancements that add a new surface, flow, or interaction pattern. Extend the existing UI; do not invent a replacement shell.",
+            "send": False,
+        },
+        {
             "label": "→ Start Build Phase (brownfield)",
             "agent": "project-mgr",
             "prompt": "Document and extend the existing project from the approved SAD and constrained PRD. Do not scaffold a replacement app.",
@@ -79,9 +86,23 @@ HANDOFFS: dict[str, list[dict[str, Any]]] = {
             "send": False,
         },
         {
+            "label": "→ Design UX",
+            "agent": "ux-designer",
+            "prompt": "Write project-context/1.define/ux.md from the PRD and SAD. Leave Approval pending. Do not invent a chat or dashboard default.",
+            "send": False,
+        },
+        {
             "label": "→ Start Build Phase",
             "agent": "project-mgr",
             "prompt": "Scaffold the project based on the SAD in project-context/1.define/sad.md",
+            "send": False,
+        },
+    ],
+    "ux-designer": [
+        {
+            "label": "→ Start Build Phase",
+            "agent": "project-mgr",
+            "prompt": "Scaffold or extend the project after ux.md Approval is approved or approved-with-changes.",
             "send": False,
         },
     ],
@@ -89,7 +110,7 @@ HANDOFFS: dict[str, list[dict[str, Any]]] = {
         {
             "label": "→ Develop Frontend",
             "agent": "frontend-eng",
-            "prompt": "Build the MVP chat UI per project-context/2.build/setup.md and SAD.",
+            "prompt": "Build the approved MVP UI per project-context/1.define/ux.md, setup.md, and SAD. Do not invent a chat or dashboard default.",
             "send": False,
         },
         {
@@ -145,6 +166,8 @@ TEMPLATE_FILES = [
     "system-description-template.md",
     "user-guide-template.md",
     "user-story-template.md",
+    "ux-review-template.md",
+    "ux-template.md",
 ]
 
 
@@ -386,6 +409,16 @@ SKILL_PROMPT_SPECS = {
     "sync-docs": {
         "out": "sync-docs.prompt.md",
         "description": "AAMAD: After a code change, propose descriptive-doc updates and wait for operator approval",
+        "agent": None,
+    },
+    "product-design": {
+        "out": "product-design.prompt.md",
+        "description": "AAMAD: Shared product-design method (Shape, Implement, Review, Harden) for UX, frontend, and QA",
+        "agent": None,
+    },
+    "visual-regression": {
+        "out": "visual-regression.prompt.md",
+        "description": "AAMAD: Playwright Test visual snapshots in the generated app; first baseline after Human judgment; operator-approved updates",
         "agent": None,
     },
 }

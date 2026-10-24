@@ -25,6 +25,8 @@ ui:
   theme: system
   visual_style: minimal
   prefer_modals: false
+  design_system_mode: create  # create | adopt | extend
+  design_system_source: ""    # workspace-relative path; required when mode is adopt
 
 coding_standards:
   style_guide: ""
@@ -44,3 +46,4 @@ testing:
   require_unit_tests: true
   require_integration_tests: true
   map_to_acceptance_criteria: true
+  require_visual_regression: false  # warning-only when true and UI is in scope

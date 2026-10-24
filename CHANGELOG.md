@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.7] - 2026-10-24
+
+### Added
+
+- **UX Design workflow** — `@ux.designer` writes `project-context/1.define/ux.md` (operator approval) and shares the `product-design` skill (Shape / Implement / Review / Harden) with `@frontend.eng` and `@qa.eng`. Material UI work requires a rendered review in `project-context/2.build/ux-review.md`. Greenfield: after SAD. Brownfield: only approved enhancements that add a new surface, flow, or interaction pattern; missing `ux.md` on an upgraded tree does not halt Build.
+- Design-system intake via `ui.design_system_mode` (`create` | `adopt` | `extend`) and `ui.design_system_source`. Adopt an external brand by placing a readable copy in the workspace; do not rewrite that document.
+- Frontend definition of done includes render → exercise → inspect agreed viewports. QA treats accessibility, responsive behavior, and interface quality as in scope for UI projects on changed routes. SAD no longer defaults the primary surface to a chat UI.
+- **Visual regression** — `.cursor/skills/visual-regression/` scaffolds Playwright Test `toHaveScreenshot` in the generated app after Human judgment. `@qa.eng` `*test-visual` runs the suite. Baseline updates wait for operator approval (`*update-visual-baselines`). A matching snapshot is not proof the design is good. `aamad validate` warns (never errors) when UI is in scope and `ux-review.md` is missing, when `ux.md` Approval is pending, or when `testing.require_visual_regression` is true without visual evidence.
+
+### Upgrade
+
+- `aamad init --overwrite --ide <cursor|claude-code|vscode|kiro>` to pick up `@ux.designer`, `product-design`, `visual-regression`, and the UX templates.
+
 ## [0.9.6] - 2026-10-24
 
 ### Added

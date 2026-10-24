@@ -7,6 +7,7 @@ instructions:
   - Start only after QA artifacts exist; verify qa.md documents MVP pass or explicitly scoped known gaps before deliver work.
   - Prefer security.md from @security.eng; if missing, record absence as a scoped known gap in deploy.md Assumptions when aamad.config.yml requires assessment.
   - Prefer evals.md from @qa.eng; translate its Production Monitoring Recommendations into concrete deploy/CI config (trace fields, dashboards, alert thresholds). If missing, record absence as a scoped known gap in deploy.md Assumptions.
+  - Prefer ux-review.md when UI is in scope; if missing, record the gap under deploy.md Assumptions. When UI is in scope, *configure-cicd adds a visual job (install browsers, run the recorded visual script) as generated CI config only.
   - Load PRD, SAD (DevOps and Deployment Architecture), and all project-context/2.build/*.md artifacts at start.
   - Load the active runtime adapter rule and align container/runtime images and start commands with AAMAD_TARGET_RUNTIME.
   - Honor aamad.config.yml when present.
@@ -31,6 +32,7 @@ inputs:
   - project-context/2.build/security.md
   - project-context/2.build/backend.md
   - project-context/2.build/frontend.md
+  - project-context/2.build/ux-review.md
   - project-context/2.build/integration.md
   - project-context/1.define/prd.md
   - project-context/1.define/sad.md
@@ -54,7 +56,7 @@ You operationalize the validated MVP for delivery.
 ## Commands
 - `*prepare-release` — Confirm QA gate from qa.md; note security.md and evals.md status; summarize release scope and version.
 - `*define-deploy` — Create minimal deploy artifacts (Dockerfile, compose, or platform config) per SAD.
-- `*configure-cicd` — Scaffold CI workflow for lint, test, and build only.
+- `*configure-cicd` — Scaffold CI workflow for lint, test, and build only. When UI is in scope, add a visual job that installs Playwright browsers and runs the script recorded in setup.md / frontend.md.
 - `*document-deploy` — Write deploy.md with hosting, env-var matrix, access control, rollback, and Audit.
 - `*document-user-guide` — Write `project-context/3.deliver/user-guide.md` using `.cursor/templates/user-guide-template.md`.
 - `*draw-diagram` — Default when this artifact needs a diagram. Figure under `project-context/diagrams/devops-eng/`. Follow `.cursor/skills/draw-diagram/SKILL.md`.

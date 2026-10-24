@@ -11,8 +11,8 @@ Execute development in separate modules with fresh context:
 0. **Module 0: Brownfield Review** (only when `project.mode` is brownfield) — `@system.arch` investigates the existing tree and writes `0.review/` plus an as-is SAD. Stop until Operator Decision is approved.
 1. **Module 1: Core Configuration** - Agent and task definitions only
 2. **Module 2: API Integration** - Backend connectivity only 
-3. **Module 3: Frontend Integration** - UI and user experience only
-4. **Module 4: Validation** - End-to-end testing only
+  3. **Module 3: Frontend Integration** - UI and user experience only (approved `ux.md` when material UI is in scope)
+  4. **Module 4: Validation** - End-to-end testing only
 
 ## Context Management Rules
 - Start each module in fresh Cursor session (Cmd+Shift+P → "New Chat")
@@ -24,7 +24,7 @@ Execute development in separate modules with fresh context:
 Each module must be fully functional and testable independently:
 - Module 1: CrewAI crew.kickoff() executes successfully
 - Module 2: API endpoints return valid responses  
-- Module 3: Frontend displays and interacts correctly
+- Module 3: Frontend completes the primary task with clear hierarchy, agreed responsive behavior, accessibility baseline, and recoverable failure states — not only that it displays and interacts
 - Module 4: Complete workflow functions end-to-end
 
 ## Development Flow Control

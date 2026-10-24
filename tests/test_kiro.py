@@ -89,6 +89,17 @@ agent:
 # Persona: QA Engineer (@qa.eng)
 """
     )
+    (agents_dir / "ux-designer.md").write_text(
+        """---
+agent:
+  name: UX Designer
+  id: ux-designer
+  role: Owns interaction design and visual direction.
+---
+
+# Persona: UX Designer (@ux.designer)
+"""
+    )
     return agents_dir
 
 
@@ -165,6 +176,10 @@ def test_convert_agents_tools_and_resources(sample_agent, tmpdir):
     qa = yaml.safe_load(by_name["qa-eng.md"].read_text().split("---")[1])
     assert qa["tools"] == ["read", "write", "shell"]
     assert "skill://.kiro/skills/**/SKILL.md" in qa["resources"]
+
+    ux = yaml.safe_load(by_name["ux-designer.md"].read_text().split("---")[1])
+    assert "web" in ux["tools"]
+    assert "skill://.kiro/skills/**/SKILL.md" in ux["resources"]
 
 
 def test_convert_prompts_are_manual_steering(sample_prompt, tmpdir):
@@ -244,6 +259,8 @@ def test_get_kiro_planned_paths():
     assert dest / ".kiro" / "agents" / "backend-eng.md" in paths
     assert dest / ".kiro" / "templates" / "prd-template.md" in paths
     assert dest / ".kiro" / "templates" / "sad-brownfield-template.md" in paths
+    assert dest / ".kiro" / "templates" / "ux-template.md" in paths
+    assert dest / ".kiro" / "agents" / "ux-designer.md" in paths
     assert len(paths) == (
         len(RULE_ORDER) + 1 + len(PROMPT_STEERING) + len(AGENT_IDS) + len(TEMPLATE_FILES)
     )
@@ -266,6 +283,10 @@ def test_extract_artifacts_kiro_layout(tmpdir):
     assert (tmpdir / ".kiro" / "steering" / "brownfield-review.md").exists()
     assert (tmpdir / ".kiro" / "templates" / "sad-brownfield-template.md").exists()
     assert (tmpdir / ".kiro" / "templates" / "current-state-template.md").exists()
+    assert (tmpdir / ".kiro" / "templates" / "ux-template.md").exists()
+    assert (tmpdir / ".kiro" / "templates" / "ux-review-template.md").exists()
+    assert (tmpdir / ".kiro" / "skills" / "product-design" / "SKILL.md").exists()
+    assert (tmpdir / ".kiro" / "skills" / "visual-regression" / "SKILL.md").exists()
     for agent_id in AGENT_IDS:
         assert (tmpdir / ".kiro" / "agents" / f"{agent_id}.md").exists()
     assert (tmpdir / ".kiro" / "skills" / "run-evals" / "SKILL.md").exists()
@@ -286,9 +307,14 @@ def test_extract_artifacts_kiro_layout(tmpdir):
     qa = yaml.safe_load(
         (tmpdir / ".kiro" / "agents" / "qa-eng.md").read_text().split("---")[1]
     )
+    ux = yaml.safe_load(
+        (tmpdir / ".kiro" / "agents" / "ux-designer.md").read_text().split("---")[1]
+    )
     assert backend["tools"] == ["read", "write", "shell"]
     assert "web" in product["tools"]
+    assert "web" in ux["tools"]
     assert "skill://.kiro/skills/**/SKILL.md" in qa["resources"]
+    assert "skill://.kiro/skills/**/SKILL.md" in ux["resources"]
     product_body = (tmpdir / ".kiro" / "agents" / "product-mgr.md").read_text()
     assert ".kiro/templates/" in product_body
     assert ".cursor/templates/" not in product_body

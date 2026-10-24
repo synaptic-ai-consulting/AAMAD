@@ -10,7 +10,7 @@
 | `@integration.eng` | `project-context/2.build/integration.md` |
 | `@devops.eng` | `project-context/3.deliver/deploy.md` |
 
-`@product-mgr`, `@system.arch`, `@qa.eng`, and `@security.eng` do not run this skill.
+`@product-mgr`, `@system.arch`, `@ux.designer`, `@qa.eng`, and `@security.eng` do not run this skill.
 
 ## Write allowlist
 
@@ -31,10 +31,11 @@ Another persona's file on this list may be edited only when it states a fact the
 
 - `project-context/1.define/**`
 - `project-context/0.review/**`
-- `project-context/2.build/qa.md`, `evals.md`, `security.md`
+- `project-context/2.build/qa.md`, `evals.md`, `security.md`, `ux-review.md`
 - application source, tests, or generated runtime config
 - `aamad.config.yml`
 - diagram HTML/SVG (use `*draw-diagram` if a figure itself is stale)
+- Playwright snapshot PNGs and diff images (use `*update-visual-baselines`)
 
 ## Loop guard
 

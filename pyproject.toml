@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "aamad"
-version = "0.9.6"
+version = "0.9.7"
 description = "AI-Assisted Multi-Agent Development framework artifacts and installer"
 readme = "README.md"
 license = { text = "Apache-2.0" }

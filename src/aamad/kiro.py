@@ -33,6 +33,7 @@ RULE_ORDER = [
 AGENT_IDS = [
     "product-mgr",
     "system-arch",
+    "ux-designer",
     "project-mgr",
     "frontend-eng",
     "backend-eng",
@@ -43,7 +44,8 @@ AGENT_IDS = [
 ]
 
 DEFAULT_TOOLS = ["read", "write", "shell"]
-WEB_TOOL_IDS = {"product-mgr", "system-arch"}
+WEB_TOOL_IDS = {"product-mgr", "system-arch", "ux-designer"}
+SKILL_RESOURCE_IDS = {"qa-eng", "ux-designer", "frontend-eng"}
 
 STEERING_RESOURCE = "file://.kiro/steering/**/*.md"
 SKILL_RESOURCE = "skill://.kiro/skills/**/SKILL.md"
@@ -68,6 +70,8 @@ TEMPLATE_FILES = [
     "system-description-template.md",
     "user-guide-template.md",
     "user-story-template.md",
+    "ux-review-template.md",
+    "ux-template.md",
 ]
 
 
@@ -169,7 +173,7 @@ def _agent_tools(agent_id: str) -> list[str]:
 
 def _agent_resources(agent_id: str) -> list[str]:
     resources = [STEERING_RESOURCE]
-    if agent_id == "qa-eng":
+    if agent_id in SKILL_RESOURCE_IDS:
         resources.append(SKILL_RESOURCE)
     return resources
 

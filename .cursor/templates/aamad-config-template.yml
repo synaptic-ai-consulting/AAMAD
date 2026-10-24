@@ -26,6 +26,11 @@ ui:
   theme: system    # light | dark | system
   visual_style: minimal
   prefer_modals: false
+  # create = greenfield default (minimal token inventory in ux.md).
+  # adopt = operator-supplied design system at design_system_source.
+  # extend = brownfield default (live UI is the system).
+  design_system_mode: create  # create | adopt | extend
+  design_system_source: ""    # workspace-relative path; required when mode is adopt
 
 coding_standards:
   style_guide: ""  # e.g. ruff / eslint / google
@@ -45,3 +50,5 @@ testing:
   require_unit_tests: true
   require_integration_tests: true
   map_to_acceptance_criteria: true
+  # Warning-only when true and UI is in scope (missing ux-review visual evidence).
+  require_visual_regression: false

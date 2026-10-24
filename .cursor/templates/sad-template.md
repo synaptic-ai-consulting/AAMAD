@@ -3,7 +3,7 @@
 ## Context & Instructions
 Generate a system architecture specification for a multi-agent MVP.
 Align agent and API design with the runtime selected via `AAMAD_TARGET_RUNTIME` (`crewai` | `claude-agent-sdk` | `cursor-sdk`) and the active adapter rule.
-Frontend stack defaults to a modern web chat UI when the PRD does not specify otherwise; do not hardcode a single vendor UI library as mandatory unless the PRD/SAD decisions require it.
+Derive the primary user-facing surface from the PRD (and `ux.md` when it exists). Do not default every application to a chat interface or dashboard. Do not hardcode a single vendor UI library as mandatory unless the PRD/SAD decisions require it.
 This document is the blueprint for Build-phase personas. Prefer lean MVP views; defer nonessential NFRs to Future Work.
 
 ## Input Requirements
@@ -27,7 +27,7 @@ This document is the blueprint for Build-phase personas. Prefer lean MVP views; 
 
 **Core vs Future Features**:
 
-- **MVP**: Core agent functionality, chat (or primary) interface, essential integrations only  
+- **MVP**: Core functionality, the PRD-specified primary interface, essential integrations only  
 - **Future**: Advanced features, enterprise security, horizontal scaling  
 - Explicit exclusions and deferrals
 
@@ -75,7 +75,7 @@ This document is the blueprint for Build-phase personas. Prefer lean MVP views; 
 
 **Interface Requirements**:
 
-- Primary chat or interaction surface  
+- Primary interaction surface (from PRD/`ux.md`, not a presumed chat)  
 - Loading / error states  
 - Placeholders for Future Work features
 

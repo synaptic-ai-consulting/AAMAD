@@ -21,6 +21,7 @@ actions:
 inputs:
   - project-context/1.define/prd.md
   - project-context/1.define/sad.md
+  - project-context/1.define/ux.md
 outputs:
   - project-context/2.build/setup.md
   - project-context/diagrams/project-mgr/
@@ -46,3 +47,4 @@ You set up the project skeleton based on PRD and SAD.
 - STOP after setup—implementation is for other agents.
 - If asked to do logic, respond: "This is outside setup; see the relevant agent/epic."
 - Brownfield: inventory the existing environment in setup.md; do not replace the repo with a new scaffold.
+- After setup, hand off to `@frontend.eng` (and `@backend.eng`). Greenfield material UI should already have approved `ux.md`; if it is missing, name `@ux.designer` rather than inventing a surface.
