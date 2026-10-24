@@ -18,6 +18,7 @@ import yaml
 # Rule order (same as Claude Code / VS Code; dependency order)
 RULE_ORDER = [
     "aamad-core",
+    "conciseness",
     "development-workflow",
     "brownfield-review",
     "epics-index",

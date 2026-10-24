@@ -93,8 +93,8 @@ flowchart LR
 
   subgraph P2[BUILD]
     B1H[AGENTS]:::hdr --> B1L["• Project Mgr<br/>• System Architect<br/>• Frontend / Backend<br/>• Integration / QA<br/>• Security Eng"]:::list
-    B3H[SKILLS]:::hdr --> B3L["• run-evals<br/>(@qa.eng)"]:::list
-    B2H[RULES]:::hdr --> B2L["• core<br/>• development‑workflow<br/>• runtime adapter (crewai, claude-agent-sdk, or cursor-sdk)"]:::list
+    B3H[SKILLS]:::hdr --> B3L["• run-evals (@qa.eng)<br/>• draw-diagram (any persona)<br/>• sync-docs (code-changing personas)"]:::list
+    B2H[RULES]:::hdr --> B2L["• core<br/>• conciseness<br/>• development‑workflow<br/>• runtime adapter (crewai, claude-agent-sdk, or cursor-sdk)"]:::list
   end
 
   subgraph P3[DELIVER]
@@ -189,7 +189,7 @@ AAMAD supports **Cursor**, **Claude Code**, **VS Code + GitHub Copilot**, and **
 | **Tool enforcement** | Instructions-based | Hard allowlist/denylist | Tool allowlist in frontmatter | Tool list in agent frontmatter |
 | **Phase 0 prompt** | `.cursor/prompts/prompt-phase-0-review` | `.claude/commands/phase-0-review.md` (slash command) | `.github/prompts/phase-0-review.prompt.md` | `.kiro/steering/phase-0-review.md` (manual steering / slash command) |
 | **Phase 1 prompt** | `.cursor/prompts/prompt-phase-1` | `.claude/commands/phase-1-define.md` (slash command) | `.github/prompts/phase-1-define.prompt.md` | `.kiro/steering/phase-1-define.md` (manual steering / slash command) |
-| **Skills** | `.cursor/skills/run-evals/` | `.claude/skills/run-evals/` (native skills) | `.github/prompts/run-evals.prompt.md` (bound to `qa-eng`; no native skills primitive) | `.kiro/skills/run-evals/` (native Agent Skills) |
+| **Skills** | `.cursor/skills/` (`run-evals`, `draw-diagram`, `sync-docs`) | `.claude/skills/` (native skills) | `.github/prompts/` (`run-evals.prompt.md`, `draw-diagram.prompt.md`, `sync-docs.prompt.md`) and `.github/skills/` | `.kiro/skills/` (native Agent Skills) |
 | **Templates** | `.cursor/templates/` | `.claude/templates/` | `.github/templates/` | `.kiro/templates/` |
 | **Project context** | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) |
 | **Bridge file** | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) |
@@ -229,7 +229,7 @@ your-project/
 │   ├── agents/          # Persona definitions (@product-mgr, @backend.eng, etc.)
 │   ├── prompts/         # Phase-specific prompts (prompt-phase-0-review, prompt-phase-1)
 │   ├── rules/           # Always-on rules (*.mdc)
-│   ├── skills/          # Agent skills (e.g. run-evals)
+│   ├── skills/          # Agent skills (run-evals, draw-diagram, sync-docs)
 │   └── templates/      # PRD, SAD, brownfield review templates
 ├── project-context/
 │   ├── 0.review/        # Brownfield only: current-state, docs, architecture backlog
@@ -260,7 +260,7 @@ your-project/
 │   ├── agents/          # Persona definitions (Claude Code format)
 │   ├── commands/        # Slash commands (phase-0-review, phase-1-define)
 │   ├── rules/           # Individual rule files (*.md)
-│   ├── skills/          # Agent skills (e.g. run-evals, native Claude Code skills)
+│   ├── skills/          # Agent skills (run-evals, draw-diagram, sync-docs)
 │   ├── templates/       # PRD, SAD, brownfield review templates
 │   └── settings.json    # Permissions, AAMAD_TARGET_RUNTIME env
 ├── project-context/
@@ -292,7 +292,7 @@ your-project/
 ├── .github/
 │   ├── instructions/   # Copilot instructions (*.instructions.md)
 │   ├── agents/         # Custom agents (*.agent.md) with optional handoffs
-│   ├── prompts/        # Phase 0/1, sync-docs, run-evals
+│   ├── prompts/        # Phase 0/1, sync-docs, run-evals, draw-diagram
 │   └── templates/      # PRD, SAD, brownfield review templates
 ├── .vscode/
 │   └── settings.json   # chat.instructionsFilesLocations, chat.agentFilesLocations
@@ -323,7 +323,7 @@ your-project/
 ├── .kiro/
 │   ├── agents/          # Persona definitions (Kiro custom agents)
 │   ├── steering/        # Always-on rules + manual Phase 0 / Phase 1 / sync-docs prompts
-│   ├── skills/          # Agent skills (e.g. run-evals)
+│   ├── skills/          # Agent skills (run-evals, draw-diagram, sync-docs)
 │   └── templates/       # PRD, SAD, brownfield review templates
 ├── project-context/
 │   ├── 0.review/        # Brownfield only
@@ -400,6 +400,9 @@ Phase 2 is executed by running each epic in sequence after completing Phase 1:
 - **Integration:** Wire up chat flow, verify, document (`integration.md`)
 - **Quality Assurance:** Run `*test-unit` and `*test-integration`, then smoke/acceptance (`*qa`); map tests to acceptance-criteria IDs when present; log in `qa.md`
 - **Evals (recommended):** `*run-evals` — golden dataset, code-based checks, LLM-as-judge scoring, and production monitoring recommendations for DevOps; logged in `evals.md`. Already past QA on an existing project? Run `*run-evals` directly — it asks you for any missing thresholds instead of blocking (see `.cursor/skills/run-evals/`).
+- **Diagrams:** when an artifact needs a figure, the owning persona draws it with `*draw-diagram` (editorial HTML and SVG under `project-context/diagrams/<persona-id>/`). That is the default diagram tool. See `.cursor/skills/draw-diagram/`.
+- **Doc sync:** after a code, config, or deploy change, the persona that made it runs `*sync-docs`, asks for operator approval, then updates only approved descriptive docs. PRD, SAD, and Review artifacts stay the source of truth. See `.cursor/skills/sync-docs/`.
+- **Chat:** operator-facing replies are 1–3 complete sentences (`.cursor/rules/conciseness.mdc`). Artifacts stay complete.
 - **Security (recommended):** `@security.eng` → `security.md` before Deliver (required when `aamad.config.yml` sets `security.require_security_assessment: true`)
 
 Artifacts are versioned and stored in `project-context/2.build` for traceability.

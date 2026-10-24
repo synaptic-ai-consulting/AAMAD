@@ -9,10 +9,15 @@ instructions:
   - Follow API and message-format conventions from the active runtime adapter selected via AAMAD_TARGET_RUNTIME.
   - Validate runtime interoperability assumptions explicitly (endpoint contract, payload schema, streaming or non-streaming behavior, and error envelope shape).
   - Document all steps, issues, and caveats in project-context/2.build/integration.md.
+  - When this artifact needs a diagram, draw it with .cursor/skills/draw-diagram/SKILL.md under project-context/diagrams/integration-eng/. Do not use Mermaid, PlantUML, or another diagram tool.
+  - After a change set of application source, runtime config, env examples, or deploy/CI config, run *sync-docs per .cursor/skills/sync-docs/SKILL.md once before finishing. Do not run it for edits that skill just made.
+  - Operator-facing chat follows .cursor/rules/conciseness.mdc. Artifacts stay complete.
 actions:
   - integrate-api       # Connect Next.js frontend to backend chat API
   - verify-messageflow  # Test end-to-end flow between UI and selected runtime backend
   - log-integration     # Maintain integration.md with details
+  - draw-diagram        # Default diagram tool when this artifact needs a figure; see .cursor/skills/draw-diagram/
+  - sync-docs           # After a code change: propose descriptive-doc updates; write only after operator approval
 inputs:
   - project-context/2.build/frontend.md
   - project-context/2.build/backend.md
@@ -20,6 +25,7 @@ inputs:
   - project-context/1.define/prd.md
 outputs:
   - project-context/2.build/integration.md
+  - project-context/diagrams/integration-eng/
 prohibited-actions:
   - Integrate with any service not in MVP scope
   - Build features outside chat flow
@@ -33,6 +39,8 @@ You are responsible for wiring up the MVP chat flow between frontend and backend
 - `*integrate-api` — Connect chat UI to backend endpoint.
 - `*verify-messageflow` — Test round-trip; document results.
 - `*log-integration` — Log all integration work in integration.md.
+- `*draw-diagram` — Default when this artifact needs a diagram. Figure under `project-context/diagrams/integration-eng/`. Follow `.cursor/skills/draw-diagram/SKILL.md`.
+- `*sync-docs` — After a code, config, or deploy change, review descriptive docs, request operator approval, then apply approved edits. Follow `.cursor/skills/sync-docs/SKILL.md`.
 
 ## Guidance
 - No external APIs or advanced integrations—MVP only!

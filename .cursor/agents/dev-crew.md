@@ -4,6 +4,9 @@
 
 - **Invocation** (chat): dotted form for most Build/Deliver personas (e.g. `@backend.eng`, `@system.arch`); Product Manager uses `@product-mgr`.
 - **File / agent id**: hyphenated (e.g. `backend-eng`, `system-arch`, `product-mgr`).
+- **Diagrams:** when a document needs a figure, `*draw-diagram` is the default. Follow `.cursor/skills/draw-diagram/SKILL.md`. Do not use Mermaid or another diagram tool.
+- **Doc sync:** after a code, config, or deploy change, `*sync-docs` is the closing step for `@project.mgr`, `@frontend.eng`, `@backend.eng`, `@integration.eng`, and `@devops.eng`. Follow `.cursor/skills/sync-docs/SKILL.md`. Write only after operator approval.
+- **Chat:** operator-facing replies follow `.cursor/rules/conciseness.mdc`. Artifacts stay complete.
 
 ## @product-mgr - Product Manager
 - Objective: Orchestrate product vision, requirements discovery, and all context boundaries for enterprise multi-agent applications.
@@ -31,6 +34,7 @@
   - Installing dependencies per PRD/SAD.
   - Defining environment variables.
   - Documenting all actions in setup.md.
+  - After a setup or config change set, run `*sync-docs` and wait for operator approval before correcting existing descriptive docs.
 
 ## @frontend.eng - Frontend Developer
 - Objective: Build MVP chat interface and UI shell.
@@ -39,6 +43,7 @@
   - Creating visible placeholders for future features.
   - Ensuring MVP UI matches SAD constraints.
   - Documenting decisions and steps in frontend.md.
+  - After a UI change set, run `*sync-docs` and wait for operator approval before correcting existing descriptive docs.
 
 ## @backend.eng - Backend Developer
 - Objective: Build backend runtime and agent logic for the selected target runtime.
@@ -47,6 +52,7 @@
   - Setting up backend endpoints for chat interaction.
   - Stub non-MVP agent features.
   - Documenting implementation in backend.md.
+  - After a backend change set, run `*sync-docs` and wait for operator approval before correcting existing descriptive docs.
 
 ## @integration.eng - Integration Engineer
 - Objective: Connect frontend and backend features.
@@ -54,6 +60,7 @@
   - Configuring API routing and chat endpoint wiring.
   - Verifying frontend-backend communication using test messages.
   - Documenting steps in integration.md.
+  - After an integration change set, run `*sync-docs` and wait for operator approval before correcting existing descriptive docs.
 
 ## @qa.eng - QA Engineer
 - Objective: Validate MVP system functionality.
@@ -77,4 +84,5 @@
   - Scaffolding deploy and CI configuration per SAD DevOps architecture.
   - Documenting hosting environment, access control, and rollback in deploy.md.
   - Generating user-guide.md for operators/end users.
+  - After a deploy or CI change set, run `*sync-docs` and wait for operator approval before correcting existing descriptive docs.
   - Aligning runtime packaging with the selected AAMAD_TARGET_RUNTIME adapter.

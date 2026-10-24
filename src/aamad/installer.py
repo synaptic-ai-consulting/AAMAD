@@ -28,6 +28,7 @@ SHARED_FILES = (
     "CHECKLIST.md",
     "README.md",
     "aamad.config.example.yml",
+    "NOTICES",
 )
 SHARED_DIRS = ("project-context",)
 
@@ -290,6 +291,7 @@ def extract_artifacts(
             skip_if_exists=skip,
             install=install_vscode_copilot,
             planned_paths=get_vscode_planned_paths(dest),
+            extra_mapped_prefixes=((".cursor/skills/", ".github/skills/"),),
         )
 
     installer = ArtifactInstaller(get_bundle_path(ide))

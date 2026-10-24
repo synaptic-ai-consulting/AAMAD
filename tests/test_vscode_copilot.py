@@ -431,14 +431,55 @@ def test_convert_prompts_missing_returns_empty(tmpdir):
 def test_convert_skills_creates_prompt_bound_to_agent(tmpdir, sample_skill):
     """convert_skills creates .github/prompts/run-evals.prompt.md bound to qa-eng."""
     out = convert_skills(sample_skill, tmpdir)
-    assert len(out) == 1
     prompt_file = tmpdir / ".github" / "prompts" / "run-evals.prompt.md"
-    assert prompt_file.exists()
+    copied = tmpdir / ".github" / "skills" / "run-evals" / "SKILL.md"
+    assert prompt_file in out
+    assert copied in out
     text = prompt_file.read_text()
     assert "---" in text
     assert "agent: qa-eng" in text
     assert "Run Evals" in text
     assert "Define and run the eval suite." in text
+    assert "Run Evals" in copied.read_text()
+
+
+def test_convert_skills_draw_diagram_omits_agent_and_copies_tree(tmpdir):
+    """A shared skill prompt is not bound to one agent, and supporting files are copied."""
+    skills_dir = tmpdir / "skills" / "draw-diagram"
+    skills_dir.mkdir(parents=True)
+    (skills_dir / "SKILL.md").write_text(
+        "---\nname: draw-diagram\ndescription: Draw.\n---\n\n# Draw diagram\n"
+    )
+    (skills_dir / "vendor").mkdir()
+    (skills_dir / "vendor" / "note.txt").write_text("vendored\n")
+    out = convert_skills(tmpdir / "skills", tmpdir / "out")
+    prompt = tmpdir / "out" / ".github" / "prompts" / "draw-diagram.prompt.md"
+    note = tmpdir / "out" / ".github" / "skills" / "draw-diagram" / "vendor" / "note.txt"
+    assert prompt in out
+    assert note in out
+    text = prompt.read_text()
+    assert "agent:" not in text
+    assert "Draw diagram" in text
+    assert note.read_text() == "vendored\n"
+
+
+def test_convert_skills_sync_docs_omits_agent_and_copies_tree(tmpdir):
+    """A shared skill prompt is not bound to one agent, and supporting files are copied."""
+    skills_dir = tmpdir / "skills" / "sync-docs"
+    skills_dir.mkdir(parents=True)
+    (skills_dir / "SKILL.md").write_text(
+        "---\nname: sync-docs\ndescription: Sync.\n---\n\n# Sync docs\n"
+    )
+    (skills_dir / "reference.md").write_text("# Ref\n")
+    out = convert_skills(tmpdir / "skills", tmpdir / "out")
+    prompt = tmpdir / "out" / ".github" / "prompts" / "sync-docs.prompt.md"
+    ref = tmpdir / "out" / ".github" / "skills" / "sync-docs" / "reference.md"
+    assert prompt in out
+    assert ref in out
+    text = prompt.read_text()
+    assert "agent:" not in text
+    assert "Sync docs" in text
+    assert ref.read_text() == "# Ref\n"
 
 
 def test_convert_skills_missing_skill_returns_empty(tmpdir):

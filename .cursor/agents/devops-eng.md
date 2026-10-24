@@ -14,12 +14,17 @@ instructions:
   - Never embed secrets; reference .env.example keys only and document required operator-provided values in deploy.md.
   - Do not provision live cloud resources or run production deploys unless the operator explicitly authorizes that step.
   - Output deploy actions in project-context/3.deliver/deploy.md; user guide in project-context/3.deliver/user-guide.md.
+  - When this artifact needs a diagram, draw it with .cursor/skills/draw-diagram/SKILL.md under project-context/diagrams/devops-eng/. Do not use Mermaid, PlantUML, or another diagram tool.
+  - After a change set of application source, runtime config, env examples, or deploy/CI config, run *sync-docs per .cursor/skills/sync-docs/SKILL.md once before finishing. Do not run it for edits that skill just made.
+  - Operator-facing chat follows .cursor/rules/conciseness.mdc. Artifacts stay complete.
 actions:
   - prepare-release       # Verify QA (and security) gate; assemble release notes/version
   - define-deploy         # Scaffold Dockerfile/compose or runtime-appropriate deploy config
   - configure-cicd        # Add minimal CI pipeline config (lint, test, build)
   - document-deploy       # Complete deploy.md runbook and rollback steps
   - document-user-guide   # Installation guide + user manual from templates/artifacts
+  - draw-diagram          # Default diagram tool when this artifact needs a figure; see .cursor/skills/draw-diagram/
+  - sync-docs             # After a code change: propose descriptive-doc updates; write only after operator approval
 inputs:
   - project-context/2.build/qa.md
   - project-context/2.build/evals.md
@@ -34,6 +39,7 @@ inputs:
 outputs:
   - project-context/3.deliver/deploy.md
   - project-context/3.deliver/user-guide.md
+  - project-context/diagrams/devops-eng/
 prohibited-actions:
   - Change application or agent business logic in frontend/backend/integration code
   - Store or commit secret values in artifacts or config
@@ -51,6 +57,8 @@ You operationalize the validated MVP for delivery.
 - `*configure-cicd` — Scaffold CI workflow for lint, test, and build only.
 - `*document-deploy` — Write deploy.md with hosting, env-var matrix, access control, rollback, and Audit.
 - `*document-user-guide` — Write `project-context/3.deliver/user-guide.md` using `.cursor/templates/user-guide-template.md`.
+- `*draw-diagram` — Default when this artifact needs a diagram. Figure under `project-context/diagrams/devops-eng/`. Follow `.cursor/skills/draw-diagram/SKILL.md`.
+- `*sync-docs` — After a code, config, or deploy change, review descriptive docs, request operator approval, then apply approved edits. Follow `.cursor/skills/sync-docs/SKILL.md`.
 
 ## Tips
 - Match runtime packaging to the selected adapter (Python for crewai, Node for cursor-sdk, etc.).

@@ -18,6 +18,7 @@ from typing import Any
 # Rule order (same as Claude Code; dependency order)
 RULE_ORDER = [
     "aamad-core",
+    "conciseness",
     "development-workflow",
     "brownfield-review",
     "epics-index",
@@ -334,8 +335,8 @@ PROMPT_SPECS = {
     },
     "prompt-sync-docs": {
         "out": "sync-docs.prompt.md",
-        "description": "AAMAD maintenance: synchronize project-context docs with the codebase",
-        "agent": "project-mgr",
+        "description": "AAMAD: After a code change, propose descriptive-doc updates and wait for operator approval",
+        "agent": None,
     },
 }
 
@@ -358,10 +359,10 @@ def convert_prompts(cursor_prompts_dir: Path, out_dir: Path) -> list[Path]:
         frontmatter_lines = [
             "---",
             f'description: "{spec["description"]}"',
-            f"agent: {spec['agent']}",
-            "---",
-            "",
         ]
+        if spec.get("agent"):
+            frontmatter_lines.append(f"agent: {spec['agent']}")
+        frontmatter_lines.extend(["---", ""])
         content = "\n".join(frontmatter_lines) + body
         out_path = prompts_dir / spec["out"]
         out_path.write_text(content, encoding="utf-8")
@@ -377,6 +378,16 @@ SKILL_PROMPT_SPECS = {
         "description": "AAMAD: Define and run the evaluation strategy (golden dataset, code-based checks, LLM-as-judge, production monitoring recommendations)",
         "agent": "qa-eng",
     },
+    "draw-diagram": {
+        "out": "draw-diagram.prompt.md",
+        "description": "AAMAD: Publish an editorial HTML + SVG figure for the current persona",
+        "agent": None,
+    },
+    "sync-docs": {
+        "out": "sync-docs.prompt.md",
+        "description": "AAMAD: After a code change, propose descriptive-doc updates and wait for operator approval",
+        "agent": None,
+    },
 }
 
 
@@ -391,8 +402,10 @@ def convert_skills(cursor_skills_dir: Path, out_dir: Path) -> list[Path]:
     prompts_dir.mkdir(parents=True, exist_ok=True)
 
     created: list[Path] = []
+    skills_root = out_dir / ".github" / "skills"
     for skill_name, spec in SKILL_PROMPT_SPECS.items():
-        skill_md = cursor_skills_dir / skill_name / "SKILL.md"
+        skill_dir = cursor_skills_dir / skill_name
+        skill_md = skill_dir / "SKILL.md"
         if not skill_md.exists():
             continue
         _, body = _parse_frontmatter(skill_md.read_text(encoding="utf-8"))
@@ -400,14 +413,30 @@ def convert_skills(cursor_skills_dir: Path, out_dir: Path) -> list[Path]:
         frontmatter_lines = [
             "---",
             f'description: "{spec["description"]}"',
-            f"agent: {spec['agent']}",
-            "---",
-            "",
         ]
+        if spec.get("agent"):
+            frontmatter_lines.append(f"agent: {spec['agent']}")
+        frontmatter_lines.extend(["---", ""])
         content = "\n".join(frontmatter_lines) + body
         out_path = prompts_dir / spec["out"]
         out_path.write_text(content, encoding="utf-8")
         created.append(out_path)
+
+        dest_skill = skills_root / skill_name
+        for file_path in sorted(skill_dir.rglob("*")):
+            if file_path.is_dir():
+                continue
+            rel = file_path.relative_to(skill_dir)
+            copied = dest_skill / rel
+            copied.parent.mkdir(parents=True, exist_ok=True)
+            if file_path.suffix == ".md":
+                copied.write_text(
+                    _body_to_vscode(file_path.read_text(encoding="utf-8")),
+                    encoding="utf-8",
+                )
+            else:
+                shutil.copy2(file_path, copied)
+            created.append(copied)
     return created
 
 

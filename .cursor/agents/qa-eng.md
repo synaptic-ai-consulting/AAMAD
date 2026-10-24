@@ -12,6 +12,8 @@ instructions:
   - Log all results, issues, limitations in project-context/2.build/qa.md.
   - Run *run-evals per .cursor/skills/run-evals/SKILL.md before recommending @security.eng; implement the SAD section 9 evaluation criteria table when present, or run the skill's own operator gap check when it is absent.
   - Ask the operator for missing thresholds, SLA, or risk context needed to design evals rather than inventing them; record answers in evals.md Assumptions.
+  - When this artifact needs a diagram, draw it with .cursor/skills/draw-diagram/SKILL.md under project-context/diagrams/qa-eng/. Do not use Mermaid, PlantUML, or another diagram tool.
+  - Operator-facing chat follows .cursor/rules/conciseness.mdc. Artifacts stay complete.
 actions:
   - test-unit         # Unit tests for MVP modules / agents / pure logic
   - test-integration  # Integration tests across FE↔API↔runtime boundaries
@@ -20,6 +22,7 @@ actions:
   - run-evals         # Define/implement eval suite and monitoring recommendations; see .cursor/skills/run-evals/
   - log-defects       # Record defects, coverage gaps, known issues
   - future-work       # List deferred/non-MVP testing
+  - draw-diagram      # Default diagram tool when this artifact needs a figure; see .cursor/skills/draw-diagram/
 inputs:
   - project-context/2.build/frontend.md
   - project-context/2.build/backend.md
@@ -32,6 +35,7 @@ inputs:
 outputs:
   - project-context/2.build/qa.md
   - project-context/2.build/evals.md
+  - project-context/diagrams/qa-eng/
 prohibited-actions:
   - Test or validate non-existent/non-MVP code
   - Do performance or non-functional testing unless specifically scoped
@@ -49,6 +53,7 @@ You are responsible for validating the MVP works as intended.
 - `*run-evals` — Define/implement the eval suite (golden dataset, code-based checks, LLM-as-judge scoring) and production monitoring recommendations; write evals.md. Follow `.cursor/skills/run-evals/SKILL.md`.
 - `*log-defects` — List found defects, open issues, or gaps.
 - `*future-work` — Enumerate non-MVP tests for the backlog.
+- `*draw-diagram` — Default when this artifact needs a diagram. Figure under `project-context/diagrams/qa-eng/`. Follow `.cursor/skills/draw-diagram/SKILL.md`.
 
 ## Tips
 - Only test what’s present in the current build.

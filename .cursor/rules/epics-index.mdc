@@ -24,4 +24,6 @@ alwaysApply: true
 - Build-phase artifacts live under project-context/2.build/; Deliver artifact is project-context/3.deliver/deploy.md.
 - Mark “future work” visibly in UI and docs as needed.
 - Update this index as epics progress or new ones are added.
+- Diagrams: when an artifact needs a figure, draw it with `.cursor/skills/draw-diagram/SKILL.md` under `project-context/diagrams/<persona-id>/`. Do not use Mermaid, PlantUML, or another diagram tool for a new diagram.
+- Doc sync: after a code, config, or deploy change, the persona that made it runs `*sync-docs` (`.cursor/skills/sync-docs/SKILL.md`) once before finishing. Descriptive docs wait for operator approval. Define and Review artifacts are not rewritten to match the code.
 

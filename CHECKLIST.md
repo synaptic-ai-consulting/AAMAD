@@ -22,12 +22,12 @@ This checklist guides you step-by-step through running AAMAD: greenfield starts 
 
 - [ ] Confirm expected outputs for **your** IDE (templates live in that IDE folder):
 
-  - [ ] **Cursor:** `.cursor/agents/`, `.cursor/rules/`, `.cursor/prompts/`, `.cursor/skills/`, `.cursor/templates/`, root `AGENTS.md`
+  - [ ] **Cursor:** `.cursor/agents/`, `.cursor/rules/` (includes `conciseness.mdc`), `.cursor/prompts/`, `.cursor/skills/` (`run-evals`, `draw-diagram`, `sync-docs`), `.cursor/templates/`, root `AGENTS.md`
   - [ ] **Claude Code:** `.claude/` (`agents/`, `rules/`, `commands/`, `skills/`, `templates/`, `settings.json`), `AGENTS.md`
-  - [ ] **VS Code + Copilot:** `.github/instructions/`, `.github/agents/`, `.github/prompts/` (includes `run-evals.prompt.md`), `.github/templates/`, `.vscode/settings.json`, `AGENTS.md`
+  - [ ] **VS Code + Copilot:** `.github/instructions/`, `.github/agents/`, `.github/prompts/` (includes `run-evals`, `draw-diagram`, `sync-docs`), `.github/skills/`, `.github/templates/`, `.vscode/settings.json`, `AGENTS.md`
   - [ ] **Kiro:** `.kiro/agents/`, `.kiro/steering/` (rules + manual Phase 0 / Phase 1 / sync-docs), `.kiro/skills/`, `.kiro/templates/`, `AGENTS.md`
 
-- [ ] Upgrading a Claude Code, VS Code, or Kiro project from 0.9.0 or earlier: `aamad init --overwrite --ide <claude-code|vscode|kiro>`. If this project is not using Cursor, delete leftover `.cursor/`.
+- [ ] Upgrading an existing project to 0.9.6: `aamad init --overwrite --ide <cursor|claude-code|vscode|kiro>` to pick up `draw-diagram`, `sync-docs`, and `conciseness`. Claude Code, VS Code, or Kiro projects from 0.9.0 or earlier: if this project is not using Cursor, delete leftover `.cursor/`.
 
 - [ ] Confirm `aamad.config.yml` exists with `project.mode` set by init. Optionally edit other preferences (or copy remaining keys from `aamad.config.example.yml`).
 - [ ] Brownfield: `project-context/0.review/` exists; an existing project README was left in place.

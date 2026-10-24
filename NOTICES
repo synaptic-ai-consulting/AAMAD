@@ -1,0 +1,14 @@
+# Notices
+
+Third-party material shipped with AAMAD.
+
+## Diagram Design
+
+The draw-diagram skill vendors Diagram Design at `.cursor/skills/draw-diagram/vendor/diagram-design/`.
+
+- Upstream: https://github.com/cathrynlavery/diagram-design
+- Commit: 0b9b10cab3dbf695642fa1a6c4b4f60df9083689
+- Copyright: Cathryn Lavery
+- License: MIT (see `LICENSE` in that directory)
+
+Icons, and the other bundled sources, are listed in `THIRD_PARTY_LICENSES.md` inside that directory (Tabler Icons, Simple Icons, log-z/logos, Devicon, and the SIL OFL faces named there). The generated HTML uses system fonts and does not download those faces.

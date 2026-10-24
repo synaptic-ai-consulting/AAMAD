@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.6] - 2026-10-24
+
+### Added
+
+- **draw-diagram** skill (`.cursor/skills/draw-diagram/`): the default diagram tool for every persona. When a spec or build document needs a figure, the persona draws editorial HTML and SVG under `project-context/diagrams/<persona-id>/` instead of Mermaid, PlantUML, or ASCII. Visual system is Diagram Design (MIT), vendored in that skill. VS Code also copies the skill tree to `.github/skills/draw-diagram/`.
+- **sync-docs** skill (`.cursor/skills/sync-docs/`): after a code, config, or deploy change, `@project.mgr`, `@frontend.eng`, `@backend.eng`, `@integration.eng`, and `@devops.eng` review descriptive docs, request operator approval, then apply only the approved edits. Define and Review artifacts are not rewritten to match the code. VS Code also copies the skill tree to `.github/skills/sync-docs/`.
+- **conciseness** rule (`.cursor/rules/conciseness.mdc`): every persona’s operator-facing chat is 1–3 complete sentences. Required artifact headings stay complete. Operator gates (Halt and Report, `*sync-docs` proposals, `*run-evals` questions) stay as long as the owning skill requires.
+
 ## [0.9.5] - 2026-10-24
 
 ### Added

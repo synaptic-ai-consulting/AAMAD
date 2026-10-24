@@ -13,11 +13,16 @@ alwaysApply: true
 - **Reproducibility and provenance:** every artifact includes Sources, Assumptions, and Open Questions sections.
 - **Deterministic execution:** actions are idempotent; perform temp-write-then-atomic-replace for file outputs.
 - **Minimal viable architecture first:** implement MVP scope before expanding; document deferrals with rationale.
+- **Operator-facing chat is concise:** 1–3 complete sentences unless an exception in `.cursor/rules/conciseness.mdc` applies. Required artifact headings stay complete.
 
 ## Agent Contract
-- Personas declare: id, role, instructions, actions, inputs, outputs, prohibited-actions. Agents MUST read only declared inputs and write only to declared outputs.
+- Personas declare: id, role, instructions, actions, inputs, outputs, prohibited-actions. Agents MUST read only declared inputs and write only to declared outputs, except `*sync-docs` which may edit the descriptive allowlist after operator approval.
 - On missing/ambiguous inputs, write Assumptions and Open Questions; do not fabricate content.
 - All actions must append an Audit block with timestamp, persona id, and action name to the artifact.
+
+## Descriptive documentation
+- After a change set of application source, runtime config, env examples, or deploy/CI config, the persona that made the change runs `*sync-docs` (`.cursor/skills/sync-docs/SKILL.md`) once before finishing.
+- That action may edit the descriptive allowlist only after operator approval. It must not edit `project-context/1.define/**` or `project-context/0.review/**`. Spec drift is reported, not patched.
 
 ## Task Contract
 - Each task defines: description, expected_output (exact target file path and required headings), acceptance_criteria, traceability to PRD/SAD/SFS anchors.

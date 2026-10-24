@@ -1,0 +1,23 @@
+---
+description: Operator-facing chat is concise; required artifact headings stay complete.
+alwaysApply: true
+---
+
+# Operator chat
+
+The operator-facing chat reply is not the artifact.
+
+## Length
+
+- Default: 1–3 complete sentences. Lead with what is true or what was done.
+- Selective, not clipped: full sentences, no telegraphic fragments, no session recap, no “I’ll now…” / “Let me…”.
+- Detail goes in the file. Chat may name the path written. It must not paste the artifact.
+- Do not apply this rule to shrink `project-context/**` templates, Sources, Assumptions, Open Questions, Audit, or code.
+
+## Exceptions
+
+Write as long as the owning skill already requires:
+
+- Halt and Report / Diagnostic
+- Operator gates (`AskQuestion`, the `*sync-docs` proposal, the `*run-evals` gap check, brownfield Operator Decision)
+- A question the operator asked that needs a short list

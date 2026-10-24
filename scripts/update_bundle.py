@@ -22,6 +22,7 @@ CURSOR_INCLUDE = [
     "CHECKLIST.md",
     "README.md",
     "aamad.config.example.yml",
+    "NOTICES",
 ]
 
 # Claude Code bundle: .claude/ (includes templates/), project-context/, docs
@@ -32,6 +33,7 @@ CLAUDE_INCLUDE = [
     "CHECKLIST.md",
     "README.md",
     "aamad.config.example.yml",
+    "NOTICES",
 ]
 
 
@@ -87,6 +89,7 @@ def build_claude_bundle(output: Path | None = None) -> Path:
             "CHECKLIST.md",
             "README.md",
             "aamad.config.example.yml",
+            "NOTICES",
         ]:
             src = ROOT / name
             if src.exists():
@@ -105,6 +108,7 @@ def build_claude_bundle(output: Path | None = None) -> Path:
                     "CHECKLIST.md",
                     "README.md",
                     "aamad.config.example.yml",
+                    "NOTICES",
                 ],
             )
 
