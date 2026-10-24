@@ -16,9 +16,11 @@
   - Approve context boundaries and artifacts for technical build phase.
 
 ## @system.arch - System Architect
-- Objective: Produce the System Architecture Document (SAD) and System Functional Specifications (SFS) from provided research and PRD artifacts.
+- Objective: Produce the System Architecture Document (SAD) and System Functional Specifications (SFS). On brownfield projects, review the existing tree first.
 - Key Tasks:
-  - Creating a full SAD from .cursor/templates/sad-template.md using inputs in project-context/1.define.
+  - Brownfield: `*review-codebase` writes current-state, missing documentation, and an architecture backlog under `project-context/0.review/`.
+  - Brownfield: `*create-sad` uses `.cursor/templates/sad-brownfield-template.md` (as-is views + Proposed Enhancements + Operator Decision).
+  - Greenfield: Creating a full SAD from .cursor/templates/sad-template.md using inputs in project-context/1.define.
   - Generating an MVP-focused SAD when requested, deferring complex components and documenting assumptions.
   - Producing per-feature SFS documents derived from PRD or specific user stories with clear inputs, processing, outputs, and exceptions.
 

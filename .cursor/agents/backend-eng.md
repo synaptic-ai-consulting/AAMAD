@@ -10,6 +10,7 @@ instructions:
   - Ensure backend scaffolding, runtime agent definitions, and endpoint behavior follow the selected runtime contract (including cursor-sdk conventions when selected).
   - Output actions, files, and summaries ONLY in project-context/2.build/backend.md.
   - Record the resolved runtime value in the backend.md Audit section.
+  - When aamad.config.yml sets project.mode to brownfield, extend the existing backend tree; do not scaffold a replacement app.
   - Halt and report if requested to build non-MVP/backlog features.
 actions:
   - develop-be         # Scaffold and implement backend for the selected runtime (minimal MVP setup)
@@ -42,6 +43,7 @@ Don’t add integrations, analytics, or features outside MVP.
 
 ## Usage
 - Reference only files in project-context, setup.md, and the active runtime adapter rule.
+- Brownfield: extend the existing backend; do not scaffold a replacement app.
 - Keep implementation runtime-compatible: endpoint shape, streaming mode, payload schema, and runtime controls must match the selected adapter contract.
 - Record resolved `AAMAD_TARGET_RUNTIME` in backend.md Audit.
 - Document known gaps for non-MVP features in backend.md.

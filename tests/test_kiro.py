@@ -11,6 +11,7 @@ import yaml
 from aamad.installer import extract_artifacts, write_agents_md
 from aamad.kiro import (
     AGENT_IDS,
+    PROMPT_STEERING,
     RULE_ORDER,
     TEMPLATE_FILES,
     convert_agents,
@@ -239,9 +240,13 @@ def test_get_kiro_planned_paths():
     assert dest / ".kiro" / "steering" / "aamad-core.md" in paths
     assert dest / ".kiro" / "steering" / "dev-crew.md" in paths
     assert dest / ".kiro" / "steering" / "phase-1-define.md" in paths
+    assert dest / ".kiro" / "steering" / "phase-0-review.md" in paths
     assert dest / ".kiro" / "agents" / "backend-eng.md" in paths
     assert dest / ".kiro" / "templates" / "prd-template.md" in paths
-    assert len(paths) == len(RULE_ORDER) + 1 + 2 + len(AGENT_IDS) + len(TEMPLATE_FILES)
+    assert dest / ".kiro" / "templates" / "sad-brownfield-template.md" in paths
+    assert len(paths) == (
+        len(RULE_ORDER) + 1 + len(PROMPT_STEERING) + len(AGENT_IDS) + len(TEMPLATE_FILES)
+    )
 
 
 def test_write_agents_md_kiro(tmpdir):
@@ -255,8 +260,12 @@ def test_extract_artifacts_kiro_layout(tmpdir):
     paths = extract_artifacts(tmpdir, ide="kiro", overwrite=False)
     assert (tmpdir / ".kiro" / "steering" / "aamad-core.md").exists()
     assert (tmpdir / ".kiro" / "steering" / "dev-crew.md").exists()
+    assert (tmpdir / ".kiro" / "steering" / "phase-0-review.md").exists()
     assert (tmpdir / ".kiro" / "steering" / "phase-1-define.md").exists()
     assert (tmpdir / ".kiro" / "steering" / "sync-docs.md").exists()
+    assert (tmpdir / ".kiro" / "steering" / "brownfield-review.md").exists()
+    assert (tmpdir / ".kiro" / "templates" / "sad-brownfield-template.md").exists()
+    assert (tmpdir / ".kiro" / "templates" / "current-state-template.md").exists()
     for agent_id in AGENT_IDS:
         assert (tmpdir / ".kiro" / "agents" / f"{agent_id}.md").exists()
     assert (tmpdir / ".kiro" / "skills" / "run-evals" / "SKILL.md").exists()

@@ -1,0 +1,19 @@
+> NOTE: This prompt starts Phase 0 (Brownfield Review) after `aamad init --mode brownfield`.
+> NOTE: Use `@system.arch` in your IDE. Do not install or invoke the REA product, MCP servers, or decompilers.
+> NOTE: The operator must record an Operator Decision on the SAD before Phase 1 constrained Define.
+
+You will help the user produce a brownfield quickstart so the human team and the AAMAD crew understand the existing repository. Follow `.cursor/rules/brownfield-review.mdc` and the templates in `.cursor/templates/`.
+
+Execute in series:
+
+1. Confirm `project.mode` is `brownfield` in `aamad.config.yml` (or that the operator asked for a Review). If the tree has no inspectable application source, halt with Diagnostic.
+2. Run `*review-codebase` as `@system.arch`:
+   - `project-context/0.review/current-state.md` from `.cursor/templates/current-state-template.md` (what the code does today)
+   - `project-context/0.review/documentation.md` from `.cursor/templates/review-documentation-template.md` (missing docs only; do not overwrite the repo README)
+   - `project-context/0.review/architecture-backlog.md` from `.cursor/templates/architecture-backlog-template.md` (architectural actions, not bug fixes)
+3. Run `*create-sad` (or `*create-sad --mvp` for a lean increment) using `.cursor/templates/sad-brownfield-template.md`. The SAD describes the current solution and includes Proposed Enhancements plus Operator Decision (`pending` until the operator edits it).
+4. Ask the operator to set Operator Decision to `approved`, `approved-with-changes`, or `rejected`.
+5. When approved, hand off to `@product-mgr` for constrained Define (PRD and stories covering only the approved enhancements). Skip MRD unless the operator asks for it.
+6. Optionally run `aamad validate --phase review` after the SAD exists, then `aamad validate --phase define` after the constrained PRD exists.
+
+Do not scaffold a replacement application. Do not invent product vision. Distinguish observation vs inference vs unknown.

@@ -5,8 +5,13 @@
 
 version: 1
 
+project:
+  # Written by `aamad init`. greenfield = start from scratch; brownfield = existing repo.
+  mode: greenfield  # greenfield | brownfield
+
 runtime:
   # Prefer AAMAD_TARGET_RUNTIME env for adapter selection; this documents intent.
+  # Greenfield `aamad init` writes target when you pick an adapter (not "choose later").
   target: crewai  # crewai | claude-agent-sdk | cursor-sdk
 
 language:

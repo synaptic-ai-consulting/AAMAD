@@ -8,6 +8,8 @@ from importlib import resources
 from pathlib import Path
 from typing import Iterable, Iterator
 
+import yaml
+
 from .kiro import get_kiro_planned_paths, install_kiro
 from .vscode_copilot import get_vscode_planned_paths, install_vscode_copilot
 
@@ -37,7 +39,7 @@ See the full agent definitions in the IDE-specific directories.
 
 ## Agent Personas
 - **@product-mgr** — Product Manager: Orchestrates product vision and requirements
-- **@system.arch** — System Architect: Produces SAD and SFS documents
+- **@system.arch** — System Architect: Reviews existing code (brownfield) and produces SAD/SFS
 - **@project.mgr** — Project Manager: Scaffolds project and environment
 - **@frontend.eng** — Frontend Developer: Builds MVP chat interface
 - **@backend.eng** — Backend Developer: Builds backend for the selected runtime
@@ -47,9 +49,15 @@ See the full agent definitions in the IDE-specific directories.
 - **@devops.eng** — DevOps Engineer: Packages deploy/CI, runbook, and user guide
 
 ## Workflow
+Greenfield (default, `project.mode: greenfield`):
 1. **Define** (Phase 1): @product-mgr → elicitation → Market Research (optional) → PRD → @system.arch → SAD
 2. **Build** (Phase 2): @project.mgr → @frontend.eng / @backend.eng → @integration.eng → @qa.eng → @security.eng
 3. **Deliver** (Phase 3): @devops.eng → deploy.md + user-guide.md
+
+Brownfield (`project.mode: brownfield`):
+1. **Review** (Phase 0): @system.arch → *review-codebase → *create-sad (as-is + proposed enhancements) → operator decision
+2. **Constrained Define** (Phase 1): @product-mgr writes PRD and stories only for approved enhancements
+3. **Build** then **Deliver** as above; extend the existing tree — do not scaffold a replacement app
 
 ## Rules
 All development follows AAMAD core rules. See project-context/ for artifacts.
@@ -119,17 +127,129 @@ def write_agents_md(
     return path
 
 
+def _skip_if_exists(dest: Path, *, mode: str, overwrite: bool) -> frozenset[str]:
+    """Bundle members to leave in place for brownfield init."""
+    if mode == "brownfield" and not overwrite and (dest / "README.md").is_file():
+        return frozenset({"README.md"})
+    return frozenset()
+
+
+def _merge_project_mode(path: Path, mode: str, runtime: str | None = None) -> None:
+    """Create or merge ``project.mode`` (and optional runtime) without clobbering other keys."""
+    data: dict = {}
+    if path.is_file():
+        loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            data = loaded
+    if "version" not in data:
+        data["version"] = 1
+    project = data.get("project")
+    if not isinstance(project, dict):
+        project = {}
+    project["mode"] = mode
+    data["project"] = project
+    if runtime and runtime != "later":
+        runtime_block = data.get("runtime")
+        if not isinstance(runtime_block, dict):
+            runtime_block = {}
+        runtime_block["target"] = runtime
+        data["runtime"] = runtime_block
+    path.write_text(
+        yaml.safe_dump(data, default_flow_style=False, sort_keys=False, allow_unicode=True),
+        encoding="utf-8",
+    )
+
+
+def _merge_dotenv(path: Path, key: str, value: str) -> None:
+    """Set ``key=value`` in a dotenv file, replacing a prior assignment of the same key."""
+    lines: list[str] = []
+    if path.is_file():
+        lines = path.read_text(encoding="utf-8").splitlines()
+    updated: list[str] = []
+    found = False
+    prefix = f"{key}="
+    export_prefix = f"export {key}="
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith(prefix) or stripped.startswith(export_prefix):
+            updated.append(f"{key}={value}")
+            found = True
+        else:
+            updated.append(line)
+    if not found:
+        if updated and updated[-1] != "":
+            updated.append("")
+        updated.append(f"{key}={value}")
+    path.write_text("\n".join(updated) + "\n", encoding="utf-8")
+
+
+def _set_claude_runtime(dest: Path, runtime: str) -> Path | None:
+    """Update ``AAMAD_TARGET_RUNTIME`` in ``.claude/settings.json`` when present."""
+    import json
+
+    settings_path = dest / ".claude" / "settings.json"
+    if not settings_path.is_file():
+        return None
+    try:
+        data = json.loads(settings_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        data = {}
+    if not isinstance(data, dict):
+        data = {}
+    env = data.get("env")
+    if not isinstance(env, dict):
+        env = {}
+    env["AAMAD_TARGET_RUNTIME"] = runtime
+    data["env"] = env
+    settings_path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+    return settings_path
+
+
+def write_mode_artifacts(
+    destination: Path,
+    *,
+    mode: str,
+    runtime: str | None = None,
+    dry_run: bool = False,
+) -> list[Path]:
+    """Write ``aamad.config.yml`` project.mode, optional runtime, and brownfield placeholder."""
+    dest = Path(destination).expanduser().resolve()
+    created: list[Path] = []
+    config_path = dest / "aamad.config.yml"
+    created.append(config_path)
+    env_path = dest / ".env"
+    apply_runtime = bool(runtime and runtime != "later")
+    if apply_runtime:
+        created.append(env_path)
+    if not dry_run:
+        _merge_project_mode(config_path, mode, runtime)
+        if apply_runtime:
+            _merge_dotenv(env_path, "AAMAD_TARGET_RUNTIME", runtime)
+            _set_claude_runtime(dest, runtime)
+    if mode == "brownfield":
+        gitkeep = dest / "project-context" / "0.review" / ".gitkeep"
+        created.append(gitkeep)
+        if not dry_run:
+            gitkeep.parent.mkdir(parents=True, exist_ok=True)
+            if not gitkeep.exists():
+                gitkeep.write_text("", encoding="utf-8")
+    return created
+
+
 def extract_artifacts(
     destination: Path | str,
     *,
     ide: str = "cursor",
+    mode: str = "greenfield",
+    runtime: str | None = None,
     overwrite: bool = False,
     dry_run: bool = False,
 ) -> list[Path]:
     """
     Extract the bundled artifacts into ``destination``.
 
-    Also writes AGENTS.md (bridge file for IDE discoverability).
+    Also writes AGENTS.md (bridge file for IDE discoverability) and merges
+    ``project.mode`` into ``aamad.config.yml``.
     For ide "vscode" and "kiro", stages the Cursor bundle in a temp directory,
     converts into `.github/` / `.kiro/`, and copies only shared paths
     (`project-context/`, docs). Templates land in the IDE folder.
@@ -137,17 +257,24 @@ def extract_artifacts(
     Args:
         destination: Directory that should receive `.cursor/` or `.claude/` or `.github/` or `.kiro/`, `project-context/`, etc.
         ide: Target IDE — "cursor" (default), "claude-code", "vscode", or "kiro".
+        mode: Project spine — "greenfield" (default) or "brownfield".
+        runtime: Greenfield runtime adapter — ``crewai``, ``claude-agent-sdk``,
+            ``cursor-sdk``, or ``later`` / ``None`` (do not set the variable).
         overwrite: If False, raises FileExistsError when target already exists.
         dry_run: When True, no files are written; returns the would-be paths.
     """
     dest = Path(destination).expanduser().resolve()
+    skip = _skip_if_exists(dest, mode=mode, overwrite=overwrite)
 
     if ide == "kiro":
         return _extract_from_cursor_stage(
             dest,
             ide="kiro",
+            mode=mode,
+            runtime=runtime,
             overwrite=overwrite,
             dry_run=dry_run,
+            skip_if_exists=skip,
             install=install_kiro,
             planned_paths=get_kiro_planned_paths(dest),
             extra_mapped_prefixes=((".cursor/skills/", ".kiro/skills/"),),
@@ -156,14 +283,24 @@ def extract_artifacts(
         return _extract_from_cursor_stage(
             dest,
             ide="vscode",
+            mode=mode,
+            runtime=runtime,
             overwrite=overwrite,
             dry_run=dry_run,
+            skip_if_exists=skip,
             install=install_vscode_copilot,
             planned_paths=get_vscode_planned_paths(dest),
         )
 
     installer = ArtifactInstaller(get_bundle_path(ide))
-    paths = list(installer.extract(dest, overwrite=overwrite, dry_run=dry_run))
+    paths = list(
+        installer.extract(
+            dest,
+            overwrite=overwrite,
+            dry_run=dry_run,
+            skip_if_exists=skip,
+        )
+    )
 
     agents_path = write_agents_md(
         destination,
@@ -173,6 +310,7 @@ def extract_artifacts(
     )
     if agents_path is not None:
         paths.append(agents_path)
+    paths.extend(write_mode_artifacts(dest, mode=mode, runtime=runtime, dry_run=dry_run))
     return paths
 
 
@@ -186,7 +324,13 @@ def _is_shared_member(filename: str) -> bool:
     return False
 
 
-def _copy_shared(stage: Path, dest: Path, *, overwrite: bool) -> list[Path]:
+def _copy_shared(
+    stage: Path,
+    dest: Path,
+    *,
+    overwrite: bool,
+    skip_if_exists: frozenset[str] = frozenset(),
+) -> list[Path]:
     """Copy project-context and root docs from a staged Cursor extract."""
     created: list[Path] = []
     for name in (*SHARED_FILES, *SHARED_DIRS):
@@ -195,6 +339,8 @@ def _copy_shared(stage: Path, dest: Path, *, overwrite: bool) -> list[Path]:
             continue
         target = dest / name
         if src.is_file():
+            if target.exists() and name in skip_if_exists:
+                continue
             if target.exists() and not overwrite:
                 raise FileExistsError(
                     f"{target} already exists. Use overwrite=True to replace it."
@@ -222,8 +368,11 @@ def _extract_from_cursor_stage(
     dest: Path,
     *,
     ide: str,
+    mode: str,
+    runtime: str | None = None,
     overwrite: bool,
     dry_run: bool,
+    skip_if_exists: frozenset[str],
     install,
     planned_paths: list[Path],
     extra_mapped_prefixes: tuple[tuple[str, str], ...] = (),
@@ -233,7 +382,9 @@ def _extract_from_cursor_stage(
     shared_paths = [
         dest / name
         for name in installer.preview()
-        if _is_shared_member(name) and not name.endswith("/")
+        if _is_shared_member(name)
+        and not name.endswith("/")
+        and name.replace("\\", "/") not in skip_if_exists
     ]
     mapped_paths: list[Path] = []
     for name in installer.preview():
@@ -250,17 +401,26 @@ def _extract_from_cursor_stage(
         paths = shared_paths + list(planned_paths) + mapped_paths
         if agents_path is not None:
             paths.append(agents_path)
+        paths.extend(write_mode_artifacts(dest, mode=mode, runtime=runtime, dry_run=True))
         return paths
 
     with tempfile.TemporaryDirectory() as tmp:
         stage = Path(tmp)
         installer.extract(stage, overwrite=True, dry_run=False)
         created = list(install(stage, dest, overwrite=overwrite))
-        created.extend(_copy_shared(stage, dest, overwrite=overwrite))
+        created.extend(
+            _copy_shared(
+                stage,
+                dest,
+                overwrite=overwrite,
+                skip_if_exists=skip_if_exists,
+            )
+        )
 
     agents_path = write_agents_md(dest, ide=ide, overwrite=overwrite, dry_run=False)
     if agents_path is not None:
         created.append(agents_path)
+    created.extend(write_mode_artifacts(dest, mode=mode, runtime=runtime, dry_run=False))
     return created
 
 
@@ -284,16 +444,20 @@ class ArtifactInstaller:
         *,
         overwrite: bool = False,
         dry_run: bool = False,
+        skip_if_exists: frozenset[str] = frozenset(),
     ) -> list[Path]:
         destination = destination.expanduser().resolve()
         if dry_run:
-            return self._planned_paths(destination)
+            return self._planned_paths(destination, skip_if_exists=skip_if_exists)
 
         with zipfile.ZipFile(self.bundle_path, "r") as zf:
             for member in zf.infolist():
+                normalized = member.filename.replace("\\", "/").rstrip("/")
                 target = destination / member.filename
                 if member.is_dir():
                     target.mkdir(parents=True, exist_ok=True)
+                    continue
+                if normalized in skip_if_exists and target.exists():
                     continue
                 if not overwrite and target.exists():
                     raise FileExistsError(
@@ -302,8 +466,19 @@ class ArtifactInstaller:
                 target.parent.mkdir(parents=True, exist_ok=True)
                 with zf.open(member, "r") as src, open(target, "wb") as dst:
                     shutil.copyfileobj(src, dst)
-        return self._planned_paths(destination)
+        return self._planned_paths(destination, skip_if_exists=skip_if_exists)
 
-    def _planned_paths(self, destination: Path) -> list[Path]:
+    def _planned_paths(
+        self,
+        destination: Path,
+        *,
+        skip_if_exists: frozenset[str] = frozenset(),
+    ) -> list[Path]:
         members: Iterable[str] = [m.filename for m in self.iter_members()]
-        return [destination / name for name in members]
+        paths: list[Path] = []
+        for name in members:
+            normalized = name.replace("\\", "/").rstrip("/")
+            if normalized in skip_if_exists and (destination / name).exists():
+                continue
+            paths.append(destination / name)
+        return paths

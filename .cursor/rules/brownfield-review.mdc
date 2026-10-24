@@ -1,0 +1,52 @@
+---
+description: Brownfield review contract — REA-style investigation principles adapted for AAMAD (no REA product or MCP).
+alwaysApply: true
+---
+
+# AAMAD Brownfield Review
+
+## Purpose
+- Govern Phase 0 Review when `aamad.config.yml` sets `project.mode: brownfield` (or when `project-context/0.review/` artifacts are being produced).
+- Adapt REA investigation *principles* for AAMAD: identify the target, inspect structure, locate features, inspect implementation, and keep unknowns explicit.
+- Do **not** install or invoke the `morluto/rea` product, `rea-agents`, MCP servers, decompilers, or binary-analysis engines.
+
+## When This Applies
+- `project.mode` is `brownfield`, or the operator invoked `@system.arch` `*review-codebase`.
+- Greenfield projects ignore Review actions; they start at Define.
+
+## Investigation Loop
+1. **Identify the target.** Repo identity, stack, entrypoints, and manifests.
+2. **Inspect structure.** Packages, modules, routes, services, stores, jobs.
+3. **Locate features.** Start from APIs, UI, tests, strings, or config — not from invented requirements.
+4. **Inspect implementation.** Read source. Record paths that support each claim.
+5. **Record unknowns.** Unobserved does not mean absent.
+
+## Evidence Discipline
+- Prefer source, tests, config, and existing docs over inference.
+- Label every material claim as **observation**, **inference**, or **unknown**.
+- Static reachability is not proof of runtime execution.
+- Do not treat missing documentation as proof the behavior does not exist.
+- Cite file paths (and current-state `BH-*` / `UNK-*` IDs) in Review artifacts and the brownfield SAD.
+
+## Outputs
+`@system.arch` writes only:
+- `project-context/0.review/current-state.md` from `.cursor/templates/current-state-template.md`
+- `project-context/0.review/documentation.md` from `.cursor/templates/review-documentation-template.md`
+- `project-context/0.review/architecture-backlog.md` from `.cursor/templates/architecture-backlog-template.md`
+- `project-context/1.define/sad.md` from `.cursor/templates/sad-brownfield-template.md` (as-is views + Proposed Enhancements + Operator Decision)
+
+Do not overwrite the repository README or existing project docs. Missing documentation belongs in `documentation.md`.
+
+## Scope
+- Architecture and documentation only.
+- Architecture backlog items are structural evolution — not bug fixes, drive-by refactors, or unrelated features.
+- No hostile-target analysis, no execution of untrusted binaries, no secret values in artifacts.
+
+## Operator Gate
+- SAD Operator Decision starts as `pending`.
+- Constrained Define (`@product-mgr` PRD/stories) starts only when status is `approved` or `approved-with-changes`.
+- `rejected` stays in Review; revise the backlog and SAD.
+
+## Failure Policy
+- If the destination has no inspectable application source (empty tree, only AAMAD scaffolding), halt and write a Diagnostic: the operator likely chose brownfield by mistake.
+- On missing Review inputs when writing the brownfield SAD, write Diagnostic and halt — do not invent a current-state dossier.

@@ -1,7 +1,7 @@
 # AAMAD Execution Checklist
 
-This checklist guides you step-by-step through running AAMAD from Phase 1 (Define) through Phase 2 (Build) and Phase 3 (Deliver), using the agentic workflows defined in the framework.  
-**Artifacts** (`project-context/`, templates, Phase 1 prompt) are the same in every IDE; **where agents and rules live** depends on how you initialized AAMAD.
+This checklist guides you step-by-step through running AAMAD: greenfield starts at Phase 1 (Define); brownfield starts at Phase 0 (Review), then a constrained Define, then Phase 2 (Build) and Phase 3 (Deliver).  
+**Artifacts** (`project-context/`, templates, Phase 0 / Phase 1 prompts) are the same in every IDE; **where agents and rules live** depends on how you initialized AAMAD.
 
 ---
 
@@ -13,30 +13,32 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
 
   | IDE | Command |
   | :-- | :------ |
-  | **Guided setup** | `aamad init --dest .` (choose Cursor, Claude Code, VS Code with GitHub Copilot, or Kiro) |
+  | **Guided setup** | `aamad init --dest .` (choose IDE, then greenfield or brownfield; greenfield also asks for a runtime adapter or “choose this later”) |
   | **Cursor** | `aamad init --ide cursor --dest .` |
   | **Claude Code** | `aamad init --ide claude-code --dest .` |
   | **VS Code + GitHub Copilot** | `aamad init --ide vscode --dest .` |
   | **Kiro** | `aamad init --ide kiro --dest .` |
+  | **Non-interactive** | add `--mode greenfield` or `--mode brownfield`; on greenfield add `--runtime {crewai,claude-agent-sdk,cursor-sdk,later}` |
 
 - [ ] Confirm expected outputs for **your** IDE (templates live in that IDE folder):
 
   - [ ] **Cursor:** `.cursor/agents/`, `.cursor/rules/`, `.cursor/prompts/`, `.cursor/skills/`, `.cursor/templates/`, root `AGENTS.md`
   - [ ] **Claude Code:** `.claude/` (`agents/`, `rules/`, `commands/`, `skills/`, `templates/`, `settings.json`), `AGENTS.md`
   - [ ] **VS Code + Copilot:** `.github/instructions/`, `.github/agents/`, `.github/prompts/` (includes `run-evals.prompt.md`), `.github/templates/`, `.vscode/settings.json`, `AGENTS.md`
-  - [ ] **Kiro:** `.kiro/agents/`, `.kiro/steering/` (rules + manual Phase 1 / sync-docs), `.kiro/skills/`, `.kiro/templates/`, `AGENTS.md`
+  - [ ] **Kiro:** `.kiro/agents/`, `.kiro/steering/` (rules + manual Phase 0 / Phase 1 / sync-docs), `.kiro/skills/`, `.kiro/templates/`, `AGENTS.md`
 
 - [ ] Upgrading a Claude Code, VS Code, or Kiro project from 0.9.0 or earlier: `aamad init --overwrite --ide <claude-code|vscode|kiro>`. If this project is not using Cursor, delete leftover `.cursor/`.
 
-- [ ] Optionally copy `aamad.config.example.yml` → `aamad.config.yml` and set project preferences.
+- [ ] Confirm `aamad.config.yml` exists with `project.mode` set by init. Optionally edit other preferences (or copy remaining keys from `aamad.config.example.yml`).
+- [ ] Brownfield: `project-context/0.review/` exists; an existing project README was left in place.
 - [ ] Skim root `AGENTS.md` so you know where personas live for your IDE.
-- [ ] To **invoke personas** (`@product-mgr`, `@backend.eng`, …) and reference files, follow [README.md → Using AAMAD in your IDE](README.md#using-aamad-in-your-ide) (Cursor, Claude Code, VS Code, and Kiro differ).
+- [ ] To **invoke personas** (`@product-mgr`, `@backend.eng`, …) and reference files, follow [README.md → Multi-IDE support](README.md#multi-ide-support) (Cursor, Claude Code, VS Code, and Kiro differ).
 
 ---
 
 ## Runtime target (Phase 2 generated MVP)
 
-- [ ] Set `AAMAD_TARGET_RUNTIME` before Build-phase implementation work (record the resolved value in `sad.md` Audit and other artifacts as rules require):
+- [ ] Set `AAMAD_TARGET_RUNTIME` before Build-phase implementation work (greenfield `aamad init` may have already written it; “choose this later” leaves CrewAI as the default until you set it). Record the resolved value in `sad.md` Audit and other artifacts as rules require:
 
   - [ ] `crewai` (default if unset / unknown per adapter registry)
   - [ ] `claude-agent-sdk`
@@ -44,11 +46,33 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
 
 ---
 
+## Phase 0: Brownfield Review (`@system.arch`) — brownfield only
+
+Skip this section when `project.mode` is `greenfield`.
+
+- [ ] Invoke `@system.arch` (or open `.cursor/prompts/prompt-phase-0-review`; Claude Code: `/phase-0-review`; VS Code: phase-0-review prompt).
+- [ ] Run `*review-codebase`
+  - [ ] `project-context/0.review/current-state.md` — what the code does today
+  - [ ] `project-context/0.review/documentation.md` — missing documentation (do not overwrite the repo README)
+  - [ ] `project-context/0.review/architecture-backlog.md` — architectural actions only (not bug fixes)
+- [ ] Run `*create-sad` (or `*create-sad --mvp` for a lean increment) using `sad-brownfield-template.md`
+  - [ ] SAD describes the **current** solution
+  - [ ] Proposed Enhancements chapter is present
+  - [ ] Operator Decision is present (starts as `pending`)
+  - [ ] Resolved `AAMAD_TARGET_RUNTIME` recorded in sad.md Audit
+- [ ] Optionally run `aamad validate --phase review`.
+- [ ] Operator records Operator Decision: `approved` | `approved-with-changes` | `rejected`.
+- [ ] If `rejected`, revise the backlog and SAD; do not start Phase 1.
+- [ ] If `approved` or `approved-with-changes`, continue to **constrained** Phase 1.
+
+---
+
 ## Phase 1: Requirements Definition (`@product-mgr`)
 
-- [ ] Invoke `@product-mgr` using your IDE’s agent chat (see **Install and IDE layout** and README → Using AAMAD in your IDE).
-- [ ] **Recommended for specialized projects:** run `*elicit-requirements` (or author `system-description.md` yourself) before MRD/PRD.
-- [ ] **MRD decision:**
+- [ ] Invoke `@product-mgr` using your IDE’s agent chat (see **Install and IDE layout** and [README → Multi-IDE support](README.md#multi-ide-support)).
+- [ ] **Brownfield:** do not start until SAD Operator Decision is `approved` or `approved-with-changes`. Scope PRD and stories to the approved enhancement set only. Skip MRD unless the operator asks for it.
+- [ ] **Recommended for specialized greenfield projects:** run `*elicit-requirements` (or author `system-description.md` yourself) before MRD/PRD.
+- [ ] **MRD decision (greenfield):**
   - [ ] Commercial / market-facing product → produce MRD
   - [ ] Internal / personal / operational tool → skip MRD; note rationale in PRD Assumptions
 - [ ] Run as needed:
@@ -59,7 +83,7 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
     - [ ] `*create-stories` — MVP user stories under project-context/1.define/user-stories/
 - [ ] Validate completeness: market analysis (when MRD produced), user personas, feature requirements, acceptance criteria, success metrics, and business/operational goals.
 - [ ] Record assumptions and open questions in artifacts for downstream resolution.
-- [ ] Approve context boundaries and artifacts for technical build phase.
+- [ ] Approve context boundaries and artifacts for the next phase (greenfield → `@system.arch`; brownfield → Build).
 
 ---
 
@@ -67,9 +91,10 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
 
 - [ ] Ensure `project-context/1.define` includes:
   - [ ] prd.md (PRD) — **required**
-  - [ ] mrd.md (MRD) — **optional** (required only for commercial/market-facing projects)
+  - [ ] mrd.md (MRD) — **optional** (required only for commercial/market-facing greenfield projects)
   - [ ] system-description.md — recommended when elicitation was used
-  - [ ] sad.md (SAD, after architecture step)
+  - [ ] sad.md (SAD — greenfield: after architecture step; brownfield: already written in Phase 0)
+- [ ] Brownfield: `project-context/0.review/` current-state, documentation, and architecture-backlog are present; Operator Decision is approved.
 - [ ] Confirm framework layout from **Install and IDE layout** is still present (re-run `aamad init` with `--overwrite` only if you intend to refresh generated files).
 - [ ] Confirm `AAMAD_TARGET_RUNTIME` is set to your chosen runtime (see **Runtime target** above).
 - [ ] Optionally run `aamad validate --phase define`.
@@ -82,14 +107,15 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 ### Step 0: Architecture Definition (`@system.arch`)
 
-- [ ] Invoke `@system.arch`.
-- [ ] Run one of:
+- [ ] **Greenfield:** Invoke `@system.arch`.
+- [ ] **Greenfield:** Run one of:
     - [ ] `*create-sad` — Generate full SAD at project-context/1.define/sad.md using sad-template.md in your IDE templates folder.
     - [ ] `*create-sad --mvp` — Generate a lean MVP SAD, deferring nonessential components and NFRs; output to project-context/1.define/sad.md.
-- [ ] Validate SAD completeness: stakeholders/concerns, views, quality attributes, decisions, constraints, and risks.
+- [ ] **Brownfield:** SAD already exists from Phase 0; do not rewrite the as-is chapter unless the operator asked for a revision.
+- [ ] Validate SAD completeness (greenfield: stakeholders/views/decisions; brownfield: as-is views + approved enhancements).
 - [ ] Record assumptions and open questions in sad.md for downstream resolution.
 - [ ] Record resolved `AAMAD_TARGET_RUNTIME` in the sad.md Audit section.
-- [ ] Run `*define-eval-criteria` — fill the SAD section 9 evaluation criteria table (dimension, metric, threshold, grading method, source) before Build starts.
+- [ ] Run `*define-eval-criteria` — fill the SAD evaluation criteria table (dimension, metric, threshold, grading method, source) before Build implementation starts. Requires a PRD.
 
 ---
 

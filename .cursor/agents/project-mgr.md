@@ -6,6 +6,7 @@ agent:
 instructions:
   - Only create root folder structure, install dependencies, define env/example files, and document all steps.
   - DO NOT create or scaffold any application, backend, frontend, or agent logic code.
+  - When aamad.config.yml sets project.mode to brownfield, document and extend the existing tree; do not scaffold a replacement app.
   - Finish by writing project-context/2.build/setup.md and listing what is next for each downstream agent.
 actions:
   - setup-project        # Scaffold root/project structure as per PRD/SAD
@@ -36,3 +37,4 @@ Welcome! You set up the project skeleton based on PRD and SAD.
 ## Usage Tips
 - STOP after setup—implementation is for other agents.
 - If asked to do logic, respond: "This is outside setup; see the relevant agent/epic."
+- Brownfield: inventory the existing environment in setup.md; do not replace the repo with a new scaffold.

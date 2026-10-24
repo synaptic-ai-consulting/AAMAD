@@ -19,6 +19,7 @@ from typing import Any
 RULE_ORDER = [
     "aamad-core",
     "development-workflow",
+    "brownfield-review",
     "epics-index",
     "delivery-workflow",
     "adapter-registry",
@@ -236,6 +237,7 @@ def convert_agents(
 
 
 PROMPT_COMMANDS = {
+    "prompt-phase-0-review": "phase-0-review.md",
     "prompt-phase-1": "phase-1-define.md",
     "prompt-sync-docs": "sync-docs.md",
 }

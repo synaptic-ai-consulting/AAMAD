@@ -8,8 +8,9 @@ alwaysApply: true
 ## Development Module Structure
 Execute development in separate modules with fresh context:
 
+0. **Module 0: Brownfield Review** (only when `project.mode` is brownfield) — `@system.arch` investigates the existing tree and writes `0.review/` plus an as-is SAD. Stop until Operator Decision is approved.
 1. **Module 1: Core Configuration** - Agent and task definitions only
-2. **Module 2: API Integration** - Backend connectivity only  
+2. **Module 2: API Integration** - Backend connectivity only 
 3. **Module 3: Frontend Integration** - UI and user experience only
 4. **Module 4: Validation** - End-to-end testing only
 

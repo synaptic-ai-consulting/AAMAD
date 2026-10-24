@@ -455,6 +455,9 @@ def test_extract_artifacts_includes_agents_md(tmpdir):
     assert agents_md in paths or any(str(p).endswith("AGENTS.md") for p in paths)
     assert ".cursor/agents/" in agents_md.read_text()
     assert (tmpdir / ".cursor" / "templates" / "prd-template.md").exists()
+    assert (tmpdir / ".cursor" / "templates" / "sad-brownfield-template.md").exists()
+    assert (tmpdir / ".cursor" / "prompts" / "prompt-phase-0-review").exists()
+    assert (tmpdir / ".cursor" / "rules" / "brownfield-review.mdc").exists()
     product = (tmpdir / ".cursor" / "agents" / "product-mgr.md").read_text()
     assert ".cursor/templates/" in product
 
@@ -478,6 +481,10 @@ def test_convert_templates_rewrites_paths(tmpdir):
 def test_extract_artifacts_claude_code_has_templates_and_no_cursor(tmpdir):
     extract_artifacts(tmpdir, ide="claude-code", overwrite=False)
     assert (tmpdir / ".claude" / "templates" / "prd-template.md").exists()
+    assert (tmpdir / ".claude" / "templates" / "sad-brownfield-template.md").exists()
+    assert (tmpdir / ".claude" / "templates" / "current-state-template.md").exists()
+    assert (tmpdir / ".claude" / "commands" / "phase-0-review.md").exists()
+    assert (tmpdir / ".claude" / "rules" / "brownfield-review.md").exists()
     assert (tmpdir / ".claude" / "agents" / "product-mgr.md").exists()
     assert not (tmpdir / ".cursor").exists()
     product = (tmpdir / ".claude" / "agents" / "product-mgr.md").read_text()

@@ -19,6 +19,7 @@ import yaml
 RULE_ORDER = [
     "aamad-core",
     "development-workflow",
+    "brownfield-review",
     "epics-index",
     "delivery-workflow",
     "adapter-registry",
@@ -47,15 +48,20 @@ STEERING_RESOURCE = "file://.kiro/steering/**/*.md"
 SKILL_RESOURCE = "skill://.kiro/skills/**/SKILL.md"
 
 PROMPT_STEERING = {
+    "prompt-phase-0-review": "phase-0-review.md",
     "prompt-phase-1": "phase-1-define.md",
     "prompt-sync-docs": "sync-docs.md",
 }
 
 TEMPLATE_FILES = [
     "aamad-config-template.yml",
+    "architecture-backlog-template.md",
+    "current-state-template.md",
     "evals-template.md",
     "mrd-template.md",
     "prd-template.md",
+    "review-documentation-template.md",
+    "sad-brownfield-template.md",
     "sad-template.md",
     "sfs-template.md",
     "system-description-template.md",
@@ -207,7 +213,7 @@ def convert_prompts(cursor_prompts_dir: Path, out_dir: Path) -> list[Path]:
     Convert Cursor prompts to manual Kiro steering files (slash-command style).
 
     Inputs: .cursor/prompts/prompt-*
-    Outputs: .kiro/steering/phase-1-define.md, .kiro/steering/sync-docs.md
+    Outputs: .kiro/steering/phase-0-review.md, .kiro/steering/phase-1-define.md, .kiro/steering/sync-docs.md
     """
     steering_dir = out_dir / ".kiro" / "steering"
     created: list[Path] = []

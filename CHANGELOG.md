@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.5] - 2026-10-24
+
+### Added
+
+- **Brownfield support** — `aamad init` asks whether the project is greenfield or brownfield after the IDE prompt. `--mode {greenfield,brownfield}` skips the question; non-interactive runs without `--mode` default to greenfield.
+- Init writes `project.mode` into `aamad.config.yml` (merged if the file already exists) and, for brownfield, creates `project-context/0.review/`.
+- After `aamad init` finishes, the terminal prints suggested next actions for the chosen IDE and project mode.
+- Greenfield init asks which runtime adapter to use (`crewai`, `claude-agent-sdk`, `cursor-sdk`, or choose later). A selected adapter writes `AAMAD_TARGET_RUNTIME`; choosing later prints that CrewAI is the default until the variable is set. `--runtime` skips the prompt.
+- Brownfield Review (Phase 0) owned by `@system.arch`: `*review-codebase` writes current-state, missing documentation, and an architecture backlog; `*create-sad` uses `sad-brownfield-template.md` (as-is views, Proposed Enhancements, Operator Decision).
+- Constrained Define: `@product-mgr` writes PRD and stories only for approved enhancements after Operator Decision is `approved` or `approved-with-changes`.
+- `aamad validate --phase review` and brownfield define gates (review artifacts + approved SAD + PRD; MRD warning suppressed).
+- `.cursor/rules/brownfield-review.mdc` adapts REA investigation principles for AAMAD. Does not install the REA product or MCP.
+- Phase 0 prompt mapped for Claude Code (`/phase-0-review`), VS Code, and Kiro.
+
+### Changed
+
+- Brownfield init leaves an existing project `README.md` in place unless `--overwrite` is set.
+- Build personas (`@project.mgr`, `@frontend.eng`, `@backend.eng`) document and extend an existing tree when `project.mode` is brownfield.
+
 ## [0.9.1] - 2026-10-24
 
 ### Changed

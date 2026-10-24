@@ -19,6 +19,7 @@ from typing import Any
 RULE_ORDER = [
     "aamad-core",
     "development-workflow",
+    "brownfield-review",
     "epics-index",
     "delivery-workflow",
     "adapter-registry",
@@ -62,8 +63,20 @@ HANDOFFS: dict[str, list[dict[str, Any]]] = {
             "prompt": "Create the SAD using inputs from project-context/1.define/",
             "send": False,
         },
+        {
+            "label": "→ Start Build Phase (brownfield)",
+            "agent": "project-mgr",
+            "prompt": "Document and extend the existing project from the approved SAD and constrained PRD. Do not scaffold a replacement app.",
+            "send": False,
+        },
     ],
     "system-arch": [
+        {
+            "label": "→ Constrained Define (brownfield)",
+            "agent": "product-mgr",
+            "prompt": "Write PRD and stories only for the approved enhancements in project-context/1.define/sad.md. Operator Decision must be approved or approved-with-changes.",
+            "send": False,
+        },
         {
             "label": "→ Start Build Phase",
             "agent": "project-mgr",
@@ -119,9 +132,13 @@ HANDOFFS: dict[str, list[dict[str, Any]]] = {
 
 TEMPLATE_FILES = [
     "aamad-config-template.yml",
+    "architecture-backlog-template.md",
+    "current-state-template.md",
     "evals-template.md",
     "mrd-template.md",
     "prd-template.md",
+    "review-documentation-template.md",
+    "sad-brownfield-template.md",
     "sad-template.md",
     "sfs-template.md",
     "system-description-template.md",
@@ -305,6 +322,11 @@ def convert_agents(cursor_agents_dir: Path, out_dir: Path) -> list[Path]:
 
 
 PROMPT_SPECS = {
+    "prompt-phase-0-review": {
+        "out": "phase-0-review.prompt.md",
+        "description": "AAMAD Phase 0: Brownfield review of the existing codebase",
+        "agent": "system-arch",
+    },
     "prompt-phase-1": {
         "out": "phase-1-define.prompt.md",
         "description": "AAMAD Phase 1: Generate Market Research and Product Requirements Document",

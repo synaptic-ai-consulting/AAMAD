@@ -9,7 +9,7 @@ alwaysApply: true
 
 ## Principles
 - **Single responsibility personas:** each persona owns a defined epic with explicit inputs, outputs, and prohibited actions.
-- **Context-first engineering:** all outputs must trace to PRD, SAD, SFS, or user stories; do not invent requirements.
+- **Context-first engineering:** all outputs must trace to PRD, SAD, SFS, user stories, or (brownfield) Review artifacts; do not invent requirements.
 - **Reproducibility and provenance:** every artifact includes Sources, Assumptions, and Open Questions sections.
 - **Deterministic execution:** actions are idempotent; perform temp-write-then-atomic-replace for file outputs.
 - **Minimal viable architecture first:** implement MVP scope before expanding; document deferrals with rationale.
@@ -41,7 +41,8 @@ alwaysApply: true
 - On iteration/time limits or missing prerequisites, write a Halt and Report section with blockers; do not continue.
 
 ## Project Configuration
-- When `aamad.config.yml` exists at the project root, all personas MUST load it at start and honor its preferences (language, libraries, UI, coding standards, security, documentation, testing).
+- When `aamad.config.yml` exists at the project root, all personas MUST load it at start and honor its preferences (language, libraries, UI, coding standards, security, documentation, testing, and `project.mode`).
+- `project.mode` is `greenfield` (default) or `brownfield`. Brownfield starts at Phase 0 Review (`@system.arch` `*review-codebase`) and uses Review artifacts plus the as-is SAD as context; do not invent a new product vision.
 - Prefer `AAMAD_TARGET_RUNTIME` environment variable over `runtime.target` in the config when both are set; record the resolved value in Audit.
 - If config conflicts with PRD or SAD, do not silently override those artifacts — record the conflict under Open Questions and proceed with PRD/SAD as authoritative for scope.
 - Use `.cursor/templates/aamad-config-template.yml` / `aamad.config.example.yml` as the schema reference; unknown keys should be flagged by `aamad validate`.

@@ -21,6 +21,16 @@ DEFINE_REQUIRED = (
 DEFINE_OPTIONAL = (
     "project-context/1.define/mrd.md",
 )
+REVIEW_ARTIFACTS = (
+    "project-context/0.review/current-state.md",
+    "project-context/0.review/documentation.md",
+    "project-context/0.review/architecture-backlog.md",
+)
+REVIEW_REQUIRED = REVIEW_ARTIFACTS + ("project-context/1.define/sad.md",)
+REVIEW_SAD_HEADINGS = (
+    "Proposed Enhancements",
+    "Operator Decision",
+)
 BUILD_ARTIFACTS = (
     "project-context/2.build/setup.md",
     "project-context/2.build/frontend.md",
@@ -42,9 +52,18 @@ RUNTIME_AUDIT_RE = re.compile(
     re.IGNORECASE,
 )
 
+OPERATOR_STATUS_RE = re.compile(
+    r"(?i)(?:status|decision)\s*[:=]\s*`?(pending|approved-with-changes|approved|rejected)`?"
+)
+OPERATOR_STATUS_WORD_RE = re.compile(
+    r"(?i)\b(pending|approved-with-changes|approved|rejected)\b"
+)
+APPROVED_STATUSES = frozenset({"approved", "approved-with-changes"})
+
 KNOWN_CONFIG_TOP_KEYS = frozenset(
     {
         "version",
+        "project",
         "runtime",
         "language",
         "libraries",
@@ -115,6 +134,87 @@ def _check_runtime_in_audit(path: Path, result: ValidationResult, *, required: b
     )
 
 
+def _operator_decision_status(text: str) -> str | None:
+    """Return the Operator Decision status if the section exists."""
+    match = re.search(
+        r"^#{2,3}\s+Operator Decision\s*$(.*?)(?=^#{2,3}\s|\Z)",
+        text,
+        re.MULTILINE | re.IGNORECASE | re.DOTALL,
+    )
+    if not match:
+        return None
+    section = match.group(1)
+    status_match = OPERATOR_STATUS_RE.search(section)
+    if status_match:
+        return status_match.group(1).lower()
+    word = OPERATOR_STATUS_WORD_RE.search(section)
+    return word.group(1).lower() if word else None
+
+
+def _read_project_mode(root: Path) -> str | None:
+    path = root / "aamad.config.yml"
+    if not path.is_file():
+        return None
+    try:
+        import yaml
+
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if not isinstance(data, dict):
+        return None
+    project = data.get("project")
+    if not isinstance(project, dict):
+        return None
+    mode = project.get("mode")
+    if mode in ("greenfield", "brownfield"):
+        return mode
+    return None
+
+
+def _is_brownfield(root: Path, exists) -> bool:
+    mode = _read_project_mode(root)
+    if mode == "brownfield":
+        return True
+    if mode == "greenfield":
+        return False
+    return any(exists(p) for p in REVIEW_ARTIFACTS)
+
+
+def _check_review_sad_headings(path: Path, result: ValidationResult) -> None:
+    text = path.read_text(encoding="utf-8")
+    rel = str(path)
+    for heading in REVIEW_SAD_HEADINGS:
+        if not _heading_present(text, heading):
+            result.add("error", rel, f"Missing required heading: {heading}")
+
+
+def _check_operator_decision(
+    path: Path,
+    result: ValidationResult,
+    *,
+    require_approved: bool,
+) -> None:
+    text = path.read_text(encoding="utf-8")
+    rel = str(path)
+    status = _operator_decision_status(text)
+    if status is None:
+        result.add(
+            "error",
+            rel,
+            "Operator Decision section is missing a status "
+            "(pending | approved | approved-with-changes | rejected)",
+        )
+        return
+    if require_approved and status not in APPROVED_STATUSES:
+        result.add(
+            "error",
+            rel,
+            f"Operator Decision status is {status}; "
+            "constrained Define requires approved or approved-with-changes",
+        )
+
+
 def validate_project(
     root: Path | str,
     *,
@@ -124,7 +224,8 @@ def validate_project(
     Validate project-context artifacts under ``root``.
 
     phase:
-      - ``define``: require prd.md + sad.md; mrd.md optional
+      - ``review``: require 0.review artifacts + sad.md (brownfield)
+      - ``define``: require prd.md + sad.md; mrd.md optional (skipped for brownfield)
       - ``build``: define + build artifacts (qa.md required)
       - ``deliver``: build + deploy.md (qa.md gate)
       - ``auto``: validate whatever artifacts exist; enforce gates when later phases appear
@@ -139,36 +240,58 @@ def validate_project(
     deliver_present = exists(DELIVER_ARTIFACTS[0])
     build_present = any(exists(p) for p in BUILD_ARTIFACTS)
     qa_present = exists("project-context/2.build/qa.md")
+    review_started = any(exists(p) for p in REVIEW_ARTIFACTS)
+    prd_present = exists("project-context/1.define/prd.md")
+    brownfield = _is_brownfield(root, exists)
 
     if phase == "auto":
         if deliver_present:
             phase = "deliver"
         elif build_present or qa_present:
             phase = "build"
+        elif review_started and not prd_present:
+            phase = "review"
         else:
             phase = "define"
 
-    # Define gate
-    for rel in DEFINE_REQUIRED:
-        path = root / rel
-        if not path.is_file():
-            if phase in ("define", "build", "deliver"):
-                result.add("error", rel, "Required Define artifact missing")
-            continue
-        _check_terminal_sections(path, result)
-        if rel.endswith("sad.md"):
-            _check_runtime_in_audit(path, result, required=True)
-
-    for rel in DEFINE_OPTIONAL:
-        path = root / rel
-        if path.is_file():
+    if phase == "review" or (brownfield and phase in ("define", "build", "deliver")):
+        for rel in REVIEW_REQUIRED:
+            path = root / rel
+            if not path.is_file():
+                result.add("error", rel, "Required Review artifact missing")
+                continue
             _check_terminal_sections(path, result)
-        elif phase == "define":
-            result.add(
-                "warning",
-                rel,
-                "MRD not found (optional for internal/personal projects)",
-            )
+            if rel.endswith("sad.md"):
+                _check_runtime_in_audit(path, result, required=True)
+                _check_review_sad_headings(path, result)
+                _check_operator_decision(
+                    path,
+                    result,
+                    require_approved=phase in ("define", "build", "deliver"),
+                )
+
+    if phase in ("define", "build", "deliver"):
+        for rel in DEFINE_REQUIRED:
+            path = root / rel
+            if not path.is_file():
+                result.add("error", rel, "Required Define artifact missing")
+                continue
+            if brownfield and rel.endswith("sad.md"):
+                continue
+            _check_terminal_sections(path, result)
+            if rel.endswith("sad.md"):
+                _check_runtime_in_audit(path, result, required=True)
+
+        for rel in DEFINE_OPTIONAL:
+            path = root / rel
+            if path.is_file():
+                _check_terminal_sections(path, result)
+            elif phase == "define" and not brownfield:
+                result.add(
+                    "warning",
+                    rel,
+                    "MRD not found (optional for internal/personal projects)",
+                )
 
     if phase in ("build", "deliver"):
         for rel in BUILD_ARTIFACTS:

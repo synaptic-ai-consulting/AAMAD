@@ -556,10 +556,13 @@ def test_get_vscode_planned_paths():
         SKILL_PROMPT_SPECS
     ) + len(TEMPLATE_FILES) + 1  # + settings
     assert dest / ".vscode" / "settings.json" in paths
+    assert dest / ".github" / "prompts" / "phase-0-review.prompt.md" in paths
     assert dest / ".github" / "prompts" / "phase-1-define.prompt.md" in paths
     assert dest / ".github" / "prompts" / "sync-docs.prompt.md" in paths
     assert dest / ".github" / "prompts" / "run-evals.prompt.md" in paths
     assert dest / ".github" / "templates" / "prd-template.md" in paths
+    assert dest / ".github" / "templates" / "sad-brownfield-template.md" in paths
+    assert dest / ".github" / "instructions" / "brownfield-review.instructions.md" in paths
 
 
 def test_convert_templates_rewrites_paths(tmpdir):
@@ -584,6 +587,10 @@ def test_extract_artifacts_vscode_creates_github_and_agents_md(tmpdir):
     assert (tmpdir / ".github" / "instructions").exists()
     assert (tmpdir / ".github" / "agents").exists()
     assert (tmpdir / ".github" / "templates" / "prd-template.md").exists()
+    assert (tmpdir / ".github" / "templates" / "sad-brownfield-template.md").exists()
+    assert (tmpdir / ".github" / "templates" / "current-state-template.md").exists()
+    assert (tmpdir / ".github" / "prompts" / "phase-0-review.prompt.md").exists()
+    assert (tmpdir / ".github" / "instructions" / "brownfield-review.instructions.md").exists()
     assert (tmpdir / ".vscode" / "settings.json").exists()
     assert (tmpdir / "AGENTS.md").exists()
     assert not (tmpdir / ".cursor").exists()

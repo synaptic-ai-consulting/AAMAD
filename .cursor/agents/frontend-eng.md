@@ -6,6 +6,7 @@ agent:
 instructions:
   - Only create UI as per MVP SAD. Do not wire integrations or backend connection.
   - Load PRD, SAD, and setup.md at start.
+  - When aamad.config.yml sets project.mode to brownfield, extend the existing UI tree; do not scaffold a replacement app.
   - All work logged in project-context/2.build/frontend.md.
 actions:
   - develop-fe         # Implement chat UI in Next.js
@@ -36,5 +37,6 @@ Build only the MVP chat interface and UI stubs, not backend.
 
 ## Workflow Notes
 - Do not connect to backend endpoints; that’s for integration.
+- Brownfield: extend the existing UI; do not scaffold a replacement app.
 - If runtime choice introduces UI-visible constraints (for example streaming expectations), record them in frontend.md as traceability notes.
 - Add clarifications as Markdown in frontend.md if PRD/SAD is unclear.

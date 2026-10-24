@@ -5,7 +5,12 @@
 
 version: 1
 
+project:
+  # Written by `aamad init`. greenfield = start from scratch; brownfield = existing repo.
+  mode: greenfield  # greenfield | brownfield
+
 runtime:
+  # Greenfield `aamad init` writes this when you pick an adapter (not "choose later").
   target: crewai
 
 language:
