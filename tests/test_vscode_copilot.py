@@ -14,6 +14,7 @@ from aamad.vscode_copilot import (
     convert_prompts,
     convert_rules,
     convert_skills,
+    convert_templates,
     get_vscode_planned_paths,
     install_vscode_copilot,
     write_settings,
@@ -545,7 +546,7 @@ Core.
 
 def test_get_vscode_planned_paths():
     """get_vscode_planned_paths returns all paths that install would create."""
-    from aamad.vscode_copilot import AGENT_IDS, RULE_ORDER
+    from aamad.vscode_copilot import AGENT_IDS, RULE_ORDER, TEMPLATE_FILES
 
     dest = Path("/some/dest")
     paths = get_vscode_planned_paths(dest)
@@ -553,11 +554,28 @@ def test_get_vscode_planned_paths():
 
     assert len(paths) == len(RULE_ORDER) + len(AGENT_IDS) + len(PROMPT_SPECS) + len(
         SKILL_PROMPT_SPECS
-    ) + 1  # + settings
+    ) + len(TEMPLATE_FILES) + 1  # + settings
     assert dest / ".vscode" / "settings.json" in paths
     assert dest / ".github" / "prompts" / "phase-1-define.prompt.md" in paths
     assert dest / ".github" / "prompts" / "sync-docs.prompt.md" in paths
     assert dest / ".github" / "prompts" / "run-evals.prompt.md" in paths
+    assert dest / ".github" / "templates" / "prd-template.md" in paths
+
+
+def test_convert_templates_rewrites_paths(tmpdir):
+    templates = tmpdir / "templates"
+    templates.mkdir()
+    (templates / "prd-template.md").write_text(
+        "See `.cursor/templates/mrd-template.md` and `.cursor/rules/aamad-core.mdc`.\n"
+    )
+    dest = tmpdir / "out"
+    created = convert_templates(templates, dest)
+    out = dest / ".github" / "templates" / "prd-template.md"
+    assert out in created
+    text = out.read_text()
+    assert ".github/templates/mrd-template.md" in text
+    assert ".github/instructions/aamad-core.instructions.md" in text
+    assert ".cursor/" not in text
 
 
 def test_extract_artifacts_vscode_creates_github_and_agents_md(tmpdir):
@@ -565,8 +583,14 @@ def test_extract_artifacts_vscode_creates_github_and_agents_md(tmpdir):
     paths = extract_artifacts(tmpdir, ide="vscode", overwrite=False)
     assert (tmpdir / ".github" / "instructions").exists()
     assert (tmpdir / ".github" / "agents").exists()
+    assert (tmpdir / ".github" / "templates" / "prd-template.md").exists()
     assert (tmpdir / ".vscode" / "settings.json").exists()
     assert (tmpdir / "AGENTS.md").exists()
+    assert not (tmpdir / ".cursor").exists()
     agents_md = (tmpdir / "AGENTS.md").read_text()
     assert ".github/agents/" in agents_md
     assert "VS Code" in agents_md or "Copilot" in agents_md
+    product = (tmpdir / ".github" / "agents" / "product-mgr.agent.md").read_text()
+    assert ".github/templates/" in product
+    assert ".cursor/templates/" not in product
+    assert any(p.name == "AGENTS.md" for p in paths)

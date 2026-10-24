@@ -12,11 +12,13 @@ from aamad.installer import extract_artifacts, write_agents_md
 from aamad.kiro import (
     AGENT_IDS,
     RULE_ORDER,
+    TEMPLATE_FILES,
     convert_agents,
     convert_dev_crew_steering,
     convert_prompts,
     convert_rules,
     convert_skills,
+    convert_templates,
     get_kiro_planned_paths,
     install_kiro,
 )
@@ -215,6 +217,7 @@ def test_install_kiro_converts_full_tree(tmpdir):
     assert dest / ".kiro" / "steering" / "phase-1-define.md" in created
     assert dest / ".kiro" / "agents" / "backend-eng.md" in created
     assert dest / ".kiro" / "skills" / "run-evals" / "SKILL.md" in created
+    assert not (dest / ".cursor").exists()
 
 
 def test_install_kiro_overwrite_false_raises(tmpdir):
@@ -237,7 +240,8 @@ def test_get_kiro_planned_paths():
     assert dest / ".kiro" / "steering" / "dev-crew.md" in paths
     assert dest / ".kiro" / "steering" / "phase-1-define.md" in paths
     assert dest / ".kiro" / "agents" / "backend-eng.md" in paths
-    assert len(paths) == len(RULE_ORDER) + 1 + 2 + len(AGENT_IDS)
+    assert dest / ".kiro" / "templates" / "prd-template.md" in paths
+    assert len(paths) == len(RULE_ORDER) + 1 + 2 + len(AGENT_IDS) + len(TEMPLATE_FILES)
 
 
 def test_write_agents_md_kiro(tmpdir):
@@ -256,11 +260,8 @@ def test_extract_artifacts_kiro_layout(tmpdir):
     for agent_id in AGENT_IDS:
         assert (tmpdir / ".kiro" / "agents" / f"{agent_id}.md").exists()
     assert (tmpdir / ".kiro" / "skills" / "run-evals" / "SKILL.md").exists()
-    assert (tmpdir / ".cursor" / "templates").exists()
-    assert not (tmpdir / ".cursor" / "rules").exists()
-    assert not (tmpdir / ".cursor" / "agents").exists()
-    assert not (tmpdir / ".cursor" / "prompts").exists()
-    assert not (tmpdir / ".cursor" / "skills").exists()
+    assert (tmpdir / ".kiro" / "templates" / "prd-template.md").exists()
+    assert not (tmpdir / ".cursor").exists()
     assert (tmpdir / "project-context").exists()
     assert (tmpdir / "AGENTS.md").exists()
     agents_md = (tmpdir / "AGENTS.md").read_text()
@@ -279,6 +280,28 @@ def test_extract_artifacts_kiro_layout(tmpdir):
     assert backend["tools"] == ["read", "write", "shell"]
     assert "web" in product["tools"]
     assert "skill://.kiro/skills/**/SKILL.md" in qa["resources"]
+    product_body = (tmpdir / ".kiro" / "agents" / "product-mgr.md").read_text()
+    assert ".kiro/templates/" in product_body
+    assert ".cursor/templates/" not in product_body
+    prompt = (tmpdir / ".kiro" / "steering" / "phase-1-define.md").read_text()
+    assert ".kiro/templates/" in prompt
+    assert ".cursor/templates/" not in prompt
+
+
+def test_convert_templates_rewrites_paths(tmpdir):
+    templates = tmpdir / "templates"
+    templates.mkdir()
+    (templates / "prd-template.md").write_text(
+        "See `.cursor/templates/mrd-template.md` and `.cursor/rules/aamad-core.mdc`.\n"
+    )
+    dest = tmpdir / "out"
+    created = convert_templates(templates, dest)
+    out = dest / ".kiro" / "templates" / "prd-template.md"
+    assert out in created
+    text = out.read_text()
+    assert ".kiro/templates/mrd-template.md" in text
+    assert ".kiro/steering/aamad-core.md" in text
+    assert ".cursor/" not in text
 
 
 def test_extract_artifacts_kiro_dry_run_writes_nothing(tmpdir):
@@ -288,3 +311,4 @@ def test_extract_artifacts_kiro_dry_run_writes_nothing(tmpdir):
     assert not (tmpdir / "AGENTS.md").exists()
     assert any(p.name == "aamad-core.md" for p in paths)
     assert any(str(p).endswith(".kiro/skills/run-evals/SKILL.md") for p in paths)
+    assert any(str(p).endswith(".kiro/templates/prd-template.md") for p in paths)

@@ -2,8 +2,8 @@
 Kiro IDE conversion logic for AAMAD.
 
 Converts Cursor-format artifacts (.cursor/rules/*.mdc, .cursor/agents/*.md,
-.cursor/prompts/, .cursor/skills/) into Kiro format (.kiro/steering/,
-.kiro/agents/, .kiro/skills/).
+.cursor/prompts/, .cursor/skills/, .cursor/templates/) into Kiro format
+(.kiro/steering/, .kiro/agents/, .kiro/skills/, .kiro/templates/).
 """
 
 from __future__ import annotations
@@ -51,6 +51,18 @@ PROMPT_STEERING = {
     "prompt-sync-docs": "sync-docs.md",
 }
 
+TEMPLATE_FILES = [
+    "aamad-config-template.yml",
+    "evals-template.md",
+    "mrd-template.md",
+    "prd-template.md",
+    "sad-template.md",
+    "sfs-template.md",
+    "system-description-template.md",
+    "user-guide-template.md",
+    "user-story-template.md",
+]
+
 
 def _parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
     """Split YAML frontmatter and body. Returns (frontmatter_dict, body)."""
@@ -66,13 +78,14 @@ def _parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
 
 
 def _rule_body_to_kiro(body: str) -> str:
-    """Rewrite .cursor/rules/ path references to .kiro/steering/."""
+    """Rewrite .cursor/rules/ and .cursor/templates/ paths for Kiro."""
     body = re.sub(
         r"\.cursor/rules/([^\s\)\"']+\.)mdc",
         r".kiro/steering/\1md",
         body,
     )
-    return body.replace(".cursor/rules/", ".kiro/steering/")
+    body = body.replace(".cursor/rules/", ".kiro/steering/")
+    return body.replace(".cursor/templates/", ".kiro/templates/")
 
 
 def _write_steering(
@@ -181,7 +194,7 @@ def convert_agents(cursor_agents_dir: Path, out_dir: Path) -> list[Path]:
         fm_text = yaml.dump(
             frontmatter, default_flow_style=False, allow_unicode=True, sort_keys=False
         )
-        content = "---\n" + fm_text.strip() + "\n---\n\n" + body + "\n"
+        content = "---\n" + fm_text.strip() + "\n---\n\n" + _rule_body_to_kiro(body) + "\n"
         out_path = agents_dir / f"{agent_id}.md"
         out_path.write_text(content, encoding="utf-8")
         created.append(out_path)
@@ -239,6 +252,27 @@ def convert_skills(cursor_skills_dir: Path, out_dir: Path) -> list[Path]:
     return created
 
 
+def convert_templates(cursor_templates_dir: Path, out_dir: Path) -> list[Path]:
+    """Copy .cursor/templates/ to .kiro/templates/, rewriting path references."""
+    dest_dir = out_dir / ".kiro" / "templates"
+    created: list[Path] = []
+    if not cursor_templates_dir.exists():
+        return created
+    for file_path in sorted(cursor_templates_dir.rglob("*")):
+        if file_path.is_dir():
+            continue
+        rel = file_path.relative_to(cursor_templates_dir)
+        out_path = dest_dir / rel
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        if file_path.suffix in {".md", ".yml", ".yaml"}:
+            text = _rule_body_to_kiro(file_path.read_text(encoding="utf-8"))
+            out_path.write_text(text, encoding="utf-8")
+        else:
+            shutil.copy2(file_path, out_path)
+        created.append(out_path)
+    return created
+
+
 def get_kiro_planned_paths(dest: Path) -> list[Path]:
     """Return the list of paths that install_kiro would create (for dry-run)."""
     dest = dest.resolve()
@@ -250,6 +284,8 @@ def get_kiro_planned_paths(dest: Path) -> list[Path]:
         paths.append(dest / ".kiro" / "steering" / dest_name)
     for agent_id in AGENT_IDS:
         paths.append(dest / ".kiro" / "agents" / f"{agent_id}.md")
+    for name in TEMPLATE_FILES:
+        paths.append(dest / ".kiro" / "templates" / name)
     return paths
 
 
@@ -272,6 +308,7 @@ def install_kiro(
     cursor_agents = cursor_root / ".cursor" / "agents"
     cursor_prompts = cursor_root / ".cursor" / "prompts"
     cursor_skills = cursor_root / ".cursor" / "skills"
+    cursor_templates = cursor_root / ".cursor" / "templates"
 
     if not cursor_rules.exists():
         raise FileNotFoundError(f"Rules directory not found: {cursor_rules}")
@@ -293,4 +330,6 @@ def install_kiro(
         created.extend(convert_prompts(cursor_prompts, dest))
     if cursor_skills.exists():
         created.extend(convert_skills(cursor_skills, dest))
+    if cursor_templates.exists():
+        created.extend(convert_templates(cursor_templates, dest))
     return created

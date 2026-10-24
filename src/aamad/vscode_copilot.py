@@ -2,15 +2,16 @@
 VS Code / GitHub Copilot IDE conversion logic for AAMAD.
 
 Converts Cursor-format artifacts (.cursor/rules/*.mdc, .cursor/agents/*.md,
-.cursor/prompts/, .cursor/skills/) into VS Code / Copilot format
-(.github/instructions/*.instructions.md, .github/agents/*.agent.md,
-.github/prompts/, .vscode/settings.json).
+.cursor/prompts/, .cursor/skills/, .cursor/templates/) into VS Code / Copilot
+format (.github/instructions/*.instructions.md, .github/agents/*.agent.md,
+.github/prompts/, .github/templates/, .vscode/settings.json).
 """
 
 from __future__ import annotations
 
 import json
 import re
+import shutil
 from pathlib import Path
 from typing import Any
 
@@ -116,6 +117,18 @@ HANDOFFS: dict[str, list[dict[str, Any]]] = {
     ],
 }
 
+TEMPLATE_FILES = [
+    "aamad-config-template.yml",
+    "evals-template.md",
+    "mrd-template.md",
+    "prd-template.md",
+    "sad-template.md",
+    "sfs-template.md",
+    "system-description-template.md",
+    "user-guide-template.md",
+    "user-story-template.md",
+]
+
 
 def _parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
     """Split YAML frontmatter and body. Returns (frontmatter_dict, body)."""
@@ -156,6 +169,17 @@ def _rule_display_name(stem: str) -> str:
     return title
 
 
+def _body_to_vscode(body: str) -> str:
+    """Rewrite .cursor/rules/ and .cursor/templates/ paths for VS Code."""
+    body = re.sub(
+        r"\.cursor/rules/([^\s\)\"']+)\.mdc",
+        r".github/instructions/\1.instructions.md",
+        body,
+    )
+    body = body.replace(".cursor/rules/", ".github/instructions/")
+    return body.replace(".cursor/templates/", ".github/templates/")
+
+
 def convert_rules(cursor_rules_dir: Path, out_dir: Path) -> list[Path]:
     """
     Convert .cursor/rules/*.mdc to .github/instructions/*.instructions.md.
@@ -188,7 +212,7 @@ def convert_rules(cursor_rules_dir: Path, out_dir: Path) -> list[Path]:
             fm_text = yaml.dump(rule_fm, default_flow_style=False, allow_unicode=True, sort_keys=False)
         except Exception:
             fm_text = f'applyTo: "{apply_to}"\nname: "{display_name}"\ndescription: "{description}"\n'
-        content = "---\n" + fm_text.strip() + "\n---\n\n" + body
+        content = "---\n" + fm_text.strip() + "\n---\n\n" + _body_to_vscode(body)
         out_path = instructions_dir / f"{name}.instructions.md"
         out_path.write_text(content, encoding="utf-8")
         created.append(out_path)
@@ -272,7 +296,7 @@ def convert_agents(cursor_agents_dir: Path, out_dir: Path) -> list[Path]:
             fm_text = yaml.dump(frontmatter, default_flow_style=False, allow_unicode=True, sort_keys=False)
         except Exception:
             fm_text = f"name: {display_name}\ndescription: {description}\ntools: {tools}\n"
-        content = "---\n" + fm_text.strip() + "\n---\n\n" + body
+        content = "---\n" + fm_text.strip() + "\n---\n\n" + _body_to_vscode(body)
         out_path = agents_dir / f"{agent_id}.agent.md"
         out_path.write_text(content, encoding="utf-8")
         created.append(out_path)
@@ -308,7 +332,7 @@ def convert_prompts(cursor_prompts_dir: Path, out_dir: Path) -> list[Path]:
         prompt_path = cursor_prompts_dir / src_name
         if not prompt_path.exists():
             continue
-        body = prompt_path.read_text(encoding="utf-8")
+        body = _body_to_vscode(prompt_path.read_text(encoding="utf-8"))
         frontmatter_lines = [
             "---",
             f'description: "{spec["description"]}"',
@@ -350,6 +374,7 @@ def convert_skills(cursor_skills_dir: Path, out_dir: Path) -> list[Path]:
         if not skill_md.exists():
             continue
         _, body = _parse_frontmatter(skill_md.read_text(encoding="utf-8"))
+        body = _body_to_vscode(body)
         frontmatter_lines = [
             "---",
             f'description: "{spec["description"]}"',
@@ -360,6 +385,27 @@ def convert_skills(cursor_skills_dir: Path, out_dir: Path) -> list[Path]:
         content = "\n".join(frontmatter_lines) + body
         out_path = prompts_dir / spec["out"]
         out_path.write_text(content, encoding="utf-8")
+        created.append(out_path)
+    return created
+
+
+def convert_templates(cursor_templates_dir: Path, out_dir: Path) -> list[Path]:
+    """Copy .cursor/templates/ to .github/templates/, rewriting path references."""
+    dest_dir = out_dir / ".github" / "templates"
+    created: list[Path] = []
+    if not cursor_templates_dir.exists():
+        return created
+    for file_path in sorted(cursor_templates_dir.rglob("*")):
+        if file_path.is_dir():
+            continue
+        rel = file_path.relative_to(cursor_templates_dir)
+        out_path = dest_dir / rel
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        if file_path.suffix in {".md", ".yml", ".yaml"}:
+            text = _body_to_vscode(file_path.read_text(encoding="utf-8"))
+            out_path.write_text(text, encoding="utf-8")
+        else:
+            shutil.copy2(file_path, out_path)
         created.append(out_path)
     return created
 
@@ -412,6 +458,8 @@ def get_vscode_planned_paths(dest: Path) -> list[Path]:
         paths.append(dest / ".github" / "prompts" / spec["out"])
     for spec in SKILL_PROMPT_SPECS.values():
         paths.append(dest / ".github" / "prompts" / spec["out"])
+    for name in TEMPLATE_FILES:
+        paths.append(dest / ".github" / "templates" / name)
     paths.append(dest / ".vscode" / "settings.json")
     return paths
 
@@ -440,6 +488,7 @@ def install_vscode_copilot(
     cursor_agents = cursor_root / ".cursor" / "agents"
     cursor_prompts = cursor_root / ".cursor" / "prompts"
     cursor_skills = cursor_root / ".cursor" / "skills"
+    cursor_templates = cursor_root / ".cursor" / "templates"
 
     if not cursor_rules.exists():
         raise FileNotFoundError(f"Rules directory not found: {cursor_rules}")
@@ -460,6 +509,8 @@ def install_vscode_copilot(
         created.extend(convert_prompts(cursor_prompts, dest))
     if cursor_skills.exists():
         created.extend(convert_skills(cursor_skills, dest))
+    if cursor_templates.exists():
+        created.extend(convert_templates(cursor_templates, dest))
     settings_path = write_settings(dest, merge=merge_settings)
     created.append(settings_path)
 

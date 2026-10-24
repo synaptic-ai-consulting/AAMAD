@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1] - 2026-10-24
+
+### Changed
+
+- Templates now live in each IDE folder instead of a leftover `.cursor/templates/` tree: `.claude/templates/`, `.github/templates/`, `.kiro/templates/`. Cursor is unchanged (`.cursor/templates/` remains the source of truth). Converted personas, rules, prompts, and skills rewrite `.cursor/templates/` references to the IDE path.
+- `aamad init --ide vscode` no longer extracts the full Cursor tree. Like Kiro, it stages the Cursor bundle and writes only `.github/`, `.vscode/`, shared docs, and `project-context/`.
+- Claude Code and Kiro installs no longer ship a `.cursor/` directory.
+
+### Upgrade
+
+- Existing Claude Code, VS Code, or Kiro projects: `aamad init --overwrite --ide <claude-code|vscode|kiro>`. If the project is not using Cursor, delete leftover `.cursor/` afterward.
+
 ## [0.9.0] - 2026-10-24
 
 ### Added

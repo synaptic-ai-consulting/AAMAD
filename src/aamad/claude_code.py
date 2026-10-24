@@ -2,8 +2,9 @@
 Claude Code IDE conversion logic for AAMAD.
 
 Converts Cursor-format artifacts (.cursor/rules/*.mdc, .cursor/agents/*.md,
-.cursor/prompts/, .cursor/skills/) into Claude Code format (.claude/rules/,
-.claude/agents/, .claude/commands/, .claude/skills/, .claude/settings.json).
+.cursor/prompts/, .cursor/skills/, .cursor/templates/) into Claude Code format
+(.claude/rules/, .claude/agents/, .claude/commands/, .claude/skills/,
+.claude/templates/, .claude/settings.json).
 """
 
 from __future__ import annotations
@@ -68,16 +69,14 @@ def _parse_frontmatter(content: str) -> tuple[dict[str, Any], str]:
 
 
 def _rule_body_to_claude(body: str) -> str:
-    """Update path references from .cursor/rules/ to .claude/rules/ for Claude Code."""
-    # Update .cursor/rules/foo.mdc -> .claude/rules/foo.md
+    """Rewrite .cursor/rules/ and .cursor/templates/ paths for Claude Code."""
     body = re.sub(
         r"\.cursor/rules/([^\s\)\"']+\.)mdc",
         r".claude/rules/\1md",
         body,
     )
-    # Catch any remaining .cursor/rules/ (without .mdc)
     body = body.replace(".cursor/rules/", ".claude/rules/")
-    return body
+    return body.replace(".cursor/templates/", ".claude/templates/")
 
 
 def convert_rules(
@@ -228,8 +227,7 @@ def convert_agents(
         frontmatter_lines.append("---")
         frontmatter_lines.append("")
 
-        # Ensure body has proper heading; keep original body
-        new_content = "\n".join(frontmatter_lines) + body
+        new_content = "\n".join(frontmatter_lines) + _rule_body_to_claude(body)
         out_path = claude_agents / f"{agent_id}.md"
         out_path.write_text(new_content, encoding="utf-8")
         created.append(out_path)
@@ -262,7 +260,8 @@ def convert_prompts(
         if not prompt_path.exists():
             continue
         out_path = claude_commands / dest_name
-        out_path.write_text(prompt_path.read_text(encoding="utf-8"), encoding="utf-8")
+        body = _rule_body_to_claude(prompt_path.read_text(encoding="utf-8"))
+        out_path.write_text(body, encoding="utf-8")
         created.append(out_path)
     return created
 
@@ -300,6 +299,27 @@ def convert_skills(
                 shutil.copy2(file_path, out_path)
             created.append(out_path)
 
+    return created
+
+
+def convert_templates(cursor_templates_dir: Path, out_dir: Path) -> list[Path]:
+    """Copy .cursor/templates/ to .claude/templates/, rewriting path references."""
+    dest_dir = out_dir / ".claude" / "templates"
+    created: list[Path] = []
+    if not cursor_templates_dir.exists():
+        return created
+    for file_path in sorted(cursor_templates_dir.rglob("*")):
+        if file_path.is_dir():
+            continue
+        rel = file_path.relative_to(cursor_templates_dir)
+        out_path = dest_dir / rel
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        if file_path.suffix in {".md", ".yml", ".yaml"}:
+            text = _rule_body_to_claude(file_path.read_text(encoding="utf-8"))
+            out_path.write_text(text, encoding="utf-8")
+        else:
+            shutil.copy2(file_path, out_path)
+        created.append(out_path)
     return created
 
 
@@ -351,6 +371,7 @@ def install_claude_code(
     cursor_agents = cursor_root / ".cursor" / "agents"
     cursor_prompts = cursor_root / ".cursor" / "prompts"
     cursor_skills = cursor_root / ".cursor" / "skills"
+    cursor_templates = cursor_root / ".cursor" / "templates"
 
     if not cursor_rules.exists():
         raise FileNotFoundError(f"Rules directory not found: {cursor_rules}")
@@ -373,6 +394,8 @@ def install_claude_code(
         created.extend(convert_prompts(cursor_prompts, dest))
     if cursor_skills.exists():
         created.extend(convert_skills(cursor_skills, dest))
+    if cursor_templates.exists():
+        created.extend(convert_templates(cursor_templates, dest))
     write_settings(dest)
     created.append(dest / ".claude" / "settings.json")
 

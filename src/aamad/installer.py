@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Iterable, Iterator
 
 from .kiro import get_kiro_planned_paths, install_kiro
+from .vscode_copilot import get_vscode_planned_paths, install_vscode_copilot
 
 BUNDLE_CURSOR = "data/aamad_bundle.zip"
 BUNDLE_CLAUDE = "data/aamad_claude_bundle.zip"
@@ -21,15 +22,12 @@ IDE_BUNDLES = {
     "kiro": BUNDLE_CURSOR,  # transform from Cursor bundle
 }
 
-KIRO_SHARED_FILES = (
+SHARED_FILES = (
     "CHECKLIST.md",
     "README.md",
     "aamad.config.example.yml",
 )
-KIRO_SHARED_DIRS = (
-    "project-context",
-    ".cursor/templates",
-)
+SHARED_DIRS = ("project-context",)
 
 AGENTS_MD_TEMPLATE = """# AAMAD Agent Framework
 
@@ -132,10 +130,9 @@ def extract_artifacts(
     Extract the bundled artifacts into ``destination``.
 
     Also writes AGENTS.md (bridge file for IDE discoverability).
-    For ide "vscode", extracts the Cursor bundle then runs VS Code conversion
-    to produce .github/ and .vscode/ (Option A: transform on the fly).
-    For ide "kiro", stages the Cursor bundle in a temp directory, converts
-    to .kiro/, and copies only shared paths (templates, project-context, docs).
+    For ide "vscode" and "kiro", stages the Cursor bundle in a temp directory,
+    converts into `.github/` / `.kiro/`, and copies only shared paths
+    (`project-context/`, docs). Templates land in the IDE folder.
 
     Args:
         destination: Directory that should receive `.cursor/` or `.claude/` or `.github/` or `.kiro/`, `project-context/`, etc.
@@ -146,22 +143,28 @@ def extract_artifacts(
     dest = Path(destination).expanduser().resolve()
 
     if ide == "kiro":
-        return _extract_kiro(dest, overwrite=overwrite, dry_run=dry_run)
+        return _extract_from_cursor_stage(
+            dest,
+            ide="kiro",
+            overwrite=overwrite,
+            dry_run=dry_run,
+            install=install_kiro,
+            planned_paths=get_kiro_planned_paths(dest),
+            extra_mapped_prefixes=((".cursor/skills/", ".kiro/skills/"),),
+        )
+    if ide == "vscode":
+        return _extract_from_cursor_stage(
+            dest,
+            ide="vscode",
+            overwrite=overwrite,
+            dry_run=dry_run,
+            install=install_vscode_copilot,
+            planned_paths=get_vscode_planned_paths(dest),
+        )
 
     installer = ArtifactInstaller(get_bundle_path(ide))
     paths = list(installer.extract(dest, overwrite=overwrite, dry_run=dry_run))
 
-    if ide == "vscode":
-        if dry_run:
-            from aamad.vscode_copilot import get_vscode_planned_paths
-
-            paths.extend(get_vscode_planned_paths(dest))
-        else:
-            from aamad.vscode_copilot import install_vscode_copilot
-
-            paths.extend(install_vscode_copilot(dest, dest, overwrite=overwrite))
-
-    # Add AGENTS.md (generated, not from bundle)
     agents_path = write_agents_md(
         destination,
         ide=ide,
@@ -173,20 +176,20 @@ def extract_artifacts(
     return paths
 
 
-def _is_kiro_shared_member(filename: str) -> bool:
+def _is_shared_member(filename: str) -> bool:
     normalized = filename.replace("\\", "/")
-    if normalized in KIRO_SHARED_FILES:
+    if normalized in SHARED_FILES:
         return True
-    for prefix in KIRO_SHARED_DIRS:
+    for prefix in SHARED_DIRS:
         if normalized == prefix or normalized.startswith(prefix + "/"):
             return True
     return False
 
 
-def _copy_kiro_shared(stage: Path, dest: Path, *, overwrite: bool) -> list[Path]:
-    """Copy project-context, .cursor/templates, and root docs from a staged Cursor extract."""
+def _copy_shared(stage: Path, dest: Path, *, overwrite: bool) -> list[Path]:
+    """Copy project-context and root docs from a staged Cursor extract."""
     created: list[Path] = []
-    for name in (*KIRO_SHARED_FILES, *KIRO_SHARED_DIRS):
+    for name in (*SHARED_FILES, *SHARED_DIRS):
         src = stage / name
         if not src.exists():
             continue
@@ -215,30 +218,36 @@ def _copy_kiro_shared(stage: Path, dest: Path, *, overwrite: bool) -> list[Path]
     return created
 
 
-def _extract_kiro(
+def _extract_from_cursor_stage(
     dest: Path,
     *,
+    ide: str,
     overwrite: bool,
     dry_run: bool,
+    install,
+    planned_paths: list[Path],
+    extra_mapped_prefixes: tuple[tuple[str, str], ...] = (),
 ) -> list[Path]:
-    """Stage the Cursor bundle, convert to .kiro/, and copy shared artifacts."""
+    """Stage the Cursor bundle, convert to an IDE tree, and copy shared artifacts."""
     installer = ArtifactInstaller(get_bundle_path("cursor"))
     shared_paths = [
         dest / name
         for name in installer.preview()
-        if _is_kiro_shared_member(name) and not name.endswith("/")
+        if _is_shared_member(name) and not name.endswith("/")
     ]
-    kiro_paths = get_kiro_planned_paths(dest)
-    skill_paths = []
+    mapped_paths: list[Path] = []
     for name in installer.preview():
         normalized = name.replace("\\", "/")
-        if normalized.startswith(".cursor/skills/") and not normalized.endswith("/"):
-            rel = normalized[len(".cursor/skills/") :]
-            skill_paths.append(dest / ".kiro" / "skills" / rel)
+        if normalized.endswith("/"):
+            continue
+        for src_prefix, dest_prefix in extra_mapped_prefixes:
+            if normalized.startswith(src_prefix):
+                rel = normalized[len(src_prefix) :]
+                mapped_paths.append(dest / dest_prefix / rel)
 
     if dry_run:
-        agents_path = write_agents_md(dest, ide="kiro", overwrite=overwrite, dry_run=True)
-        paths = shared_paths + kiro_paths + skill_paths
+        agents_path = write_agents_md(dest, ide=ide, overwrite=overwrite, dry_run=True)
+        paths = shared_paths + list(planned_paths) + mapped_paths
         if agents_path is not None:
             paths.append(agents_path)
         return paths
@@ -246,10 +255,10 @@ def _extract_kiro(
     with tempfile.TemporaryDirectory() as tmp:
         stage = Path(tmp)
         installer.extract(stage, overwrite=True, dry_run=False)
-        created = list(install_kiro(stage, dest, overwrite=overwrite))
-        created.extend(_copy_kiro_shared(stage, dest, overwrite=overwrite))
+        created = list(install(stage, dest, overwrite=overwrite))
+        created.extend(_copy_shared(stage, dest, overwrite=overwrite))
 
-    agents_path = write_agents_md(dest, ide="kiro", overwrite=overwrite, dry_run=False)
+    agents_path = write_agents_md(dest, ide=ide, overwrite=overwrite, dry_run=False)
     if agents_path is not None:
         created.append(agents_path)
     return created

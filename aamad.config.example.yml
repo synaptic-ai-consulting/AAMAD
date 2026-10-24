@@ -1,6 +1,7 @@
 # Example AAMAD project configuration.
 # Copy to aamad.config.yml and adjust for your project.
-# See .cursor/templates/aamad-config-template.yml for the full schema comments.
+# See aamad-config-template.yml in your IDE templates folder
+# (.cursor/templates, .claude/templates, .github/templates, or .kiro/templates).
 
 version: 1
 

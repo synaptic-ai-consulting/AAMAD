@@ -13,6 +13,7 @@ from aamad.claude_code import (
     convert_prompts,
     convert_rules,
     convert_skills,
+    convert_templates,
     install_claude_code,
     write_settings,
 )
@@ -453,3 +454,35 @@ def test_extract_artifacts_includes_agents_md(tmpdir):
     assert agents_md.exists()
     assert agents_md in paths or any(str(p).endswith("AGENTS.md") for p in paths)
     assert ".cursor/agents/" in agents_md.read_text()
+    assert (tmpdir / ".cursor" / "templates" / "prd-template.md").exists()
+    product = (tmpdir / ".cursor" / "agents" / "product-mgr.md").read_text()
+    assert ".cursor/templates/" in product
+
+
+def test_convert_templates_rewrites_paths(tmpdir):
+    templates = tmpdir / "templates"
+    templates.mkdir()
+    (templates / "prd-template.md").write_text(
+        "See `.cursor/templates/mrd-template.md` and `.cursor/rules/aamad-core.mdc`.\n"
+    )
+    dest = tmpdir / "out"
+    created = convert_templates(templates, dest)
+    out = dest / ".claude" / "templates" / "prd-template.md"
+    assert out in created
+    text = out.read_text()
+    assert ".claude/templates/mrd-template.md" in text
+    assert ".claude/rules/aamad-core.md" in text
+    assert ".cursor/" not in text
+
+
+def test_extract_artifacts_claude_code_has_templates_and_no_cursor(tmpdir):
+    extract_artifacts(tmpdir, ide="claude-code", overwrite=False)
+    assert (tmpdir / ".claude" / "templates" / "prd-template.md").exists()
+    assert (tmpdir / ".claude" / "agents" / "product-mgr.md").exists()
+    assert not (tmpdir / ".cursor").exists()
+    product = (tmpdir / ".claude" / "agents" / "product-mgr.md").read_text()
+    assert ".claude/templates/" in product
+    assert ".cursor/templates/" not in product
+    prompt = (tmpdir / ".claude" / "commands" / "phase-1-define.md").read_text()
+    assert ".claude/templates/" in prompt
+    assert ".cursor/templates/" not in prompt

@@ -149,7 +149,7 @@ aamad init --ide kiro         # Kiro
 | **Tool enforcement** | Instructions-based | ✅ Hard allowlist/denylist | ✅ Tool allowlist in frontmatter | ✅ Tool list in agent frontmatter |
 | **Phase 1 prompt** | `.cursor/prompts/prompt-phase-1` | `.claude/commands/phase-1-define.md` (slash command) | `.github/prompts/phase-1-define.prompt.md` | `.kiro/steering/phase-1-define.md` (manual steering / slash command) |
 | **Skills** | `.cursor/skills/run-evals/` | `.claude/skills/run-evals/` (native skills) | `.github/prompts/run-evals.prompt.md` (bound to `qa-eng`; no native skills primitive) | `.kiro/skills/run-evals/` (native Agent Skills) |
-| **Templates** | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) | `.cursor/templates/` (shared) |
+| **Templates** | `.cursor/templates/` | `.claude/templates/` | `.github/templates/` | `.kiro/templates/` |
 | **Project context** | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) | `project-context/` (shared) |
 | **Bridge file** | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) | `AGENTS.md` (root) |
 
@@ -224,9 +224,8 @@ your-project/
 │   ├── commands/        # Slash commands (e.g. phase-1-define)
 │   ├── rules/           # Individual rule files (*.md)
 │   ├── skills/          # Agent skills (e.g. run-evals, native Claude Code skills)
+│   ├── templates/       # PRD, SAD, MR templates
 │   └── settings.json    # Permissions, AAMAD_TARGET_RUNTIME env
-├── .cursor/
-│   └── templates/       # PRD, SAD, MR templates (shared)
 ├── project-context/
 │   ├── 1.define/
 │   ├── 2.build/
@@ -261,11 +260,10 @@ your-project/
 ├── .github/
 │   ├── instructions/   # Copilot instructions (*.instructions.md)
 │   ├── agents/         # Custom agents (*.agent.md) with optional handoffs
-│   └── prompts/        # Phase 1 prompt, sync-docs, run-evals (phase-1-define.prompt.md, ...)
+│   ├── prompts/        # Phase 1 prompt, sync-docs, run-evals (phase-1-define.prompt.md, ...)
+│   └── templates/      # PRD, SAD, MR templates
 ├── .vscode/
 │   └── settings.json   # chat.instructionsFilesLocations, chat.agentFilesLocations
-├── .cursor/
-│   └── templates/      # PRD, SAD, MR templates (shared)
 ├── project-context/
 │   ├── 1.define/
 │   ├── 2.build/
@@ -302,9 +300,8 @@ your-project/
 ├── .kiro/
 │   ├── agents/          # Persona definitions (Kiro custom agents)
 │   ├── steering/        # Always-on rules + manual Phase 1 / sync-docs prompts
-│   └── skills/          # Agent skills (e.g. run-evals)
-├── .cursor/
-│   └── templates/       # PRD, SAD, MR templates (shared)
+│   ├── skills/          # Agent skills (e.g. run-evals)
+│   └── templates/       # PRD, SAD, MR templates
 ├── project-context/
 │   ├── 1.define/
 │   ├── 2.build/
@@ -348,12 +345,14 @@ How you interact with AAMAD depends on your IDE. The framework produces the same
 These are **IDE-agnostic** — no change when you switch:
 
 - **`project-context/`** — Directory layout and all Phase 1/2/3 outputs (MRD, PRD, SAD, setup.md, frontend.md, backend.md, integration.md, qa.md).
-- **Templates** — PRD, SAD, MR templates (in `.cursor/templates/`; shared across IDEs).
+- **Templates** — Same PRD, SAD, and MR files, stored in the IDE folder (`.cursor/templates/`, `.claude/templates/`, `.github/templates/`, or `.kiro/templates/`).
 - **Phase 1 prompt** — Usable in any AI chat; same content in Cursor prompts, Claude Code commands, or VS Code prompts.
 - **Crew logic and artifacts** — The same persona/rules/templates methodology regardless of IDE.
 - **Git and dependency setup** — Same repo and `pyproject.toml` workflow.
 
-What **does** change per IDE: where rules and agents live (`.cursor/`, `.claude/`, `.github/`, or `.kiro/`) and how you invoke personas and reference files (see table above).
+What **does** change per IDE: where rules, agents, and templates live (`.cursor/`, `.claude/`, `.github/`, or `.kiro/`) and how you invoke personas and reference files (see table above).
+
+Upgrading a Claude Code, VS Code, or Kiro project from 0.9.0 or earlier: run `aamad init --overwrite --ide <claude-code|vscode|kiro>`. If the project is not using Cursor, delete leftover `.cursor/` afterward.
 
 ---
 
@@ -420,8 +419,8 @@ Use `AAMAD_TARGET_RUNTIME` to choose the runtime target for the generated multi-
 The Product Manager persona (`@product-mgr`) conducts discovery and context setup to standardize project scoping:
 
 - **Elicitation (recommended):** Structured questionnaire → `system-description.md` via `*elicit-requirements`
-- **Market Research (optional):** MRD using `.cursor/templates/mrd-template.md` for commercial products; skip for internal/personal tools
-- **Requirements:** PRD using `.cursor/templates/prd-template.md`
+- **Market Research (optional):** MRD using the `mrd-template.md` in your IDE templates folder for commercial products; skip for internal/personal tools
+- **Requirements:** PRD using the `prd-template.md` in your IDE templates folder
 - **User stories:** MVP stories for architecture and QA traceability
 - **Project config:** Optional `aamad.config.yml` for language, UI, testing, and security defaults
 - **Validation:** Run `aamad validate --phase define` when artifacts exist
@@ -483,4 +482,4 @@ Licensed under Apache License 2.0.
 ---
 
 > For detailed step-by-step Phase 2 execution, see [CHECKLIST.md](CHECKLIST.md).  
-> For advanced reference and prompt engineering, see `.cursor/templates/` and `.cursor/rules/`.
+> For advanced reference and prompt engineering, see the templates and rules folders for your IDE.

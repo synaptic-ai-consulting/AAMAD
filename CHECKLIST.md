@@ -19,12 +19,14 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
   | **VS Code + GitHub Copilot** | `aamad init --ide vscode --dest .` |
   | **Kiro** | `aamad init --ide kiro --dest .` |
 
-- [ ] Confirm expected outputs for **your** IDE (templates stay under `.cursor/templates/` for all):
+- [ ] Confirm expected outputs for **your** IDE (templates live in that IDE folder):
 
   - [ ] **Cursor:** `.cursor/agents/`, `.cursor/rules/`, `.cursor/prompts/`, `.cursor/skills/`, `.cursor/templates/`, root `AGENTS.md`
-  - [ ] **Claude Code:** `.claude/` (`agents/`, `rules/`, `commands/`, `skills/`, `settings.json`), `.cursor/templates/`, `AGENTS.md`
-  - [ ] **VS Code + Copilot:** `.github/instructions/`, `.github/agents/`, `.github/prompts/` (includes `run-evals.prompt.md`), `.vscode/settings.json`, `.cursor/templates/`, `AGENTS.md`
-  - [ ] **Kiro:** `.kiro/agents/`, `.kiro/steering/` (rules + manual Phase 1 / sync-docs), `.kiro/skills/`, `.cursor/templates/`, `AGENTS.md`
+  - [ ] **Claude Code:** `.claude/` (`agents/`, `rules/`, `commands/`, `skills/`, `templates/`, `settings.json`), `AGENTS.md`
+  - [ ] **VS Code + Copilot:** `.github/instructions/`, `.github/agents/`, `.github/prompts/` (includes `run-evals.prompt.md`), `.github/templates/`, `.vscode/settings.json`, `AGENTS.md`
+  - [ ] **Kiro:** `.kiro/agents/`, `.kiro/steering/` (rules + manual Phase 1 / sync-docs), `.kiro/skills/`, `.kiro/templates/`, `AGENTS.md`
+
+- [ ] Upgrading a Claude Code, VS Code, or Kiro project from 0.9.0 or earlier: `aamad init --overwrite --ide <claude-code|vscode|kiro>`. If this project is not using Cursor, delete leftover `.cursor/`.
 
 - [ ] Optionally copy `aamad.config.example.yml` → `aamad.config.yml` and set project preferences.
 - [ ] Skim root `AGENTS.md` so you know where personas live for your IDE.
@@ -51,8 +53,8 @@ This checklist guides you step-by-step through running AAMAD from Phase 1 (Defin
   - [ ] Internal / personal / operational tool → skip MRD; note rationale in PRD Assumptions
 - [ ] Run as needed:
     - [ ] `*elicit-requirements` — System description at project-context/1.define/system-description.md
-    - [ ] `*create-mrd` — Market Research Document at project-context/1.define/mrd.md using .cursor/templates/mrd-template.md
-    - [ ] `*create-prd` — Product Requirements Document at project-context/1.define/prd.md using .cursor/templates/prd-template.md
+    - [ ] `*create-mrd` — Market Research Document at project-context/1.define/mrd.md using mrd-template.md in your IDE templates folder
+    - [ ] `*create-prd` — Product Requirements Document at project-context/1.define/prd.md using prd-template.md in your IDE templates folder
     - [ ] `*create-context` — MRD (unless skipped) and PRD with context summary for handoff
     - [ ] `*create-stories` — MVP user stories under project-context/1.define/user-stories/
 - [ ] Validate completeness: market analysis (when MRD produced), user personas, feature requirements, acceptance criteria, success metrics, and business/operational goals.
@@ -82,7 +84,7 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 - [ ] Invoke `@system.arch`.
 - [ ] Run one of:
-    - [ ] `*create-sad` — Generate full SAD at project-context/1.define/sad.md using .cursor/templates/sad-template.md.
+    - [ ] `*create-sad` — Generate full SAD at project-context/1.define/sad.md using sad-template.md in your IDE templates folder.
     - [ ] `*create-sad --mvp` — Generate a lean MVP SAD, deferring nonessential components and NFRs; output to project-context/1.define/sad.md.
 - [ ] Validate SAD completeness: stakeholders/concerns, views, quality attributes, decisions, constraints, and risks.
 - [ ] Record assumptions and open questions in sad.md for downstream resolution.
@@ -222,4 +224,4 @@ For projects already at or past the QA stage without a SAD section 9 evaluation 
 
 ---
 
-> For detailed guidelines and troubleshooting, see [README.md](README.md) and documentation in `.cursor/templates` and `.cursor/rules`.
+> For detailed guidelines and troubleshooting, see [README.md](README.md) and the templates and rules folders for your IDE.

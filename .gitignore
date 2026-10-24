@@ -8,6 +8,9 @@ build/
 # Virtual environment
 .venv/
 
+# Environment variables
+.env
+
 # Test cache
 .pytest_cache/
 
