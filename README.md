@@ -16,6 +16,7 @@ It systematizes research-driven planning, modular AI agent workflows, and rapid 
 - [Getting Started](#getting-started)
   - [Installation](#installation)
   - [Initialization](#initialization)
+  - [Tutorial](#tutorial)
   - [Multi-IDE support](#multi-ide-support)
     - [Cursor](#cursor)
     - [Claude Code](#claude-code)
@@ -172,6 +173,21 @@ Non-interactive runs without `--ide` exit 2. Init writes `project.mode` into `aa
 When init finishes, the terminal prints suggested next actions for the chosen IDE and mode (brownfield starts at `@system.arch` / Phase 0; greenfield starts at `@product-mgr` / Phase 1). Init does not run the Review or Define agents itself.
 
 Inspect bundle contents: `aamad bundle-info --verbose` or `aamad bundle-info --ide claude-code`. For `--ide vscode` and `--ide kiro`, artifacts are generated from the Cursor bundle (no separate bundle).
+
+---
+
+### Tutorial
+
+`aamad tutorial` walks the crew workflow in the terminal: what init does, greenfield versus brownfield, which persona to open, the five SAD decisions, and the gates before Deliver. Each lesson ends with one check. On a terminal you get a menu; otherwise it prints the study sheet.
+
+```bash
+aamad tutorial
+aamad tutorial --list
+aamad tutorial --lesson five-decisions
+aamad tutorial --print
+```
+
+The last screen reads the current folder and names the next persona. It does not write files or run agents. Pass `--dest` to point it at another project.
 
 ---
 

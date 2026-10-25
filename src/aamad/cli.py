@@ -16,6 +16,7 @@ from .onboarding import (
     resolve_mode,
     resolve_runtime,
 )
+from .tutorial import LESSONS, run_tutorial
 from .validator import format_report, validate_project
 
 PHASE_CHOICES = ["auto", "review", "define", "build", "deliver"]
@@ -79,7 +80,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="aamad",
         description=(
-            "Install the AAMAD multi-agent framework artifacts into the current project."
+            "Install AAMAD framework artifacts, learn the crew workflow, "
+            "and validate project-context gates."
         ),
     )
     sub = parser.add_subparsers(dest="command", required=True)
@@ -161,6 +163,34 @@ def build_parser() -> argparse.ArgumentParser:
         default="auto",
         help="Phase gate to enforce: auto (default), review, define, build, or deliver.",
     )
+
+    tutorial_cmd = sub.add_parser(
+        "tutorial",
+        help="Learn the crew workflow from the terminal.",
+    )
+    tutorial_cmd.add_argument(
+        "--dest",
+        type=Path,
+        default=Path.cwd(),
+        help="Project folder to read when suggesting a next step (default: cwd).",
+    )
+    tutorial_cmd.add_argument(
+        "--lesson",
+        choices=[lesson.id for lesson in LESSONS],
+        default=None,
+        help="Walk one lesson instead of the full set.",
+    )
+    tutorial_cmd.add_argument(
+        "--list",
+        action="store_true",
+        help="Print lesson ids and titles.",
+    )
+    tutorial_cmd.add_argument(
+        "--print",
+        dest="print_only",
+        action="store_true",
+        help="Print the study sheet without prompts.",
+    )
     return parser
 
 
@@ -212,6 +242,20 @@ def main(argv: list[str] | None = None) -> int:
         result = validate_project(args.dest, phase=args.phase)
         print(format_report(result))
         return 0 if result.ok else 1
+
+    if args.command == "tutorial":
+        interactive = (
+            not args.print_only
+            and not args.list
+            and sys.stdin.isatty()
+            and sys.stdout.isatty()
+        )
+        return run_tutorial(
+            args.dest,
+            lesson_id=args.lesson,
+            list_only=args.list,
+            interactive=interactive,
+        )
 
     parser.error("Unknown command")
     return 2

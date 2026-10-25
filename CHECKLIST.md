@@ -9,6 +9,7 @@ This checklist guides you step-by-step through running AAMAD: greenfield starts 
 
 - [ ] Install prerequisites (Python 3.9+, Node when your stack needs it; see [README.md](README.md)).
 - [ ] Install AAMAD: `pip install aamad` or `uv pip install aamad`.
+- [ ] Optional: run `aamad tutorial` for a terminal walkthrough of the crew workflow (`--list`, `--lesson`, `--print`).
 - [ ] Initialize framework files for your IDE (pick one):
 
   | IDE | Command |
