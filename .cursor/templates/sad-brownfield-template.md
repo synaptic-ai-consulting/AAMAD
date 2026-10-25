@@ -58,6 +58,12 @@ Do not modify application code. Architectural issues only — not bug fixes.
 |----|----------|----------|----------------------------------------|
 | AD-001 | … | … | in force |
 
+Label the current application pattern as **observation**, **inference**, or **unknown**. Do not invent a greenfield multi-agent crew.
+
+- **As-is primary shape** (if inferable): [augmented call | workflow | agent | unknown]
+- **Evidence label**: observation | inference | unknown
+- **Evidence**: path or BH-* / UNK-* ID
+
 ### 8. Architectural Risks and Technical Debt
 
 - Structural risks only (coupling, missing boundaries, undocumented contracts)
@@ -74,6 +80,58 @@ Derive this chapter from `architecture-backlog.md`. Group items into a recommend
 
 - Explicit exclusions and deferrals
 - For `*create-sad --mvp`, include only the top-N items needed for a first increment
+
+Fill the following decision headings for the **approved enhancement increment** only. `*create-sad --mvp` may defer scale, not these decisions. When a figure is needed, draw it with `.cursor/skills/draw-diagram/SKILL.md` under `project-context/diagrams/system-arch/`.
+
+### Work Ownership
+
+For each step in the approved increment: owner is model, existing system, or human. Collaborative draft-and-decide is allowed. Justify with reversibility, stakes, and who is accountable. Deterministic rules and live records stay in the system that already owns them.
+
+| Step | Owner | Reversibility | Stakes | Accountable party | Rationale |
+|------|-------|---------------|--------|-------------------|-----------|
+| … | … | … | … | … | … |
+
+**Feasibility verdict**: `feasible as scoped` | `feasible with constraints` | `not feasible`  
+**Load-bearing constraint** (when constrained): …
+
+### Pattern Decision
+
+- **Primary shape**: [augmented call | workflow | agent]
+- **Workflow sub-shape** (when applicable): …
+- **Deciding factor** (predictability, error cost, observability, latency, cost): …
+- **Rejected alternatives and reversal cost**: …
+- **Tool allowlist / Turn budget / Stop conditions** (required when Primary shape is agent): …
+
+There is no fourth option named multi-agent. Sequence written in code is a workflow. A model that chooses the next role is an agent. Orchestrator plus subagents stays inside the agent pattern and needs a coverage check, retry or gap flag, orchestrator checkpoint, shared trace id, and a human gate before irreversible actions.
+
+### Reference Architecture
+
+- **Selected reference architecture**: …
+- **Known failure this design prevents**: …
+- **Second pattern** (only when two parts fail differently): … | none
+
+Retrieval is forbidden as the source of live state.
+
+### Model and Context Strategy
+
+- **Default model tier**: balanced default unless a measured need requires another
+- **Context strategy**: progressive
+- **Swap-as-release rule**: eval gate and rollback criterion before any model or prompt change
+- **Entry point** and **named tradeoff**: …
+- **Identity**: enforced in server-side code
+
+### Control Register
+
+| ID | Risk category | Control | Control point | Failure direction | Owner | Evidence artifact | Review routing |
+|----|---------------|---------|---------------|-------------------|-------|-------------------|----------------|
+| CR-001 | … | … | input / output / tool-call | fail closed | … | … | … |
+
+### Production Shape
+
+- Cost and latency at expected volume for the increment
+- Retries, fallback, circuit breaker
+- Architecture-specific failure mode and mitigation
+- Per-request traces separate from dashboards
 
 ### 10. Operator Decision
 

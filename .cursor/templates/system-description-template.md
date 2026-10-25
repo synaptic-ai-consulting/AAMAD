@@ -25,34 +25,62 @@ Do not invent facts; record unknowns under Open Questions.
 - Existing systems, data sources, or workflows to respect
 - Regulatory or organizational constraints (if any)
 
-### 3. Functional Requirements
+### 3. Discovery Buckets
 
-Numbered requirements with stable IDs (`FR-001`, …):
+Translate every stakeholder preference into a testable constraint before accepting it. Tag each row **requirement** or **assumption**. Do not select an application pattern here — that is `@system.arch`.
 
-| ID | Description | Priority (Must/Should/Could) |
-|----|-------------|------------------------------|
-| FR-001 | … | Must |
+#### Must do
 
-### 4. Non-Functional Requirements
+| ID | Item | Kind (requirement / assumption) | Testable constraint |
+|----|------|---------------------------------|---------------------|
+| MD-001 | … | requirement | … |
 
-Numbered NFRs (`NFR-001`, …) covering performance, security, reliability, usability, and operability as applicable.
+#### Must not do
 
-### 5. Constraints
+| ID | Item | Kind (requirement / assumption) | Testable constraint |
+|----|------|---------------------------------|---------------------|
+| MN-001 | … | requirement | … |
+
+#### Must cost
+
+| ID | Item | Kind (requirement / assumption) | Testable constraint |
+|----|------|---------------------------------|---------------------|
+| MC-001 | … | assumption | latency, per-interaction cost, or volume |
+
+#### Must prove
+
+| ID | Item | Kind (requirement / assumption) | Evidence the system must produce |
+|----|------|---------------------------------|----------------------------------|
+| MP-001 | … | requirement | … |
+
+### 4. Functional Requirements
+
+Numbered requirements with stable IDs (`FR-001`, …) derived from the Must-do bucket:
+
+| ID | Description | Priority (Must/Should/Could) | Source bucket ID |
+|----|-------------|------------------------------|------------------|
+| FR-001 | … | Must | MD-001 |
+
+### 5. Non-Functional Requirements
+
+Numbered NFRs (`NFR-001`, …) covering performance, security, reliability, usability, and operability as applicable. Trace cost and proof items to MC-* / MP-* IDs.
+
+### 6. Constraints
 
 - Technology constraints (language, cloud, offline, etc.)
 - Budget / timeline constraints
 - Integration constraints (must / must-not integrate with …)
 
-### 6. Assumptions
+### 7. Assumptions
 
-- Explicit assumptions the build may rely on
+- Explicit assumptions the build may rely on (rows tagged assumption above, plus any others)
 
-### 7. Acceptance Criteria
+### 8. Acceptance Criteria
 
 Numbered criteria (`AC-001`, …) that QA can map to unit and integration tests.
 Prefer Given/When/Then or checklist form.
 
-### 8. Out of Scope / Future Work
+### 9. Out of Scope / Future Work
 
 - Explicit exclusions for MVP
 

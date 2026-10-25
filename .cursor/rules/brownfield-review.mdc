@@ -33,7 +33,7 @@ alwaysApply: true
 - `project-context/0.review/current-state.md` from `.cursor/templates/current-state-template.md`
 - `project-context/0.review/documentation.md` from `.cursor/templates/review-documentation-template.md`
 - `project-context/0.review/architecture-backlog.md` from `.cursor/templates/architecture-backlog-template.md`
-- `project-context/1.define/sad.md` from `.cursor/templates/sad-brownfield-template.md` (as-is views + Proposed Enhancements + Operator Decision)
+- `project-context/1.define/sad.md` from `.cursor/templates/sad-brownfield-template.md` (as-is views + Proposed Enhancements + Operator Decision). Label the as-is pattern as observation, inference, or unknown. After Operator Decision, fill Work Ownership, Pattern Decision, Reference Architecture, Model and Context Strategy, and Control Register for the approved increment.
 
 Do not overwrite the repository README or existing project docs. Missing documentation belongs in `documentation.md`.
 

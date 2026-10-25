@@ -145,7 +145,7 @@ def _merge_project_mode(path: Path, mode: str, runtime: str | None = None) -> No
         if isinstance(loaded, dict):
             data = loaded
     if "version" not in data:
-        data["version"] = 1
+        data["version"] = 2
     project = data.get("project")
     if not isinstance(project, dict):
         project = {}

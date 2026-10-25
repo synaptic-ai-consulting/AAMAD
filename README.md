@@ -70,7 +70,7 @@ AAMAD changes “vibe coding” from ad-hoc prompting into a **context-first, pe
 
 - **Persona-driven development:** Each workflow is owned and documented by a clear AI agent persona with a single responsibility principle.
 - **Context artifacts:** All major actions, decisions, and documentation are stored as markdown artifacts, ensuring explainability and reproducibility.
-- **Quality gates:** Required artifact headings, optional `aamad validate`, and QA → evals → security → deliver sequencing.
+- **Quality gates:** Required SAD decision headings, `aamad validate`, and QA → evals → verification checklist → security → deliver sequencing.
 - **Evals as acceptance criteria:** Measurable success thresholds (accuracy, latency, safety, security, cost) defined before Build in the SAD and implemented as a golden-dataset eval suite (`*run-evals`) that gates future model/prompt changes.
 - **Project configuration:** Optional `aamad.config.yml` for shared language, UI, testing, and security preferences across personas.
 - **Documentation sync:** After enhancing generated code, use `prompt-sync-docs` so `project-context/` stays aligned with the implementation.
@@ -110,11 +110,11 @@ flowchart LR
 
 - **Phase 0 (Review, brownfield only):** System Architect (`@system.arch`) inspects the existing repo, writes `project-context/0.review/` artifacts, and an as-is SAD with proposed enhancements. The operator records an Operator Decision before Define.
 
-- **Phase 1 (Define):** Product Manager persona (`@product-mgr`) conducts structured elicitation (recommended), optional MRD for commercial products, and PRD/user stories. On brownfield projects this is a **constrained Define**: PRD and stories cover only the approved enhancement set.
+- **Phase 1 (Define):** Product Manager persona (`@product-mgr`) conducts structured elicitation (must do / must not / must cost / must prove), optional MRD for commercial products, and PRD/user stories. System Architect records Work Ownership, Pattern Decision, Reference Architecture, Model and Context Strategy, and Control Register before Build. On brownfield projects this is a **constrained Define**: PRD, stories, and those decisions cover only the approved enhancement set.
 
-- **Phase 2 (Build):** Multi‑agent execution by UX Designer (when UI is in scope), Project Manager, Frontend Engineer, Backend Engineer, Integration Engineer, QA Engineer (unit + integration stages), and (recommended) Security Engineer, governed by core/development-workflow rules and the selected runtime adapter rule. Greenfield `@ux.designer` writes `ux.md` after the SAD; brownfield UX runs only for approved material UI enhancements.
+- **Phase 2 (Build):** UX Designer (when UI is in scope), Project Manager, Frontend Engineer, Backend Engineer, Integration Engineer, QA Engineer (unit, integration, evals, `*verify-change`), and Security Engineer implement the recorded pattern. Greenfield `@ux.designer` writes `ux.md` after the SAD; brownfield UX runs only for approved material UI enhancements.
 
-- **Phase 3 (Deliver):** DevOps Engineer (`@devops.eng`) packages the validated MVP using the `delivery-workflow` rule; artifacts include `project-context/3.deliver/deploy.md` and optionally `user-guide.md`.
+- **Phase 3 (Deliver):** DevOps Engineer (`@devops.eng`) packages the validated MVP using the `delivery-workflow` rule; artifacts include `project-context/3.deliver/deploy.md` (live control register and outcome document) and optionally `user-guide.md`. `evals.md` and `security.md` are required under default config.
 
 ---
 
@@ -378,7 +378,7 @@ Do not overwrite the existing project README. Architecture backlog items are str
 The Product Manager persona (`@product-mgr`) conducts discovery and context setup to standardize project scoping:
 
 - **Brownfield:** wait for Operator Decision `approved` or `approved-with-changes`. Write a PRD and stories only for the approved enhancements. Skip MRD unless asked.
-- **Elicitation (recommended on greenfield):** Structured questionnaire → `system-description.md` via `*elicit-requirements`
+- **Elicitation (recommended on greenfield):** Four discovery buckets (must do / must not / must cost / must prove) → `system-description.md` via `*elicit-requirements`. Do not select an application pattern here.
 - **Market Research (optional):** MRD using the `mrd-template.md` in your IDE templates folder for commercial products; skip for internal/personal tools and for brownfield by default
 - **Requirements:** PRD using the `prd-template.md` in your IDE templates folder
 - **User stories:** MVP stories for architecture and QA traceability
@@ -393,28 +393,28 @@ Each role is embodied by an agent persona, defined in `.cursor/agents/` (Cursor)
 Before implementation, confirm `AAMAD_TARGET_RUNTIME` (`crewai` default if unset, `claude-agent-sdk` supported, `cursor-sdk` supported). Greenfield init can set this when you pick an adapter.
 Phase 2 is executed by running each epic in sequence after completing Phase 1:
 
-- **Architecture:** Greenfield generates `sad.md`; brownfield already has an as-is SAD from Phase 0. Fill eval criteria via `*define-eval-criteria` after a PRD exists.
+- **Architecture:** Greenfield `@system.arch` runs `*decompose-work`, `*select-pattern`, and `*define-controls` then writes `sad.md`. Brownfield labels the as-is pattern and records the same five decisions on the approved increment. Fill eval criteria via `*define-eval-criteria` after a PRD exists. A multi-agent crew is not the default; the Pattern Decision chooses augmented call, workflow, or agent.
 - **UX (when UI is in scope):** `@ux.designer` `*design-ux` writes `ux.md` and waits for operator approval. Brownfield: only for approved enhancements that add a new surface, flow, or interaction pattern. Shared method: `.cursor/skills/product-design/`. Adopt an external brand with `ui.design_system_mode: adopt` and a workspace path in `ui.design_system_source`.
 - **Setup:** Scaffold environment, install dependencies, and document (`setup.md`)
 - **Frontend:** Implement the approved `ux.md` contract, render and review (`ux-review.md`), then scaffold Playwright Test visual snapshots in the generated app (`.cursor/skills/visual-regression/`). A matching baseline is not proof the design is good.
-- **Backend:** Implement backend for the selected runtime, document (`backend.md`)
-- **Integration:** Wire up chat flow, verify, document (`integration.md`)
-- **Quality Assurance:** Run `*test-unit` and `*test-integration`, then smoke/acceptance (`*qa`); when UI is in scope run `*test-visual` (Playwright snapshots in the generated app). Map tests to acceptance-criteria IDs when present; log in `qa.md`. A matching baseline is not a Human judgment pass.
-- **Evals (recommended):** `*run-evals` — golden dataset, code-based checks, LLM-as-judge scoring, and production monitoring recommendations for DevOps; logged in `evals.md`. Already past QA on an existing project? Run `*run-evals` directly — it asks you for any missing thresholds instead of blocking (see `.cursor/skills/run-evals/`).
+- **Backend:** Implement the recorded Pattern Decision for the selected runtime, document (`backend.md`)
+- **Integration:** Wire the PRD primary surface to the backend, verify, document (`integration.md`)
+- **Quality Assurance:** Run `*test-unit` and `*test-integration`, then smoke/acceptance (`*qa`); when UI is in scope run `*test-visual` (Playwright snapshots in the generated app). Run `*verify-change` (correctness, security, maintainability, author explanation). Map tests to acceptance-criteria IDs when present; log in `qa.md`. A matching baseline is not a Human judgment pass.
+- **Evals (required when the Pattern Decision includes a model call):** `*run-evals` — golden dataset, code-based checks, LLM-as-judge scoring, and production monitoring recommendations for DevOps; logged in `evals.md`. Already past QA on an existing project? Run `*run-evals` directly — it asks you for any missing thresholds instead of blocking (see `.cursor/skills/run-evals/`).
 - **Diagrams:** when an artifact needs a figure, the owning persona draws it with `*draw-diagram` (editorial HTML and SVG under `project-context/diagrams/<persona-id>/`). That is the default diagram tool. See `.cursor/skills/draw-diagram/`.
 - **Doc sync:** after a code, config, or deploy change, the persona that made it runs `*sync-docs`, asks for operator approval, then updates only approved descriptive docs. PRD, SAD, and Review artifacts stay the source of truth. See `.cursor/skills/sync-docs/`.
 - **Chat:** operator-facing replies are 1–3 complete sentences (`.cursor/rules/conciseness.mdc`). Artifacts stay complete.
-- **Security (recommended):** `@security.eng` → `security.md` before Deliver (required when `aamad.config.yml` sets `security.require_security_assessment: true`)
+- **Security:** `@security.eng` verifies the Control Register against the code and writes `security.md` before Deliver (required when `security.require_security_assessment` is true; the 1.0 default)
 
 Artifacts are versioned and stored in `project-context/2.build` for traceability.
 
 ### Phase 3: Deliver Stage (DevOps)
 
-After QA (and preferably security), invoke `@devops.eng`:
+After QA, evals, and security, invoke `@devops.eng`:
 
-- **Release readiness:** Confirm `qa.md` (and note `evals.md` and `security.md` status)
+- **Release readiness:** Confirm `qa.md`, `evals.md`, and `security.md` (required under default config)
 - **Deploy / CI:** Minimal deploy and pipeline config aligned with SAD and `AAMAD_TARGET_RUNTIME`, incorporating `evals.md`'s Production Monitoring Recommendations (trace fields, dashboards, alert thresholds)
-- **Runbook:** `project-context/3.deliver/deploy.md` (hosting, env matrix, access, rollback)
+- **Runbook:** `project-context/3.deliver/deploy.md` (hosting, env matrix, access, rollback, live control register, outcome document)
 - **User docs:** `*document-user-guide` → `project-context/3.deliver/user-guide.md`
 - **Validate:** `aamad validate --phase deliver`
 

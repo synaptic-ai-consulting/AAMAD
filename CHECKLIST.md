@@ -57,6 +57,7 @@ Skip this section when `project.mode` is `greenfield`.
   - [ ] `project-context/0.review/architecture-backlog.md` — architectural actions only (not bug fixes)
 - [ ] Run `*create-sad` (or `*create-sad --mvp` for a lean increment) using `sad-brownfield-template.md`
   - [ ] SAD describes the **current** solution
+  - [ ] As-is pattern labeled observation, inference, or unknown
   - [ ] Proposed Enhancements chapter is present
   - [ ] Operator Decision is present (starts as `pending`)
   - [ ] Resolved `AAMAD_TARGET_RUNTIME` recorded in sad.md Audit
@@ -76,7 +77,7 @@ Skip this section when `project.mode` is `greenfield`.
   - [ ] Commercial / market-facing product → produce MRD
   - [ ] Internal / personal / operational tool → skip MRD; note rationale in PRD Assumptions
 - [ ] Run as needed:
-    - [ ] `*elicit-requirements` — System description at project-context/1.define/system-description.md
+    - [ ] `*elicit-requirements` — System description (must do / must not / must cost / must prove; each row tagged requirement or assumption)
     - [ ] `*create-mrd` — Market Research Document at project-context/1.define/mrd.md using mrd-template.md in your IDE templates folder
     - [ ] `*create-prd` — Product Requirements Document at project-context/1.define/prd.md using prd-template.md in your IDE templates folder
     - [ ] `*create-context` — MRD (unless skipped) and PRD with context summary for handoff
@@ -109,10 +110,11 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 ### Step 0: Architecture Definition (`@system.arch`)
 
 - [ ] **Greenfield:** Invoke `@system.arch`.
-- [ ] **Greenfield:** Run one of:
+- [ ] **Greenfield:** Run `*decompose-work`, `*select-pattern`, and `*define-controls` before or as part of:
     - [ ] `*create-sad` — Generate full SAD at project-context/1.define/sad.md using sad-template.md in your IDE templates folder.
-    - [ ] `*create-sad --mvp` — Generate a lean MVP SAD, deferring nonessential components and NFRs; output to project-context/1.define/sad.md.
-- [ ] **Brownfield:** SAD already exists from Phase 0; do not rewrite the as-is chapter unless the operator asked for a revision.
+    - [ ] `*create-sad --mvp` — Lean SAD. May defer scale, not the pattern decision or the control register.
+- [ ] Confirm SAD headings: Work Ownership, Pattern Decision, Reference Architecture, Model and Context Strategy, Control Register.
+- [ ] **Brownfield:** SAD already exists from Phase 0; do not rewrite the as-is chapter unless the operator asked for a revision. Complete Work Ownership, Pattern Decision, Reference Architecture, Model and Context Strategy, and Control Register on the approved increment.
 - [ ] Validate SAD completeness (greenfield: stakeholders/views/decisions; brownfield: as-is views + approved enhancements).
 - [ ] Record assumptions and open questions in sad.md for downstream resolution.
 - [ ] Record resolved `AAMAD_TARGET_RUNTIME` in the sad.md Audit section.
@@ -162,9 +164,10 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 - [ ] Invoke `@backend.eng`.
 - [ ] Run `*develop-be`
-  - [ ] Scaffold backend runtime and MVP runtime agent(s) using the selected runtime adapter (`.cursor/rules/adapter-${AAMAD_TARGET_RUNTIME}.mdc` after init; paths differ by IDE but content is equivalent)
-  - [ ] Add stub code for future/backlog agent logic
-  - [ ] Implement backend chat API endpoint
+  - [ ] Scaffold backend runtime that implements the SAD Pattern Decision using the selected runtime adapter (`.cursor/rules/adapter-${AAMAD_TARGET_RUNTIME}.mdc` after init; paths differ by IDE but content is equivalent)
+  - [ ] Do not introduce an agent loop, live-state retrieval, or a side-effecting tool the SAD did not allow
+  - [ ] Add stub code for future/backlog logic
+  - [ ] Implement the primary backend API endpoint
   - [ ] Document all work in backend.md
 
 ---
@@ -173,8 +176,8 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 - [ ] Invoke `@integration.eng`.
 - [ ] Run `*integrate-api`
-  - [ ] Wire MVP frontend chat to backend chat API
-  - [ ] Test basic chat round-trip functionality
+  - [ ] Wire the PRD primary surface to the backend API
+  - [ ] Test a basic round-trip on that flow
   - [ ] Document integration and known issues in integration.md
 
 ---
@@ -190,10 +193,11 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
   - [ ] When a UI exists, consume `ux.md` and `ux-review.md`; check accessibility, responsive behavior, and interface quality on changed routes
   - [ ] Run `*test-visual` when UI is in scope; a green visual run is not a Human judgment pass
   - [ ] Log issues, known gaps, and future work in qa.md
+- [ ] Run `*verify-change` — correctness, security, maintainability, and a short explanation of what shipped (cite `ux-review.md` when UI changed)
 
 ---
 
-### Step 5.4: Evaluation Strategy (`@qa.eng`) — recommended before Security/Deliver
+### Step 5.4: Evaluation Strategy (`@qa.eng`) — required before Deliver when the Pattern Decision includes a model call
 
 - [ ] Run `*run-evals` following `.cursor/skills/run-evals/SKILL.md`.
 - [ ] Implement the SAD section 9 evaluation criteria table when present; otherwise answer the skill's operator gap check (thresholds, SLA, risk tolerance, dataset provenance, judge calibration).
@@ -202,10 +206,11 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 ---
 
-### Step 5.5: Security Assessment (`@security.eng`) — recommended before Deliver
+### Step 5.5: Security Assessment (`@security.eng`) — required before Deliver under default config
 
-- [ ] Invoke `@security.eng` (required when `aamad.config.yml` sets `security.require_security_assessment: true`).
+- [ ] Invoke `@security.eng` (required when `aamad.config.yml` sets `security.require_security_assessment: true`; the 1.0 default).
 - [ ] Run `*assess-security` (and `*scan-secrets` / `*review-deps` as needed).
+- [ ] Verify each SAD Control Register row against the code.
 - [ ] Complete project-context/2.build/security.md with severity-ranked findings.
 - [ ] Route mitigations to owning personas; do not change app logic inside this persona.
 
@@ -213,18 +218,18 @@ Use the same persona invocation pattern as Phase 1 (Cursor `@name`, Claude Code 
 
 ### Step 6: Deliver (`@devops.eng`)
 
-- [ ] Invoke `@devops.eng` after QA artifacts are complete (and evals.md / security.md when available).
+- [ ] Invoke `@devops.eng` after QA, evals, and security artifacts are complete (required under default config).
 - [ ] Run `*prepare-release`
-  - [ ] Confirm qa.md documents MVP verification (pass or scoped gaps)
-  - [ ] Note evals.md status and fold its monitoring recommendations into deploy config
-  - [ ] Note security.md status (present or accepted gap)
+  - [ ] Confirm qa.md documents MVP verification (pass or scoped gaps) and the verification checklist
+  - [ ] Confirm evals.md and fold its monitoring recommendations into deploy config
+  - [ ] Confirm security.md (Control Register verified or accepted gaps)
   - [ ] Summarize release scope and version in deploy.md
 - [ ] Run `*define-deploy` and `*configure-cicd`
   - [ ] Add minimal deploy and CI config aligned with SAD and AAMAD_TARGET_RUNTIME
   - [ ] When UI is in scope, include a generated visual-regression job (install browsers, run the recorded script)
   - [ ] Do not embed secrets; reference `.env.example` keys only
 - [ ] Run `*document-deploy`
-  - [ ] Complete project-context/3.deliver/deploy.md (hosting, access control, rollback, Audit)
+  - [ ] Complete project-context/3.deliver/deploy.md (hosting, access, rollback, live control register, Outcome Document, Audit)
 - [ ] Run `*document-user-guide`
   - [ ] Complete project-context/3.deliver/user-guide.md
 - [ ] Optionally run `aamad validate --phase deliver`.

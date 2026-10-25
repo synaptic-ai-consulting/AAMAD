@@ -46,7 +46,8 @@ alwaysApply: true
 - On iteration/time limits or missing prerequisites, write a Halt and Report section with blockers; do not continue.
 
 ## Project Configuration
-- When `aamad.config.yml` exists at the project root, all personas MUST load it at start and honor its preferences (language, libraries, UI, coding standards, security, documentation, testing, and `project.mode`).
+- When `aamad.config.yml` exists at the project root, all personas MUST load it at start and honor its preferences (language, libraries, UI, coding standards, security, documentation, testing, `project.mode`, `model`, `spend`, `crew.autonomy`, and `quality`).
+- `crew.autonomy` (`assisted` | `epic` | `autonomous`) governs the development crew only. It does not select the application Pattern Decision and does not raise tool privilege. `autonomous` still cannot skip brownfield Review, the five SAD decisions, the UX gate when a surface is in scope, or the eval gate.
 - `project.mode` is `greenfield` (default) or `brownfield`. Brownfield starts at Phase 0 Review (`@system.arch` `*review-codebase`) and uses Review artifacts plus the as-is SAD as context; do not invent a new product vision.
 - Prefer `AAMAD_TARGET_RUNTIME` environment variable over `runtime.target` in the config when both are set; record the resolved value in Audit.
 - If config conflicts with PRD or SAD, do not silently override those artifacts — record the conflict under Open Questions and proceed with PRD/SAD as authoritative for scope.
@@ -55,4 +56,4 @@ alwaysApply: true
 ## Security and Compliance
 - Never embed secrets in artifacts; use environment variables in runtime code only. Record third-party content in NOTICES as needed
 - Provide `.env.example` entries for required runtime secrets and keep secret values out of Prompt Trace and diagnostics.
-- Prefer a Security Assessment (`@security.eng` → `project-context/2.build/security.md`) before Deliver when `security.require_security_assessment` is true in `aamad.config.yml` or when the operator requests it.
+- Require a Security Assessment (`@security.eng` → `project-context/2.build/security.md`) before Deliver when `security.require_security_assessment` is true in `aamad.config.yml` (1.0 default) or when the operator requests it. The assessment verifies the SAD Control Register against the code.

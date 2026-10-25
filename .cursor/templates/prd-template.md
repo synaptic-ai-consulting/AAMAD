@@ -1,8 +1,9 @@
 # AAMAD PRD Generation Template
 
 ## Context & Instructions
-Generate a comprehensive Product Requirements Document (PRD) for a multi-agent system.
+Generate a comprehensive Product Requirements Document (PRD) for the product.
 Base decisions on the provided Deep Research / MRD findings when present, or on a system description / elicitation notes when MRD was skipped.
+Do not prescribe an agent roster or an application pattern. Point architecture at the SAD Pattern Decision.
 Ensure the PRD is production-ready for MVP scope and addresses real needs identified in the inputs.
 The selected runtime (`AAMAD_TARGET_RUNTIME`) constrains Phase 2 implementation conventions; do not hardcode a single runtime framework as the product definition.
 
@@ -10,7 +11,7 @@ The selected runtime (`AAMAD_TARGET_RUNTIME`) constrains Phase 2 implementation 
 
 **Deep Research Report / MRD**: [PASTE OR REFERENCE `project-context/1.define/mrd.md` — or mark N/A if skipped]  
 **System Description** (optional): [REFERENCE `project-context/1.define/system-description.md` IF PRESENT]  
-**System Concept**: [INSERT YOUR MULTI-AGENT SYSTEM DESCRIPTION]  
+**System Concept**: [INSERT THE PRODUCT DESCRIPTION — not a presumed multi-agent crew]  
 **Selected Runtime**: [crewai | claude-agent-sdk | cursor-sdk]
 
 ## PRD Structure — Generate All Sections Below
@@ -25,13 +26,13 @@ The selected runtime (`AAMAD_TARGET_RUNTIME`) constrains Phase 2 implementation 
 
 **Solution Overview** (Evidence-based):
 
-* Multi-agent system approach and unique value proposition  
+* Product approach and unique value proposition  
 * Key differentiators vs alternatives  
 * Expected business or operational outcomes and success metrics
 
 **Strategic Rationale**:
 
-* Why multi-agent architecture is optimal for this problem  
+* Why this product is the right response to the problem  
 * Business case / ROI or operational value  
 * Market timing and competitive positioning (or N/A for internal tools)
 
@@ -57,20 +58,18 @@ The selected runtime (`AAMAD_TARGET_RUNTIME`) constrains Phase 2 implementation 
 
 ### 3. Technical Requirements & Architecture
 
-**Runtime & Agent Specifications** (aligned with Selected Runtime):
+Do not prescribe an application pattern or a roster of runtime agents here. `@system.arch` records Work Ownership and Pattern Decision in `sad.md`. This section states constraints the architecture must satisfy.
 
-* Agent roles and responsibilities (based on workflow analysis)  
-* Collaboration patterns (sequential, hierarchical, or harness-specific)  
-* Task / turn orchestration and delegation boundaries  
-* Example (CrewAI-style fields when runtime is `crewai`): role, goal, backstory, tools, memory, delegation — adapt field names for other runtimes per the active adapter rule
+**Discovery constraints** (from system description when present):
 
-**Core Agent Definitions**:
+* Must do / must not / must cost / must prove rows, each tagged requirement or assumption  
+* Feasibility notes for the architect (do not issue the pattern verdict)
 
-* agent: [agent_name]  
-* role: "[specific role from user journey analysis]"  
-* goal: "[goal derived from user needs]"  
-* tools: [list_of_required_tools]  
-* runtime notes: [adapter-specific controls, e.g. max_iter, hooks, allowed_tools]
+**Runtime constraints** (aligned with Selected Runtime):
+
+* Tool and integration boundaries the product must honor  
+* Identity, data-minimization, and logging obligations  
+* Adapter-specific controls to consider after the SAD pattern is chosen (e.g. `max_iter`, hooks, `allowed_tools`)
 
 **Integration Requirements**:
 
@@ -129,9 +128,9 @@ The selected runtime (`AAMAD_TARGET_RUNTIME`) constrains Phase 2 implementation 
 * Web / mobile platform specifications  
 * Accessibility and usability standards
 
-**Agent Interaction Design**:
+**Human–system interaction**:
 
-* Human-agent communication patterns  
+* Communication patterns for the primary surface  
 * Feedback and error handling approaches  
 * Transparency and explainability features
 
@@ -144,7 +143,7 @@ The selected runtime (`AAMAD_TARGET_RUNTIME`) constrains Phase 2 implementation 
 **Technical Metrics**:
 
 * System performance and reliability targets  
-* Agent effectiveness and accuracy rates  
+* Task effectiveness and accuracy rates  
 * Cost efficiency and resource utilization
 
 **User Experience Metrics**:

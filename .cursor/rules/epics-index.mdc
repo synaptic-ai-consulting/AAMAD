@@ -8,11 +8,11 @@ alwaysApply: true
 | Epic         | Persona        | Primary Output Artifact | PRD/SAD Section Reference      | Invocation        |
 |--------------|---------------|------------------------|-------------------------------|-------------------|
 | Review       | @system.arch   | current-state.md, documentation.md, architecture-backlog.md | Existing codebase | *review-codebase |
-| Architecture | @system.arch   | sad.md                 | SAD: Views & Decisions (greenfield: PRD; brownfield: 0.review + Proposed Enhancements) | *create-sad |
+| Architecture | @system.arch   | sad.md                 | SAD: Work Ownership, Pattern Decision, Reference Architecture, Model and Context Strategy, Control Register | *decompose-work / *select-pattern / *define-controls / *create-sad |
 | UX           | @ux.designer   | ux.md                  | PRD: UI Scope, SAD: Frontend, approved enhancements (brownfield) | *design-ux        |
 | Setup        | @project.mgr   | setup.md               | SAD: Environment, PRD: Setup   | *setup-project    |
 | Frontend     | @frontend.eng  | frontend.md, ux-review.md | SAD: MVP UI, ux.md | *develop-fe       |
-| Backend      | @backend.eng   | backend.md             | SAD: Crew Spec, PRD: Agent Def | *develop-be       |
+| Backend      | @backend.eng   | backend.md             | SAD: Pattern Decision, Application Runtime | *develop-be       |
 | Integration  | @integration.eng | integration.md       | SAD: API & Flows, PRD: Int Req | *integrate-api    |
 | QA           | @qa.eng        | qa.md                  | SAD: Testing, PRD: QA Plan     | *qa               |
 | Evals        | @qa.eng        | evals.md               | SAD: Testing §9 (criteria table), PRD: Success Metrics | *run-evals |
@@ -28,4 +28,5 @@ alwaysApply: true
 - Diagrams: when an artifact needs a figure, draw it with `.cursor/skills/draw-diagram/SKILL.md` under `project-context/diagrams/<persona-id>/`. Do not use Mermaid, PlantUML, or another diagram tool for a new diagram.
 - Doc sync: after a code, config, or deploy change, the persona that made it runs `*sync-docs` (`.cursor/skills/sync-docs/SKILL.md`) once before finishing. Descriptive docs wait for operator approval. Define and Review artifacts are not rewritten to match the code.
 - UX: `@ux.designer` `*design-ux` writes `ux.md` for material UI. `@frontend.eng` implements it and writes `ux-review.md`. Shared method: `.cursor/skills/product-design/SKILL.md`. Visual snapshots: `.cursor/skills/visual-regression/SKILL.md`.
+- Architecture decisions: `@system.arch` records Work Ownership, Pattern Decision, Reference Architecture, Model and Context Strategy, and Control Register before Build. Verification: `@qa.eng` `*verify-change`.
 

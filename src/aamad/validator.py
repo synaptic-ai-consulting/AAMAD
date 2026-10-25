@@ -31,6 +31,21 @@ REVIEW_SAD_HEADINGS = (
     "Proposed Enhancements",
     "Operator Decision",
 )
+SAD_DECISION_HEADINGS = (
+    "Work Ownership",
+    "Pattern Decision",
+    "Reference Architecture",
+    "Model and Context Strategy",
+    "Control Register",
+)
+EVALS_MD = "project-context/2.build/evals.md"
+SECURITY_MD = "project-context/2.build/security.md"
+PRIMARY_SHAPE_RE = re.compile(
+    r"(?i)primary shape\*?\*?\s*[:=]\s*`?(augmented call|workflow|agent|none|n/?a|no model)"
+)
+NO_MODEL_SHAPES = frozenset({"none", "n/a", "na", "no model"})
+AGENT_TURN_BUDGET_RE = re.compile(r"(?i)turn budget")
+AGENT_STOP_RE = re.compile(r"(?i)stop condition")
 BUILD_ARTIFACTS = (
     "project-context/2.build/setup.md",
     "project-context/2.build/frontend.md",
@@ -93,6 +108,10 @@ KNOWN_CONFIG_TOP_KEYS = frozenset(
         "security",
         "documentation",
         "testing",
+        "model",
+        "spend",
+        "crew",
+        "quality",
     }
 )
 
@@ -193,6 +212,67 @@ def _read_project_mode(root: Path) -> str | None:
     if mode in ("greenfield", "brownfield"):
         return mode
     return None
+
+
+def _config_flag(root: Path, section: str, key: str, default: bool) -> bool:
+    data = _read_config(root).get(section)
+    if not isinstance(data, dict) or key not in data:
+        return default
+    return bool(data.get(key))
+
+
+def _require_evals(root: Path) -> bool:
+    return _config_flag(root, "quality", "require_evals", True)
+
+
+def _require_security_assessment(root: Path) -> bool:
+    return _config_flag(root, "security", "require_security_assessment", True)
+
+
+def _section_body(text: str, heading: str) -> str | None:
+    match = re.search(
+        rf"^#{{2,3}}\s+{re.escape(heading)}\s*$(.*?)(?=^#{{2,3}}\s|\Z)",
+        text,
+        re.MULTILINE | re.IGNORECASE | re.DOTALL,
+    )
+    return match.group(1) if match else None
+
+
+def _primary_shape(text: str) -> str | None:
+    section = _section_body(text, "Pattern Decision") or text
+    match = PRIMARY_SHAPE_RE.search(section)
+    return match.group(1).lower() if match else None
+
+
+def _pattern_includes_model_call(text: str) -> bool:
+    shape = _primary_shape(text)
+    if shape is None:
+        return True
+    return shape not in NO_MODEL_SHAPES
+
+
+def _check_sad_decision_headings(path: Path, result: ValidationResult) -> None:
+    text = path.read_text(encoding="utf-8")
+    rel = str(path)
+    for heading in SAD_DECISION_HEADINGS:
+        if not _heading_present(text, heading):
+            result.add("error", rel, f"Missing required heading: {heading}")
+    shape = _primary_shape(text)
+    if shape != "agent":
+        return
+    section = _section_body(text, "Pattern Decision") or text
+    if not AGENT_TURN_BUDGET_RE.search(section):
+        result.add(
+            "error",
+            rel,
+            "Agent Pattern Decision must record a turn budget",
+        )
+    if not AGENT_STOP_RE.search(section):
+        result.add(
+            "error",
+            rel,
+            "Agent Pattern Decision must record stop conditions",
+        )
 
 
 def _require_visual_regression(root: Path) -> bool:
@@ -362,6 +442,8 @@ def validate_project(
                     result,
                     require_approved=phase in ("define", "build", "deliver"),
                 )
+                if phase in ("define", "build", "deliver"):
+                    _check_sad_decision_headings(path, result)
 
     if phase in ("define", "build", "deliver"):
         for rel in DEFINE_REQUIRED:
@@ -374,6 +456,7 @@ def validate_project(
             _check_terminal_sections(path, result)
             if rel.endswith("sad.md"):
                 _check_runtime_in_audit(path, result, required=True)
+                _check_sad_decision_headings(path, result)
 
         for rel in DEFINE_OPTIONAL:
             path = root / rel
@@ -403,6 +486,8 @@ def validate_project(
             if path.is_file():
                 _check_terminal_sections(path, result)
             else:
+                if phase == "deliver" and _require_evals(root):
+                    continue
                 result.add(
                     "warning",
                     rel,
@@ -416,12 +501,40 @@ def validate_project(
                 "project-context/2.build/qa.md",
                 "Deliver phase gate failed: qa.md must exist before deploy",
             )
+        sad = root / "project-context/1.define/sad.md"
+        sad_text = sad.read_text(encoding="utf-8") if sad.is_file() else ""
+        evals = root / EVALS_MD
+        if evals.is_file():
+            _check_terminal_sections(evals, result)
+        elif _require_evals(root) and _pattern_includes_model_call(sad_text):
+            result.add(
+                "error",
+                EVALS_MD,
+                "Deliver phase gate failed: evals.md required when the "
+                "Pattern Decision includes a model call",
+            )
+        security = root / SECURITY_MD
+        if security.is_file():
+            _check_terminal_sections(security, result)
+        elif _require_security_assessment(root):
+            result.add(
+                "error",
+                SECURITY_MD,
+                "Deliver phase gate failed: security.md required when "
+                "security.require_security_assessment is true",
+            )
         deploy = root / DELIVER_ARTIFACTS[0]
         if not deploy.is_file():
             result.add("error", DELIVER_ARTIFACTS[0], "Deliver artifact missing")
         else:
             _check_terminal_sections(deploy, result)
             _check_runtime_in_audit(deploy, result, required=True)
+            if not _heading_present(deploy.read_text(encoding="utf-8"), "Outcome Document"):
+                result.add(
+                    "error",
+                    DELIVER_ARTIFACTS[0],
+                    "Missing required heading: Outcome Document",
+                )
 
     _check_ux_gates(root, phase, result)
     _check_aamad_config(root, result)

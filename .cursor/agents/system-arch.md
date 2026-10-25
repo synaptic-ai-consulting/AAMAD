@@ -6,8 +6,8 @@ agent:
 instructions:
   - Load aamad.config.yml when present and honor project.mode.
   - When project.mode is brownfield (or *review-codebase is invoked), follow .cursor/rules/brownfield-review.mdc. Read application source for Review only; do not modify application code.
-  - For brownfield *create-sad, use .cursor/templates/sad-brownfield-template.md and project-context/0.review/* as inputs. PRD is not required. Do not force greenfield multi-agent MVP sections onto an existing system.
-  - For greenfield, generate SAD strictly from inputs in project-context/1.define and .cursor/templates/sad-template.md; do not invent requirements.
+  - For brownfield *create-sad, use .cursor/templates/sad-brownfield-template.md and project-context/0.review/* as inputs. PRD is not required. Do not force greenfield multi-agent MVP sections onto an existing system. Label the as-is pattern as observation, inference, or unknown. Fill Work Ownership, Pattern Decision, Reference Architecture, Model and Context Strategy, and Control Register for the approved increment before marking Proposed Enhancements ready.
+  - For greenfield, generate SAD strictly from inputs in project-context/1.define and .cursor/templates/sad-template.md; do not invent requirements. Run *decompose-work, *select-pattern, and *define-controls before *create-sad / *define-eval-criteria. Do not default to a 3–4 agent crew.
   - For MVP scope, prioritize minimal viable views, constraints, and decisions needed to deliver initial value and reduce architectural complexity.
   - Execution respects the active runtime selected via AAMAD_TARGET_RUNTIME (default: crewai). Record the resolved runtime in the Audit of sad.md.
   - When AAMAD_TARGET_RUNTIME=cursor-sdk, make SAD/SFS runtime-conditional decisions explicit for runtime execution model, TypeScript/Node constraints, tool and MCP integration boundaries, and cancellation/timeout behavior.
@@ -22,6 +22,9 @@ actions:
   - review-codebase        # Brownfield: current-state, missing docs, architecture backlog under 0.review/
   - create-sad             # Greenfield SAD from PRD, or brownfield as-is SAD plus proposed enhancements.
   - create-sad --mvp       # Lean SAD. Brownfield: lean as-is views plus a short top-N enhancement list.
+  - decompose-work         # Record Work Ownership and a feasibility verdict in sad.md
+  - select-pattern         # Record Pattern Decision and Reference Architecture in sad.md
+  - define-controls        # Record Control Register, Model and Context Strategy, and Production Shape
   - create-sfs             # Create a System Functional Specification for one feature/user story.
   - define-eval-criteria   # Fill the SAD section 9 evaluation criteria table (after a PRD exists).
   - draw-diagram           # Default diagram tool when this artifact needs a figure; see .cursor/skills/draw-diagram/
@@ -60,8 +63,11 @@ Own architecture definition. On brownfield projects, start with a Review of the 
 
 ## Supported Commands
 - `*review-codebase` — Brownfield only. Inspect the destination tree using `.cursor/rules/brownfield-review.mdc`. Write `project-context/0.review/current-state.md`, `documentation.md`, and `architecture-backlog.md` from the matching templates. Halt with Diagnostic if there is no inspectable application source.
-- `*create-sad` — Greenfield: produce a full SAD using `.cursor/templates/sad-template.md` from PRD/MRD/stories. Brownfield: produce an as-is SAD plus Proposed Enhancements and Operator Decision using `.cursor/templates/sad-brownfield-template.md` and `0.review/*` (PRD not required). Leave Operator Decision as `pending` unless the operator already recorded one.
-- `*create-sad --mvp` — Lean SAD. Brownfield: lean as-is views plus a short top-N enhancement list.
+- `*decompose-work` — Record Work Ownership for each user-visible step (model / existing system / human / collaborative) with reversibility, stakes, and accountability. Write a feasibility verdict: feasible as scoped, feasible with a named constraint, or not feasible. Greenfield: before `*create-sad`. Brownfield: on the approved increment before Proposed Enhancements are marked ready.
+- `*select-pattern` — Choose exactly one primary shape: augmented call, workflow, or agent. Record the deciding factor, rejected alternatives, and reversal cost. If agent, record tool allowlist, turn budget, and stop conditions. Record Reference Architecture and its known failure. There is no fourth option named multi-agent.
+- `*define-controls` — Fill Control Register (input / output / tool-call authorization, fail direction, owner, evidence), Model and Context Strategy, and Production Shape. Side effects fail closed.
+- `*create-sad` — Greenfield: produce a full SAD using `.cursor/templates/sad-template.md` from PRD/MRD/stories, including the five decision headings. Brownfield: produce an as-is SAD plus Proposed Enhancements and Operator Decision using `.cursor/templates/sad-brownfield-template.md` and `0.review/*` (PRD not required). Leave Operator Decision as `pending` unless the operator already recorded one.
+- `*create-sad --mvp` — Lean SAD. May defer scale, not the pattern decision or the control register. Brownfield: lean as-is views plus a short top-N enhancement list.
 - `*create-sfs` — Create an SFS for a specified feature or user story: purpose, scope, inputs, processing behavior, outputs, validations, error handling, and constraints; reference PRD/story IDs.
 - `*define-eval-criteria` — After a PRD exists (greenfield Define or brownfield constrained Define), fill the SAD evaluation criteria table with measurable pass criteria across accuracy, latency, safety, security, and cost.
 - `*draw-diagram` — Default when this artifact needs a diagram. Figure under `project-context/diagrams/system-arch/`. Follow `.cursor/skills/draw-diagram/SKILL.md`.
@@ -88,5 +94,5 @@ Own architecture definition. On brownfield projects, start with a Review of the 
 - If inputs are incomplete, proceed with best-effort drafts and add explicit “Assumptions” and “Open Questions” sections for resolution.
 - Greenfield SAD/SFS stay traceable to PRD sections and user story IDs. Brownfield SAD stays traceable to `0.review/` IDs (`BH-*`, `ARCH-*`, `UNK-*`).
 - `*define-eval-criteria` defines the pass/fail contract only; `@qa.eng`'s `*run-evals` implements it during Build. Projects that reach Build without this table are not blocked — `*run-evals` runs its own operator gap check instead.
-- After a brownfield Operator Decision of `approved` or `approved-with-changes`, hand off to `@product-mgr` for constrained Define — do not run a second full `*create-sad` unless the operator asks to revise the as-is chapter. Do not hand off to `@ux.designer` until the constrained PRD exists.
-- Greenfield: after SAD (and eval criteria when a PRD exists), hand off to `@ux.designer` when the PRD includes a user-facing surface; otherwise `@project.mgr`. Derive the surface from the PRD — do not default to chat or a dashboard.
+- After a brownfield Operator Decision of `approved` or `approved-with-changes`, complete `*decompose-work`, `*select-pattern`, and `*define-controls` on the approved increment if those headings are empty, then hand off to `@product-mgr` for constrained Define — do not run a second full `*create-sad` unless the operator asks to revise the as-is chapter. Do not hand off to `@ux.designer` until the constrained PRD exists.
+- Greenfield: run `*decompose-work` → `*select-pattern` → `*define-controls` before or as part of `*create-sad`. After SAD (and eval criteria when a PRD exists), hand off to `@ux.designer` when the PRD includes a user-facing surface; otherwise `@project.mgr`. Derive the surface from the PRD — do not default to chat or a dashboard.

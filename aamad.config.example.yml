@@ -3,7 +3,7 @@
 # See aamad-config-template.yml in your IDE templates folder
 # (.cursor/templates, .claude/templates, .github/templates, or .kiro/templates).
 
-version: 1
+version: 2
 
 project:
   # Written by `aamad init`. greenfield = start from scratch; brownfield = existing repo.
@@ -47,3 +47,19 @@ testing:
   require_integration_tests: true
   map_to_acceptance_criteria: true
   require_visual_regression: false  # warning-only when true and UI is in scope
+
+model:
+  default_tier: balanced
+  allowlist: []
+  swap_requires_eval: true
+
+spend:
+  per_request_ceiling: ""
+  rate_cap: ""
+
+crew:
+  autonomy: epic  # assisted | epic | autonomous
+
+quality:
+  require_evals: true
+  require_verification_checklist: true

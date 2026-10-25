@@ -156,12 +156,14 @@ TEMPLATE_FILES = [
     "aamad-config-template.yml",
     "architecture-backlog-template.md",
     "current-state-template.md",
+    "deploy-template.md",
     "evals-template.md",
     "mrd-template.md",
     "prd-template.md",
     "review-documentation-template.md",
     "sad-brownfield-template.md",
     "sad-template.md",
+    "security-template.md",
     "sfs-template.md",
     "system-description-template.md",
     "user-guide-template.md",
@@ -420,6 +422,11 @@ SKILL_PROMPT_SPECS = {
         "out": "visual-regression.prompt.md",
         "description": "AAMAD: Playwright Test visual snapshots in the generated app; first baseline after Human judgment; operator-approved updates",
         "agent": None,
+    },
+    "verify-change": {
+        "out": "verify-change.prompt.md",
+        "description": "AAMAD: Verification checklist for AI-written changes (correctness, security, maintainability, author explanation)",
+        "agent": "qa-eng",
     },
 }
 

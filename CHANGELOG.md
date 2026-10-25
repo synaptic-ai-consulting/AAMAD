@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2026-10-24
+
+### Added
+
+- Architecture decision sequence in greenfield and brownfield SAD templates: Work Ownership, Pattern Decision, Reference Architecture, Model and Context Strategy, Control Register, and Production Shape. `@system.arch` actions `*decompose-work`, `*select-pattern`, and `*define-controls`.
+- Discovery buckets on system description and PRD (must do / must not / must cost / must prove; requirement vs assumption). PRD no longer prescribes an agent roster.
+- `@qa.eng` `*verify-change` skill: correctness, security, maintainability, and an explanation of what shipped.
+- `security-template.md` and Control Register verification in `@security.eng`.
+- `deploy-template.md` Outcome Document, live control register, and spend posture.
+- Config version 2 keys: `model`, `spend`, `crew.autonomy`, `quality.require_evals`, `quality.require_verification_checklist`.
+
+### Changed
+
+- Breaking: `aamad validate --phase define` errors if the five SAD decision headings are missing. An agent Pattern Decision without a turn budget or stop conditions fails.
+- Breaking: `aamad validate --phase deliver` errors if `evals.md` is missing when the Pattern Decision includes a model call, if `security.md` is missing when `security.require_security_assessment` is true (the 1.0 default), or if `deploy.md` lacks Outcome Document.
+- SAD no longer defaults to a 3–4 agent crew or a chat UI. Application patterns are augmented call, workflow, or agent.
+- Backend, frontend, and integration implement the recorded pattern. Integration no longer assumes a chat UI.
+
+### Upgrade
+
+- `aamad init --overwrite --ide <cursor|claude-code|vscode|kiro>`, then re-run `*decompose-work` through `*define-controls` before the next Build. Existing Review, UX, and sync-docs behavior stays valid.
+
 ## [0.9.7] - 2026-10-24
 
 ### Added

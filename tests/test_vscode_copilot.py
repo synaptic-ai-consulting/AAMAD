@@ -644,6 +644,7 @@ def test_get_vscode_planned_paths():
     assert dest / ".github" / "prompts" / "run-evals.prompt.md" in paths
     assert dest / ".github" / "prompts" / "product-design.prompt.md" in paths
     assert dest / ".github" / "prompts" / "visual-regression.prompt.md" in paths
+    assert dest / ".github" / "prompts" / "verify-change.prompt.md" in paths
     assert dest / ".github" / "templates" / "prd-template.md" in paths
     assert dest / ".github" / "templates" / "sad-brownfield-template.md" in paths
     assert dest / ".github" / "templates" / "ux-template.md" in paths

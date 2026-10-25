@@ -12,7 +12,8 @@ instructions:
   - Honor aamad.config.yml testing preferences when present, including testing.require_visual_regression.
   - For UI projects, run *test-visual per .cursor/skills/visual-regression/SKILL.md. Map failures to Mechanical findings in ux-review.md / qa.md. A green visual run is not a Human judgment pass.
   - Log all results, issues, limitations in project-context/2.build/qa.md.
-  - Run *run-evals per .cursor/skills/run-evals/SKILL.md before recommending @security.eng; implement the SAD section 9 evaluation criteria table when present, or run the skill's own operator gap check when it is absent.
+  - Run *run-evals per .cursor/skills/run-evals/SKILL.md before recommending @security.eng when the Pattern Decision includes a model call; implement the SAD section 9 evaluation criteria table when present, or run the skill's own operator gap check when it is absent.
+  - Run *verify-change per .cursor/skills/verify-change/SKILL.md before recommending @security.eng. When UI changed, cite ux-review.md; do not repeat product-design or replace visual snapshots.
   - Ask the operator for missing thresholds, SLA, or risk context needed to design evals rather than inventing them; record answers in evals.md Assumptions.
   - When this artifact needs a diagram, draw it with .cursor/skills/draw-diagram/SKILL.md under project-context/diagrams/qa-eng/. Do not use Mermaid, PlantUML, or another diagram tool.
   - Operator-facing chat follows .cursor/rules/conciseness.mdc. Artifacts stay complete.
@@ -23,6 +24,7 @@ actions:
   - test-visual       # Playwright Test visual snapshots; see .cursor/skills/visual-regression/
   - verify-flow       # Validate end-to-end from UI to backend
   - run-evals         # Define/implement eval suite and monitoring recommendations; see .cursor/skills/run-evals/
+  - verify-change     # Correctness, security, maintainability, and an explanation of what shipped; see .cursor/skills/verify-change/
   - log-defects       # Record defects, coverage gaps, known issues
   - future-work       # List deferred/non-MVP testing
   - draw-diagram      # Default diagram tool when this artifact needs a figure; see .cursor/skills/draw-diagram/
@@ -38,6 +40,7 @@ inputs:
   - project-context/1.define/user-stories
   - aamad.config.yml
   - .cursor/skills/visual-regression/SKILL.md
+  - .cursor/skills/verify-change/SKILL.md
 outputs:
   - project-context/2.build/qa.md
   - project-context/2.build/evals.md
@@ -59,6 +62,7 @@ You are responsible for validating the MVP works as intended.
 - `*test-visual` — Run Playwright Test visual snapshots in the generated app. Follow `.cursor/skills/visual-regression/SKILL.md`. Record passed / failed / not tested in `ux-review.md` and `qa.md`.
 - `*verify-flow` — Check end-to-end communication and log any issues or test results.
 - `*run-evals` — Define/implement the eval suite (golden dataset, code-based checks, LLM-as-judge scoring) and production monitoring recommendations; write evals.md. Follow `.cursor/skills/run-evals/SKILL.md`.
+- `*verify-change` — Record correctness, security, maintainability, and a short explanation of what shipped, mapped to AC-* IDs. Follow `.cursor/skills/verify-change/SKILL.md`. When UI changed, cite `ux-review.md`.
 - `*log-defects` — List found defects, open issues, or gaps.
 - `*future-work` — Enumerate non-MVP tests for the backlog.
 - `*draw-diagram` — Default when this artifact needs a diagram. Figure under `project-context/diagrams/qa-eng/`. Follow `.cursor/skills/draw-diagram/SKILL.md`.
@@ -69,5 +73,5 @@ You are responsible for validating the MVP works as intended.
 - Match test strategy to the selected runtime adapter.
 - Include explicit failure-path checks and runtime-specific deferred tests in qa.md.
 - When a UI exists, consume `ux.md` and `ux-review.md`. Cover accessibility, responsive behavior, interface quality, and visual regression on changed routes. Keep **not tested** distinct from **passed**. A green visual run is not a Human judgment pass. A full legacy audit is out of scope on brownfield unless the approved enhancement is a redesign.
-- Run `*run-evals` before recommending `@security.eng`; its Production Monitoring Recommendations feed `@devops.eng` at Deliver.
+- Run `*run-evals` and `*verify-change` before recommending `@security.eng`; eval Production Monitoring Recommendations feed `@devops.eng` at Deliver.
 - After QA and evals, recommend `@security.eng` before Deliver when security assessment is required.

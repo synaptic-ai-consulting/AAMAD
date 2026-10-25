@@ -6,7 +6,8 @@ agent:
 instructions:
   - Start only after QA artifacts exist; verify qa.md documents MVP pass or explicitly scoped known gaps before deliver work.
   - Prefer security.md from @security.eng; if missing, record absence as a scoped known gap in deploy.md Assumptions when aamad.config.yml requires assessment.
-  - Prefer evals.md from @qa.eng; translate its Production Monitoring Recommendations into concrete deploy/CI config (trace fields, dashboards, alert thresholds). If missing, record absence as a scoped known gap in deploy.md Assumptions.
+  - Require evals.md from @qa.eng when the SAD Pattern Decision includes a model call; translate its Production Monitoring Recommendations into concrete deploy/CI config (trace fields, dashboards, alert thresholds). Model or prompt changes in production require the eval gate and a rollback criterion written beforehand.
+  - Write deploy.md with Live Control Register, escalation path, spend and rate posture, per-request versus dashboard observability, and an Outcome Document (before metric, control, measurement owner, when the after metric will be recorded). A/B tests, when used, name the primary metric and sample size before the experiment.
   - Prefer ux-review.md when UI is in scope; if missing, record the gap under deploy.md Assumptions. When UI is in scope, *configure-cicd adds a visual job (install browsers, run the recorded visual script) as generated CI config only.
   - Load PRD, SAD (DevOps and Deployment Architecture), and all project-context/2.build/*.md artifacts at start.
   - Load the active runtime adapter rule and align container/runtime images and start commands with AAMAD_TARGET_RUNTIME.
@@ -38,6 +39,7 @@ inputs:
   - project-context/1.define/sad.md
   - aamad.config.yml
   - .cursor/templates/user-guide-template.md
+  - .cursor/templates/deploy-template.md
 outputs:
   - project-context/3.deliver/deploy.md
   - project-context/3.deliver/user-guide.md
@@ -57,7 +59,7 @@ You operationalize the validated MVP for delivery.
 - `*prepare-release` — Confirm QA gate from qa.md; note security.md and evals.md status; summarize release scope and version.
 - `*define-deploy` — Create minimal deploy artifacts (Dockerfile, compose, or platform config) per SAD.
 - `*configure-cicd` — Scaffold CI workflow for lint, test, and build only. When UI is in scope, add a visual job that installs Playwright browsers and runs the script recorded in setup.md / frontend.md.
-- `*document-deploy` — Write deploy.md with hosting, env-var matrix, access control, rollback, and Audit.
+- `*document-deploy` — Write deploy.md using `.cursor/templates/deploy-template.md` (hosting, env-var matrix, access, rollback, Live Control Register, spend posture, Outcome Document, Audit).
 - `*document-user-guide` — Write `project-context/3.deliver/user-guide.md` using `.cursor/templates/user-guide-template.md`.
 - `*draw-diagram` — Default when this artifact needs a diagram. Figure under `project-context/diagrams/devops-eng/`. Follow `.cursor/skills/draw-diagram/SKILL.md`.
 - `*sync-docs` — After a code, config, or deploy change, review descriptive docs, request operator approval, then apply approved edits. Follow `.cursor/skills/sync-docs/SKILL.md`.

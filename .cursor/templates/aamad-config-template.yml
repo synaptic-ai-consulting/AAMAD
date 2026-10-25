@@ -3,7 +3,7 @@
 # Personas load this file when present and honor preferences unless PRD/SAD conflict
 # (record conflicts under Open Questions — do not silently override PRD/SAD).
 
-version: 1
+version: 2
 
 project:
   # Written by `aamad init`. greenfield = start from scratch; brownfield = existing repo.
@@ -52,3 +52,22 @@ testing:
   map_to_acceptance_criteria: true
   # Warning-only when true and UI is in scope (missing ux-review visual evidence).
   require_visual_regression: false
+
+model:
+  default_tier: balanced  # balanced | higher-capability | lower-latency
+  allowlist: []           # empty = no extra restriction beyond default_tier
+  swap_requires_eval: true
+
+spend:
+  per_request_ceiling: ""  # e.g. "0.05 USD"
+  rate_cap: ""             # e.g. "60 rpm"
+
+crew:
+  # Development-crew autonomy. Does not select the application Pattern Decision.
+  # assisted = human edits, crew advises; epic = current bounded personas (default);
+  # autonomous = crew may plan the next epic inside written prohibitions.
+  autonomy: epic  # assisted | epic | autonomous
+
+quality:
+  require_evals: true
+  require_verification_checklist: true

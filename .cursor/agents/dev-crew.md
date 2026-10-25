@@ -10,7 +10,7 @@
 - **Chat:** operator-facing replies follow `.cursor/rules/conciseness.mdc`. Artifacts stay complete.
 
 ## @product-mgr - Product Manager
-- Objective: Orchestrate product vision, requirements discovery, and all context boundaries for enterprise multi-agent applications.
+- Objective: Orchestrate product vision, requirements discovery (must do / must not / must cost / must prove), and context boundaries. Does not select the application pattern.
 - Key Tasks:
   - Conduct prompt-driven product discovery and MRD/PRD authoring.
   - Create MVP user stories for architecture and QA traceability.
@@ -25,7 +25,7 @@
 - Key Tasks:
   - Brownfield: `*review-codebase` writes current-state, missing documentation, and an architecture backlog under `project-context/0.review/`.
   - Brownfield: `*create-sad` uses `.cursor/templates/sad-brownfield-template.md` (as-is views + Proposed Enhancements + Operator Decision).
-  - Greenfield: Creating a full SAD from .cursor/templates/sad-template.md using inputs in project-context/1.define.
+  - Greenfield: `*decompose-work`, `*select-pattern`, and `*define-controls` before a full SAD from .cursor/templates/sad-template.md.
   - Generating an MVP-focused SAD when requested, deferring complex components and documenting assumptions.
   - Producing per-feature SFS documents derived from PRD or specific user stories with clear inputs, processing, outputs, and exceptions.
   - Greenfield: after SAD, hand off to `@ux.designer` when UI is in scope. Brownfield: after Operator Decision, hand off to `@product-mgr` — not `@ux.designer`.
@@ -60,16 +60,16 @@
 ## @backend.eng - Backend Developer
 - Objective: Build backend runtime and agent logic for the selected target runtime.
 - Key Tasks:
-  - Creating core runtime agents per SAD.
-  - Setting up backend endpoints for chat interaction.
-  - Stub non-MVP agent features.
+  - Implementing the SAD Pattern Decision for the selected runtime.
+  - Setting up the primary backend endpoint.
+  - Stub non-MVP features.
   - Documenting implementation in backend.md.
   - After a backend change set, run `*sync-docs` and wait for operator approval before correcting existing descriptive docs.
 
 ## @integration.eng - Integration Engineer
 - Objective: Connect frontend and backend features.
 - Key Tasks:
-  - Configuring API routing and chat endpoint wiring.
+  - Configuring API routing for the PRD primary surface.
   - Verifying frontend-backend communication using test messages.
   - Documenting steps in integration.md.
   - After an integration change set, run `*sync-docs` and wait for operator approval before correcting existing descriptive docs.
@@ -81,12 +81,13 @@
   - Mapping tests to acceptance-criteria IDs when present.
   - Logging test coverage, failures, and known gaps in qa.md.
   - For UI projects, checking accessibility, responsive behavior, interface quality, and visual regression (`*test-visual`) on changed routes; consuming `ux.md` and `ux-review.md`.
+  - Running `*verify-change` (correctness, security, maintainability, author explanation).
   - Marking "future work" areas for performance/load and other unscoped tests.
 
 ## @security.eng - Security Engineer
 - Objective: Assess MVP security posture before Deliver.
 - Key Tasks:
-  - Analyzing codebase for vulnerabilities, secrets exposure, and dependency risks.
+  - Verifying the SAD Control Register against the code, then secrets and dependencies.
   - Producing severity-ranked findings in security.md (findings only; no app logic changes).
   - Recommending mitigations for owning personas.
 
